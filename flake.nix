@@ -35,7 +35,7 @@
     nix-homebrew,
     nixpkgs,
     ...
-  } @ inputs let
+  } @ inputs: let
     inherit (self) outputs;
 
     # ────────────────────────────────────────────────────────────────
@@ -45,7 +45,6 @@
     users = {
       nrew = {
         name = "Nrew";
-        editor = "nvim";
       };
     };
 
@@ -61,9 +60,8 @@
           userConfig = users.${username};          # Specific user configuration
         };
         modules = [
-          ./hosts/shared.nix                       # Abstract configuration
           ./hosts/${hostname}/configuration.nix    # Host-specific configuration
-          home-manager.darwinModules.home-manager
+    #     home-manager.darwinModules.home-manager
           nix-homebrew.darwinModules.nix-homebrew
         ];
       };
