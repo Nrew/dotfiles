@@ -5,6 +5,18 @@
     ...
 }: 
 {
+    # ────────────────────────────────────────────────────────────────
+    # Shared-Specific Settings
+    # ────────────────────────────────────────────────────────────────
+
+    imports = [
+        ../shared.nix
+    ];
+
+    # ────────────────────────────────────────────────────────────────
+    # macOS-Specific Settings
+    # ────────────────────────────────────────────────────────────────
+
     # Enable Nix-Homebrew configuration
     nix-homebrew = {
         enable = true;
@@ -12,24 +24,6 @@
         user = "${userConfig.name}"; # Homebrew installed for the current user
         autoMigrate = true; # Automatically migrate old Homebrew packages
     };
-
-    # Nixpkgs configuration
-    nixpkgs = {
-        overlays = [
-            outputs.overlays.stable-packages # Include any custom overlays
-        ];
-        config = {
-            allowUnfree = true; # Allow unfree packages (e.g., proprietary fonts)
-        };
-    };
-
-    # Nix settings
-    nix.settings = {
-        experimental-features = "nix-command flakes"; # Enable new Nix features
-        auto-optimize-store = true; # Automatically optimize the Nix store
-    };
-
-    nix.package = pkgs.nix; # Set the Nix package as the default
 
     # Enable Nix Daemon for system-wide package management
     services.nix-daemon.enable = true;
@@ -43,7 +37,10 @@
     # Enable TouchID for sudo
     security.pam.enableSudoTouchIdAuth = true;
 
-    # macOS system settings
+    # ────────────────────────────────────────────────────────────────
+    # macOS System Settings
+    # ────────────────────────────────────────────────────────────────
+
     system.defaults = {
         ".GlobalPreferences" = {};
         NSGlobalDomain = {
@@ -86,37 +83,26 @@
         };
     };
 
-    # System-level packages
-    environment.systemPackages = with pkgs; [
-        neovim
-        docker
-        kitty
-        tmux
-        fzf
-        sshs
-        git
-        spicetify-cli
-        jq
-        starship
-    ]; # Core utilities and tools
+    # ────────────────────────────────────────────────────────────────
+    # macOS-Specific System-Level Packages
+    # ────────────────────────────────────────────────────────────────
 
-    # Enable Sketchybar
+    environment.systemPackages = with pkgs; [];
+
+    # ────────────────────────────────────────────────────────────────
+    # Sketchybar Configuration
+    # ────────────────────────────────────────────────────────────────
+
     services.sketchybar.enable = true;
 
-    # Enable Zsh
-    programs.zsh.enable = true;
+    # ────────────────────────────────────────────────────────────────
+    # Homebrew-Specific Settings
+    # ────────────────────────────────────────────────────────────────
 
-    # Fonts configuration
-    fonts.packages = with pkgs; [
-        (nerdfonts.override { fonts = [ "JetBrainsMono" ]; }) # Use JetBrainsMono Nerd Font
-    ];
-
-    # Homebrew-specific settings
     homebrew = {
         enable = true;
         brews = [ "mas" ]; # Install CLI tools via Homebrew
         casks = [
-            "aerospace"
             "anki"
             "raycast"
         ]; # Install GUI apps via Homebrew
@@ -126,10 +112,4 @@
         onActivation.autoUpdate = true; # Automatically update Homebrew packages
         onActivation.upgrade = true; # Automatically upgrade Homebrew packages
     };
-
-    # Set Git commit hash for darwin-version
-    system.configurationRevision = self.rev or self.dirtyRev or null;
-
-    # Used for backwards compatibility
-    system.stateVersion = 5;
 }
