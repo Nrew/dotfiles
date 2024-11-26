@@ -1,23 +1,27 @@
 { config, pkgs, ... }:
 
 {
-  # Enable SketchyBar service
   services.sketchybar = {
     enable = true;
 
-    # Include additional SketchyBar configurations
     extraConfig = ''
       # ────────────────────────────────────────────────────────────────
       # Dynamic Colors from Pywal
       # ────────────────────────────────────────────────────────────────
 
-      # Load Pywal colors
-      source ~/.cache/wal/colors.sh
+      # Check if Pywal colors exist, otherwise use fallbacks
+      if [ -f ~/.cache/wal/colors.sh ]; then
+        source ~/.cache/wal/colors.sh
+      else
+        BACKGROUND="#1e1e2e"  # Default background color
+        FOREGROUND="#cdd6f4"  # Default foreground color
+        COLOR1="#89b4fa"      # Default icon color
+      fi
 
-      # Set bar colors using Pywal colors
-      bar_color=${BACKGROUND}           # Pywal background color
-      label_color=${FOREGROUND}         # Pywal foreground color
-      icon_color=${COLOR1}              # Example: Pywal's first accent color
+      # Apply colors to SketchyBar
+      bar_color=$BACKGROUND
+      label_color=$FOREGROUND
+      icon_color=$COLOR1
 
       # ────────────────────────────────────────────────────────────────
       # Bar Configuration

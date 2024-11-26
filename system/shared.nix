@@ -36,6 +36,7 @@
         spotify
         spicetify-cli
         jq
+        texinfo
         sshs
         vscode
     ];
@@ -44,33 +45,32 @@
     # Fonts Configuration
     # ────────────────────────────────────────────────────────────────
 
-    fonts.packages = with pkgs; [
-        (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })  # JetBrainsMono Nerd Font
-        (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; })      # FiraCode Nerd Font
-    ];
-
-    fonts.fontconfig.defaultFonts = {
-        monospace = [ "JetBrainsMono" ];
-        sans = [ "FiraCode" ];
+    fonts = {
+        packages = with pkgs; [
+            (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })  # JetBrainsMono Nerd Font
+            (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; })       # FiraCode Nerd Font
+        ];
     };
 
     # ────────────────────────────────────────────────────────────────
     # Environment Variables
     # ────────────────────────────────────────────────────────────────
 
-    home.environmentVariables = {
+    
+    # Define system-wide environment variables
+    environment.variables = {
         EDITOR = "nvim";                 # Default editor
         TERM = "kitty";                  # Terminal type
-        SHELL = pkgs.zsh;                # Default shell
         LANG = "en_US.UTF-8";            # Locale settings
         LC_ALL = "en_US.UTF-8";          # Locale settings
     };
 
-    home.sessionVariables = {
-        PATH = "${pkgs.git}/bin:${pkgs.neovim}/bin:${pkgs.kitty}/bin:$PATH";
-        MANPATH = "${pkgs.man-db}/share/man:$MANPATH";
-        INFOPATH = "${pkgs.info}/share/info:$INFOPATH";
+    sessionVariables = with pkgs; {
+        PATH = "${git}/bin:${neovim}/bin:${kitty}/bin:$PATH";
+        MANPATH = "${man-db}/share/man:$MANPATH";
+        INFOPATH = "${texinfo}/share/info:$INFOPATH";
     };
+    
 
     # ────────────────────────────────────────────────────────────────
     # Zsh Configuration

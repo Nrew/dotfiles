@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, userConfig, ... }:
 
 {
   programs.kitty = {
@@ -18,7 +18,7 @@
 
     # Additional Kitty settings
     extraConfig = ''
-      include ${config.home.homeDirectory}/.cache/wal/colors-kitty.conf
+      include ${userConfig.home}/.cache/wal/colors-kitty.conf
       background_opacity 0.9
       tab_bar_style powerline
     '';
