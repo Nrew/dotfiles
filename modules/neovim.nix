@@ -11,6 +11,7 @@
       nvim-treesitter
       telescope-nvim
       lsp-zero
+      wal
     ];
 
     # Add Lua-based configurations
@@ -23,6 +24,9 @@
 
       -- Telescope setup
       require'telescope'.setup {}
+
+      -- Theme
+      colorscheme wal
     '';
   };
 }

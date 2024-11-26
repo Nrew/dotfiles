@@ -9,10 +9,10 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
 
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    #home-manager = {
+    #  url = "github:nix-community/home-manager";
+    #  inputs.nixpkgs.follows = "nixpkgs";
+    #};
 
     # Nix Darwin (for macOS)
     darwin = {
@@ -72,17 +72,17 @@
     # Home Manager Configuration
     # ────────────────────────────────────────────────────────────────
 
-    mkHomeConfiguration = system: username: hostname:
-      home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs { inherit system; }; # Use system-specific nixpkgs
-        extraSpecialArgs = {
-          inherit inputs outputs;
-          userConfig = users.${username};           # Specific user configuration
-        };
-        modules = [
-          ./users/${username}/${hostname}.nix       # User+host-specific configuration
-        ];
-      };
+    # mkHomeConfiguration = system: username: hostname:
+    #  home-manager.lib.homeManagerConfiguration {
+    #    pkgs = import nixpkgs { inherit system; }; # Use system-specific nixpkgs
+    #    extraSpecialArgs = {
+    #      inherit inputs outputs;
+    #      userConfig = users.${username};           # Specific user configuration
+    #    };
+    #    modules = [
+    #      ./users/${username}/${hostname}.nix       # User+host-specific configuration
+    #    ];
+    #  };
 
     # ────────────────────────────────────────────────────────────────
     # Outputs
@@ -96,11 +96,11 @@
         "MacBook-Pro" = mkDarwinConfiguration "MacBook-Pro" "nrew";
       };
 
-      # Home Manager configuration for "username" on "system"
-      homeConfigurations = {
-        # Home Manager configuration for the user on the host
-        "nrew-macbook" = mkHomeConfiguration "aarch64-darwin" "nrew" "MacBook-Pro";
-      };
+    #  # Home Manager configuration for "username" on "system"
+    #  homeConfigurations = {
+    #    # Home Manager configuration for the user on the host
+    #    "nrew-macbook" = mkHomeConfiguration "aarch64-darwin" "nrew" "MacBook-Pro";
+    #  };
 
       overlays = import ./overlays { inherit inputs; };
     };

@@ -18,6 +18,13 @@
     # ────────────────────────────────────────────────────────────────
 
     environment.systemPackages = with pkgs; [
+        (python3.withPackages (ps: with ps; [
+            pip
+            virtualenv
+        ]))
+        wal
+        feh
+        pywal
         neovim
         docker
         git

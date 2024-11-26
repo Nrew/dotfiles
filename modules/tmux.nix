@@ -4,6 +4,10 @@
   programs.tmux = {
     enable = true; # Enable Tmux configuration
 
+    config = ''
+      source ${config.home.homeDirectory}/.cache/wal/colors-tmux.conf
+    '';
+
     # Add custom Tmux configuration
     extraConfig = ''
       set -g mouse on
