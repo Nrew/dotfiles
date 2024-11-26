@@ -2,7 +2,7 @@
 
 {
   imports = [ 
-    ./programs/kitty.nix 
+    ./modules/kitty.nix 
     # Add other program configs here
   ];
 
@@ -19,7 +19,7 @@
 
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
     stateVersion = "24.05";
-  }
+    };
 
     # Nicely reload system units when changing configs
     systemd.user.startServices = "sd-switch";

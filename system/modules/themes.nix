@@ -5,12 +5,6 @@
   # System Packages
   # ────────────────────────────────────────────────────────────────
 
-  environment.systemPackages = with pkgs; [
-    wal            # Pywal for color generation
-    feh            # Wallpaper setter (you can replace with another tool)
-    jq             # JSON processor for parsing Pywal colors
-  ];
-
   # ────────────────────────────────────────────────────────────────
   # Theme Update Script
   # ────────────────────────────────────────────────────────────────

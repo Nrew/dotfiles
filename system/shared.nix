@@ -1,4 +1,4 @@
-{ self, config, pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
     # ────────────────────────────────────────────────────────────────
@@ -6,7 +6,7 @@
     # ────────────────────────────────────────────────────────────────
 
     imports = [
-        ../modules/themes.nix
+        ./modules/themes.nix
     ];
 
     # ────────────────────────────────────────────────────────────────
@@ -18,7 +18,6 @@
             pip
             virtualenv
         ]))
-        wal
         feh
         pywal
         neovim
@@ -61,25 +60,11 @@
         LC_ALL = "en_US.UTF-8";          # Locale settings
     };
 
-    sessionVariables = with pkgs; {
-        PATH = "${git}/bin:${neovim}/bin:${kitty}/bin:$PATH";
-        MANPATH = "${man-db}/share/man:$MANPATH";
-        INFOPATH = "${texinfo}/share/info:$INFOPATH";
-    };
-    
-
-    # ────────────────────────────────────────────────────────────────
-    # Zsh Configuration
-    # ────────────────────────────────────────────────────────────────
-
-    programs.zsh = {
-        enable = true;                   # Enable Zsh as the default shell
-        shellAliases = {
-            ll = "ls -la";               # List files in long format
-            gs = "git status";           # Git status shortcut
-            vim = "nvim";                # Alias Vim to Neovim
-        };
-    };
+    # sessionVariables = with pkgs; {
+    #    PATH = "${git}/bin:${neovim}/bin:${kitty}/bin:$PATH";
+    #    MANPATH = "${man-db}/share/man:$MANPATH";
+    #    INFOPATH = "${texinfo}/share/info:$INFOPATH";
+    # };
 
     # ────────────────────────────────────────────────────────────────
     # Core Nix Settings
@@ -94,6 +79,5 @@
 
     nix.package = pkgs.nix; # Set the Nix package as the default
 
-    system.configurationRevision = self.rev or self.dirtyRev or null;
     system.stateVersion = 5; # Used for backwards compatibility
 }

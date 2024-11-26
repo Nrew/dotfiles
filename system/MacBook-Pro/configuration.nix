@@ -1,7 +1,7 @@
 {
     pkgs,
     outputs,
-    userConfig,
+    username,
     ...
 }: 
 {
@@ -19,7 +19,7 @@
     nix-homebrew = {
         enable = true;
         enableRosetta = true; # Enable Rosetta for compatibility with x86 Homebrew packages
-        user = "${userConfig.name}"; # Homebrew installed for the current user
+        user = "${username}"; # Homebrew installed for the current user
         autoMigrate = true; # Automatically migrate old Homebrew packages
     };
 
@@ -27,9 +27,9 @@
     services.nix-daemon.enable = true;
 
     # User configuration
-    users.users.${userConfig.name} = {
-        name = "${userConfig.name}";
-        home = "/Users/${userConfig.name}";
+    users.users.${username} = {
+        name = "${username}";
+        home = "/Users/${username}";
     };
 
     # Enable TouchID for sudo

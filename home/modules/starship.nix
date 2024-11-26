@@ -4,10 +4,12 @@
   # Enable Starship Prompt
   programs.starship = {
     enable = true;
+    enableZshIntegration = true;
 
     # Configure Starship settings
     settings = {
       add_newline = false;                # Disable newline after the prompt
+      
       prompt_order = [                    # Define the order of modules in the prompt
         "directory"                       # Current directory
         "git_status"                      # Git status
@@ -19,6 +21,30 @@
       # Use Pywal colors for prompt styling
       directory = {
         style = "$(cat ~/.cache/wal/colors.json | jq -r '.colors.color1')";
+      };
+
+      aws = {
+        disabled = true;
+      };
+
+      docker_context = {
+        symbol = " ";
+      };
+
+      lua = {
+        symbol = " ";
+      };
+      package = {
+        symbol = " ";
+      };
+      php = {
+        symbol = " ";
+      };
+      python = {
+        symbol = " ";
+      };
+      terraform = {
+        symbol = " ";
       };
 
       git_status = {
