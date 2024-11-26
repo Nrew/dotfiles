@@ -65,9 +65,9 @@
           home-manager.darwinModules.home-manager  # Enable Home Manager
           {
             home-manager = {
-              useGlobalPkgs = true;
+              useGlobalPkgs = false;
               useUserPackages = true;
-              extraSpecialArgs = { inherit inputs username; };
+              extraSpecialArgs = { inherit inputs outputs username; };
               users.${username} = import ./home;   # Home manager config
             };
           }

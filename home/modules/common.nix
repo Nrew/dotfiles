@@ -1,12 +1,12 @@
 {outputs, ...}: {
   imports = [
-    ../modules/fastfetch.nix
+    #../modules/fastfetch.nix
     ../modules/kitty.nix
     ../modules/fzf.nix
     ../modules/git.nix
     ../modules/lazygit.nix
     ../modules/neovim.nix
-    ../modules/tmux.nix
+    #../modules/tmux.nix
     ../modules/zsh.nix
   ];
 

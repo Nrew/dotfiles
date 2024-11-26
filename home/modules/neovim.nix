@@ -3,34 +3,44 @@
 {
   programs.neovim = {
     enable = true;
-    package = pkgs.neovim-unwrapped;
+    package = pkgs.neovim-unwrapped;  # Use unwrapped Neovim for flexibility
     defaultEditor = true;
+
+    # Enable additional runtime dependencies
     withNodeJs = true;
     withPython3 = true;
     withRuby = true;
 
+    # Extra packages for formatting and LSP
     extraPackages = with pkgs; [
       # Formatters and linters
-      black            # Python formatter
-      isort            # Python import sorter
-      ruff             # Python linter
-      stylua           # Lua formatter
-      nodePackages.prettier # Correctly reference Prettier from Node.js packages
-      shellcheck       # Shell script linter
-      shfmt            # Shell script formatter
+      black
+      isort
+      ruff
+      stylua
+      nodePackages.prettier
+      shellcheck
+      shfmt
 
       # Language servers
-      pyright          # Python LSP
-      gopls            # Go LSP
-      terraform-ls     # Terraform LSP
-      vscode-langservers-extracted # General VSCode LSP support
-      yaml-language-server # YAML LSP
+      pyright
+      gopls
+      terraform-ls
+      vscode-langservers-extracted
+      yaml-language-server
     ];
 
-    configure = ''
-      -- Use packer.nvim for plugin management
-      vim.cmd [[packadd packer.nvim]]
+    # Use Neovim `extraConfig` to define plugins and settings
+    extraConfig = ''
+      -- Auto-install packer.nvim if not present
+      local fn = vim.fn
+      local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
+      if fn.empty(fn.glob(install_path)) > 0 then
+        fn.system({ 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path })
+        vim.cmd [[packadd packer.nvim]]
+      end
 
+      -- Plugin management with packer.nvim
       require('packer').startup(function()
         use 'wbthomason/packer.nvim'                     -- Plugin manager
         use 'neovim/nvim-lspconfig'                     -- Built-in LSP client
@@ -40,12 +50,11 @@
         use 'dylanaraps/wal.vim'                        -- Pywal color scheme
       end)
 
-      -- Set up LSP servers
-      local lspconfig = require('lspconfig')
-      lspconfig.pyright.setup {}
-      lspconfig.gopls.setup {}
-      lspconfig.terraformls.setup {}
-      lspconfig.yamlls.setup {}
+      -- Configure LSP with lsp-zero
+      local lsp = require('lsp-zero')
+      lsp.preset('recommended')
+      lsp.setup_servers({ 'pyright', 'gopls', 'terraformls', 'yamlls' })
+      lsp.setup()
 
       -- Treesitter configuration
       require('nvim-treesitter.configs').setup {
@@ -60,7 +69,7 @@
         },
       }
 
-      -- Pywal colorscheme
+      -- Pywal colorscheme with fallback
       vim.cmd [[
         silent! colorscheme wal
         if !filereadable(expand("~/.cache/wal/colors-wal.vim"))
@@ -69,12 +78,12 @@
       ]]
 
       -- General Neovim settings
-      vim.opt.number = true           -- Show line numbers
-      vim.opt.relativenumber = true   -- Show relative numbers
-      vim.opt.tabstop = 4             -- Tab width
-      vim.opt.shiftwidth = 4          -- Indent width
-      vim.opt.expandtab = true        -- Use spaces instead of tabs
-      vim.opt.clipboard = "unnamedplus" -- Use system clipboard
+      vim.opt.number = true                 -- Show line numbers
+      vim.opt.relativenumber = true         -- Show relative numbers
+      vim.opt.tabstop = 4                   -- Tab width
+      vim.opt.shiftwidth = 4                -- Indent width
+      vim.opt.expandtab = true              -- Use spaces instead of tabs
+      vim.opt.clipboard = "unnamedplus"     -- Use system clipboard
     '';
   };
 }

@@ -1,9 +1,11 @@
 { config, pkgs, ... }:
 
 {
+  imports = [ ./sketchybar.nix ]; 
+
   services.sketchybar = {
     enable = true;
-
+    
     extraConfig = ''
       # ────────────────────────────────────────────────────────────────
       # Dynamic Colors from Pywal
@@ -27,59 +29,57 @@
       # Bar Configuration
       # ────────────────────────────────────────────────────────────────
 
-      bar_height=30                     # Set the bar height
-      bar_padding_left=5                # Padding on the left
-      bar_padding_right=5               # Padding on the right
-      bar_position=top                  # Set bar position: top or bottom
-
-      # Enable shadow behind the bar
-      bar_shadow=true
-
-      # ────────────────────────────────────────────────────────────────
-      # Icon and Label Font
-      # ────────────────────────────────────────────────────────────────
-
-      label.font="JetBrainsMono Nerd Font:Bold:12.0"
-      icon.font="JetBrainsMono Nerd Font:Bold:12.0"
+      sketchybar --bar height=30 \
+                      position=top \
+                      padding_left=5 \
+                      padding_right=5 \
+                      color=$bar_color \
+                      shadow=on
 
       # ────────────────────────────────────────────────────────────────
-      # Items (Battery, CPU, Apps, etc.)
+      # Font Configuration
+      # ────────────────────────────────────────────────────────────────
+
+      sketchybar --default label.font="JetBrainsMono Nerd Font:Bold:12.0" \
+                          icon.font="JetBrainsMono Nerd Font:Bold:12.0"
+
+      # ────────────────────────────────────────────────────────────────
+      # Items Configuration
       # ────────────────────────────────────────────────────────────────
 
       # Battery
-      sketchybar --add item battery right
-      sketchybar --set battery script="pmset -g batt | grep -Eo '\\d+%' | cut -d% -f1"
-                  label.drawing=off
-                  icon.drawing=on
-                  icon.color=$COLOR2
+      sketchybar --add item battery right \
+                --set battery script="pmset -g batt | grep -Eo '\\d+%' | cut -d% -f1" \
+                            label.drawing=off \
+                            icon.drawing=on \
+                            icon.color=$COLOR1
 
       # CPU Usage
-      sketchybar --add item cpu right
-      sketchybar --set cpu script="top -l 1 | grep 'CPU usage' | awk '{print $3}'"
-                 label.drawing=off
-                 icon.drawing=on
-                 icon.color=$COLOR3
+      sketchybar --add item cpu right \
+                --set cpu script="top -l 1 | grep 'CPU usage' | awk '{print \$3}'" \
+                         label.drawing=off \
+                         icon.drawing=on \
+                         icon.color=$COLOR1
 
       # Current Application
-      sketchybar --add item front_app left
-      sketchybar --set front_app script="osascript -e 'tell application \"System Events\" to get name of first application process whose frontmost is true'"
-                 label.drawing=on
-                 icon.drawing=off
-                 label.color=$COLOR4
+      sketchybar --add item front_app left \
+                --set front_app script="osascript -e 'tell application \"System Events\" to get name of first application process whose frontmost is true'" \
+                              label.drawing=on \
+                              icon.drawing=off \
+                              label.color=$COLOR1
 
       # Clock
-      sketchybar --add item clock right
-      sketchybar --set clock script="date '+%H:%M:%S'"
-                 update_freq=1
-                 label.drawing=on
-                 label.color=$COLOR5
+      sketchybar --add item clock right \
+                --set clock script="date '+%H:%M:%S'" \
+                           update_freq=1 \
+                           label.drawing=on \
+                           label.color=$COLOR1
 
       # ────────────────────────────────────────────────────────────────
       # Final Settings
       # ────────────────────────────────────────────────────────────────
 
-      sketchybar --add event brew_update_interval 900
-      sketchybar --add script 'sketchybar --update'
+      sketchybar --update
     '';
   };
 }

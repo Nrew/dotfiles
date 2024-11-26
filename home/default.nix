@@ -3,7 +3,7 @@
 {
   imports = [ 
     ./modules/common.nix 
-    # Add other program configs here
+    ./modules/sketchybar/sketchybar.nix
   ];
 
   # Enable home-manager
