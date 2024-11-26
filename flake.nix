@@ -56,7 +56,7 @@
       darwin.lib.darwinSystem {
         system = darwinSystem;                     # macOS on Apple Silicon
         specialArgs = {
-          inherit inputs outputs hostname;
+          inherit inputs outputs hostname username;
         };
         modules = [
           ./system/shared.nix                      # General configuration
@@ -67,11 +67,8 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              extraSpecialArgs = 
-              {
-                inherit inputs username;
-              };
-              users.${username} = import ./modules;
+              extraSpecialArgs = { inherit inputs username; };
+              users.${username} = import ./home;   # Home manager config
             };
           }
 

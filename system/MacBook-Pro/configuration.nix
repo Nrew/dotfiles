@@ -9,10 +9,7 @@
     # Shared-Specific Settings
     # ────────────────────────────────────────────────────────────────
 
-    imports = [
-        ../../modules/sketchybar.nix
-        ../../modules/themes.nix
-    ];
+    imports = [];
 
     # ────────────────────────────────────────────────────────────────
     # macOS-Specific Settings

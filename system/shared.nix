@@ -6,11 +6,7 @@
     # ────────────────────────────────────────────────────────────────
 
     imports = [
-        ../modules/kitty.nix
-        ../modules/neovim.nix
-        ../modules/tmux.nix
-        ../modules/starship.nix
-        ../modules/spicetify.nix
+        ../modules/themes.nix
     ];
 
     # ────────────────────────────────────────────────────────────────
