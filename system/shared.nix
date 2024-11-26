@@ -5,9 +5,7 @@
     # Import Modules
     # ────────────────────────────────────────────────────────────────
 
-    imports = [
-        ./modules/themes.nix
-    ];
+    imports = [];
 
     # ────────────────────────────────────────────────────────────────
     # Shared System Packages
@@ -18,22 +16,10 @@
             pip
             virtualenv
         ]))
-        feh
-        pywal
-        neovim
-        docker
-        git
-        tmux
-        fzf
-        starship
-        kitty
-        htop
-        spotify
-        spicetify-cli
-        jq
-        texinfo
-        sshs
-        vscode
+        docker          # Requires system-level daemon
+        jq              # General-purpose command-line JSON processor
+        texinfo         # Needed for compiling tools like Emacs
+        htop            # System-wide resource monitor
     ];
 
     # ────────────────────────────────────────────────────────────────

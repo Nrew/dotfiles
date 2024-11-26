@@ -1,12 +1,11 @@
 {outputs, ...}: {
   imports = [
     ../modules/fastfetch.nix
+    ../modules/kitty.nix
     ../modules/fzf.nix
     ../modules/git.nix
-    ../modules/home.nix
     ../modules/lazygit.nix
     ../modules/neovim.nix
-    ../modules/scripts.nix
     ../modules/tmux.nix
     ../modules/zsh.nix
   ];
@@ -21,4 +20,17 @@
       allowUnfree = true;
     };
   };
+
+#   pywal
+#        neovim
+#        git
+#        tmux
+#        fzf
+#        starship
+#        kitty
+#        spotify
+#        spicetify-cli
+#        sshs
+#    vscode
+
 }

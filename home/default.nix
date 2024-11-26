@@ -2,7 +2,7 @@
 
 {
   imports = [ 
-    ./modules/kitty.nix 
+    ./modules/common.nix 
     # Add other program configs here
   ];
 
@@ -11,11 +11,13 @@
 
   home = {
     username = username;
-    homeDirectory = "/Users/${username}";
+    homeDirectory =
+      if pkgs.stdenv.isDarwin
+      then "/Users/${username}"
+      else "/home/${username}";
 
-    sessionPath = [
-        "/opt/homebrew/bin/"
-    ];
+    # MacOs Specific
+    sessionPath = [ "/opt/homebrew/bin/" ];
 
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
     stateVersion = "24.05";

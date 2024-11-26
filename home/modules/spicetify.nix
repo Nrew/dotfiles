@@ -1,21 +1,18 @@
 { config, pkgs, ... }:
 
-{
-  # ────────────────────────────────────────────────────────────────
-  # Spicetify Configuration
-  # ────────────────────────────────────────────────────────────────
-
-  environment.systemPackages = with pkgs; [
-    spicetify-cli    # Spicetify CLI for Spotify theming
-    jq               # JSON processor for Pywal integration
-    spotify          # Spotify application (if using nixpkgs)
+let
+  spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
+in {
+  imports = [
+    # Spicetify
+    inputs.spicetify-nix.homeManagerModules.default
   ];
 
   # ────────────────────────────────────────────────────────────────
   # Spicetify Theme Integration with Pywal
   # ────────────────────────────────────────────────────────────────
 
-  system.activationScripts.spicetify = {
+  programs.spicetify = {
     text = ''
       # Generate Spicetify theme based on Pywal colors
       if [ -f ~/.cache/wal/colors.json ]; then
