@@ -9,10 +9,10 @@
     settings = {
       add_newline = false;                # Disable newline after the prompt
       prompt_order = [                    # Define the order of modules in the prompt
-        "directory",                      # Current directory
-        "git_status",                     # Git status
-        "cmd_duration",                   # Command execution time
-        "line_break",                     # Break to the next line
+        "directory"                       # Current directory
+        "git_status"                      # Git status
+        "cmd_duration"                    # Command execution time
+        "line_break"                      # Break to the next line
         "character"                       # Shell prompt character
       ];
 

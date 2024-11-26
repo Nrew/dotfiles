@@ -33,6 +33,7 @@
         starship
         kitty
         htop
+        spotify
         spicetify-cli
         jq
         sshs

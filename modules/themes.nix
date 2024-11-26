@@ -42,6 +42,9 @@
     # Reload BetterDiscord theme
     # python ~/.pywal-discord/pywal-discord.py
 
+    # Update Spicetify with new Pywal theme
+    spicetify apply
+    
     echo "Theme updated based on wallpaper: $WALLPAPER"
   ''}";
 }
