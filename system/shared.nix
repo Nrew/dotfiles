@@ -20,6 +20,7 @@
         jq              # General-purpose command-line JSON processor
         texinfo         # Needed for compiling tools like Emacs
         htop            # System-wide resource monitor
+        lua5_4
     ];
 
     # ────────────────────────────────────────────────────────────────
@@ -58,9 +59,11 @@
 
     nixpkgs.config.allowUnfree = true;
 
-    nix.settings = {
-        experimental-features = "nix-command flakes"; # Enable new Nix features
-        auto-optimize-store = true;                   # Automatically optimize the Nix store
+    nix = {
+    extraOptions = ''
+      auto-optimise-store = true
+      experimental-features = nix-command flakes
+    '';
     };
 
     nix.package = pkgs.nix; # Set the Nix package as the default

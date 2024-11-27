@@ -1,26 +1,26 @@
-{ config, pkgs, username, ... }: 
+{ pkgs, username, ... }: 
 
 {
-  imports = [ 
-    ./modules/common.nix 
-    ./modules/sketchybar/sketchybar.nix
-  ];
+    imports = [ 
+        ./modules/common.nix 
+        ./modules/sketchybar/sketchybar.nix
+    ];
 
-  # Enable home-manager
-  programs.home-manager.enable = true;
+    # Enable home-manager
+    programs.home-manager.enable = true;
 
-  home = {
-    username = username;
-    homeDirectory =
-      if pkgs.stdenv.isDarwin
-      then "/Users/${username}"
-      else "/home/${username}";
+    home = {
+        username = username;
+        homeDirectory =
+            if pkgs.stdenv.isDarwin
+            then "/Users/${username}"
+            else "/home/${username}";
 
-    # MacOs Specific
-    sessionPath = [ "/opt/homebrew/bin/" ];
+        # MacOs Specific
+        sessionPath = [ "/opt/homebrew/bin/" ];
 
-    # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-    stateVersion = "24.05";
+        # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
+        stateVersion = "24.05";
     };
 
     # Nicely reload system units when changing configs

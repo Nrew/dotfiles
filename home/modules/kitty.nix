@@ -20,8 +20,8 @@
 
     settings = {
       # Window
-      window_padding_width = "16 24";
-      window_margin_width = "0";
+      window_padding_width = "16";
+      window_margin_width = "20";
       single_window_margin_width = "0";
       window_border_width = "0";
       draw_minimal_borders = "yes";

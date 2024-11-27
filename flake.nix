@@ -43,7 +43,7 @@
     # System Configuration
     # ────────────────────────────────────────────────────────────────
 
-    username = "Nrew";
+    username = "nrew";
 
     # Supported Systems
     darwinSystem = "aarch64-darwin";
@@ -59,19 +59,9 @@
           inherit inputs outputs hostname username;
         };
         modules = [
-          ./system/shared.nix                      # General configuration
           ./system/${hostname}/configuration.nix   # Host-specific configuration
 
           home-manager.darwinModules.home-manager  # Enable Home Manager
-          {
-            home-manager = {
-              useGlobalPkgs = false;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs outputs username; };
-              users.${username} = import ./home;   # Home manager config
-            };
-          }
-
           nix-homebrew.darwinModules.nix-homebrew  # Enable Homebrew
         ];
       };
@@ -80,17 +70,16 @@
     # Home Manager Configuration
     # ────────────────────────────────────────────────────────────────
 
-    # mkHomeConfiguration = system: username: hostname:
-    #  home-manager.lib.homeManagerConfiguration {
-    #    pkgs = import nixpkgs { inherit system; }; # Use system-specific nixpkgs
-    #    extraSpecialArgs = {
-    #      inherit inputs outputs;
-    #      userConfig = users.${username};           # Specific user configuration
-    #    };
-    #    modules = [
-    #      ./users/${username}/${hostname}.nix       # User+host-specific configuration
-    #    ];
-    #  };
+    mkHomeConfiguration = system: hostname:
+      home-manager.lib.homeManagerConfiguration {
+        pkgs = import nixpkgs { inherit system; }; # Use system-specific nixpkgs
+        extraSpecialArgs = {
+          inherit inputs outputs username;           # Specific user configuration
+        };
+        modules = [
+          ./home/default.nix       # User+host-specific configuration
+        ];
+    };
 
     # ────────────────────────────────────────────────────────────────
     # Outputs
@@ -105,10 +94,10 @@
       };
 
       # Home Manager configuration for "username" on "system"
-      # homeConfigurations = {
-      #  # Home Manager configuration for the user on the host
-      #  "nrew-macbook" = mkHomeConfiguration "aarch64-darwin" "nrew" "MacBook-Pro";
-      # };
+      homeConfigurations = {
+       # Home Manager configuration for the user on the host
+       "nrew" = mkHomeConfiguration "aarch64-darwin" "MacBook-Pro";
+      };
 
       overlays = import ./overlays { inherit inputs; };
     };

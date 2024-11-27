@@ -7,6 +7,7 @@
     ../modules/lazygit.nix
     ../modules/neovim.nix
     #../modules/tmux.nix
+    ../modules/starship.nix
     ../modules/zsh.nix
   ];
 
