@@ -19,68 +19,33 @@
     # ────────────────────────────────────────────────────────────────
 
     settings = {
+
       # Window
       window_padding_width = "16";
-      window_margin_width = "20";
       single_window_margin_width = "0";
-      window_border_width = "0";
-      draw_minimal_borders = "yes";
-      placement_strategy = "center";
-      hide_window_decorations = "yes";
       confirm_os_window_close = 0;
-      resize_in_steps = "yes";
-      enabled_layouts = "tall,stack,fat,grid,splits,horizontal,vertical";
 
-      # Tabs
-      tab_bar_edge = "top";
-      tab_bar_style = "powerline";
-      tab_powerline_style = "slanted";
-      tab_title_template = "{index}: {title}";
-      active_tab_font_style = "bold";
-      inactive_tab_font_style = "normal";
-      tab_activity_symbol = "󰘳";
-
-      # Cursor
-      cursor_shape = "beam";
-      cursor_beam_thickness = "1.5";
-      cursor_blink_interval = "0.5";
-      cursor_stop_blinking_after = "0";
 
       # URLs
-      url_style = "double";
-      open_url_with = "default";
-      url_prefixes = "http https file ftp gemini irc gopher mailto news git";
       detect_urls = "yes";
 
       # Mouse
-      mouse_hide_wait = "3.0";
-      click_interval = "0.5";
-      focus_follows_mouse = "yes";
-      pointer_shape_when_grabbed = "beam";
 
       # Performance
-      repaint_delay = "10";
-      input_delay = "3";
-      sync_to_monitor = "yes";
       
+      # Shell
+      shell = zsh;
+      shell_integration = "enabled";
+      allow_hyperlinks = "yes";
+
       # Bell
       enable_audio_bell = "no";
       visual_bell_duration = "0.0";
       window_alert_on_bell = "yes";
       bell_on_tab = "󰂜 ";
 
-      # Advanced
-      shell_integration = "enabled";
-      allow_remote_control = "yes";
-      listen_on = "unix:/tmp/kitty";
-      update_check_interval = "0";
-      clipboard_control = "write-clipboard write-primary read-clipboard read-primary";
-      allow_hyperlinks = "yes";
-
       # Theme settings
-      background_opacity = "0.95";
       dynamic_background_opacity = "yes";
-      dim_opacity = "0.75";
     };
 
     # ────────────────────────────────────────────────────────────────
@@ -88,32 +53,35 @@
     # ────────────────────────────────────────────────────────────────
 
     keybindings = {
-      # Tabs
-      "ctrl+shift+t" = "new_tab";
-      "ctrl+shift+w" = "close_tab";
-      "ctrl+shift+l" = "next_tab";
-      "ctrl+shift+h" = "previous_tab";
-      "ctrl+shift+." = "move_tab_forward";
-      "ctrl+shift+," = "move_tab_backward";
-
-      # Windows
-      "ctrl+shift+enter" = "new_window";
-      "ctrl+shift+q" = "close_window";
-      "ctrl+shift+]" = "next_window";
-      "ctrl+shift+[" = "previous_window";
-
-      # Layout
-      "ctrl+shift+space" = "next_layout";
-      "ctrl+shift+z" = "toggle_layout stack";
-
+      # Window management
+      "cmd+enter" = "new_window_with_cwd";
+      "cmd+w" = "close_window";
+      "cmd+]" = "next_window";
+      "cmd+[" = "previous_window";
+      "cmd+f" = "move_window_forward";
+      "cmd+b" = "move_window_backward";
+      
+      # Tab management
+      "cmd+t" = "new_tab_with_cwd";
+      "cmd+alt+w" = "close_tab";
+      "shift+cmd+]" = "next_tab";
+      "shift+cmd+[" = "previous_tab";
+      "cmd+1" = "goto_tab 1";
+      "cmd+2" = "goto_tab 2";
+      "cmd+3" = "goto_tab 3";
+      "cmd+4" = "goto_tab 4";
+      "cmd+5" = "goto_tab 5";
+      
       # Font size
-      "ctrl+shift+equal" = "increase_font_size";
-      "ctrl+shift+minus" = "decrease_font_size";
-      "ctrl+shift+backspace" = "restore_font_size";
-
-      # Copy/Paste with clipboard
-      "ctrl+shift+c" = "copy_to_clipboard";
-      "ctrl+shift+v" = "paste_from_clipboard";
+      "cmd+plus" = "change_font_size all +2.0";
+      "cmd+minus" = "change_font_size all -2.0";
+      "cmd+0" = "change_font_size all 0";
+      
+      # Misc
+      "cmd+c" = "copy_to_clipboard";
+      "cmd+v" = "paste_from_clipboard";
+      "cmd+k" = "clear_terminal scrollback active";
+      "cmd+l" = "clear_terminal scroll active";
     };
 
     # ────────────────────────────────────────────────────────────────
@@ -121,29 +89,76 @@
     # ────────────────────────────────────────────────────────────────
 
     extraConfig = ''
-      # Import pywal colors
+      # Load pywal colors
       include ${config.home.homeDirectory}/.cache/wal/colors-kitty.conf
-
-      # Advanced cursor settings
-      cursor_blink_interval -1
-      cursor_stop_blinking_after 15.0
-
-      # Mark terminal command output
-      scrollback_pager less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER
-      scrollback_lines 10000
-      wheel_scroll_multiplier 5.0
-
-      # Rectangle selection
-      rectangle_select_modifiers ctrl+alt
-      terminal_select_modifiers shift
-
-      # Shell integration features
-      shell_integration enabled
       
-      # Disable annoying features
-      copy_on_select no
-      focus_follows_mouse yes
-      enable_audio_bell no
+      # Additional styling
+      active_tab_foreground   #${config.home.homeDirectory}/.cache/wal/colors-kitty.conf:color15}
+      active_tab_background   #${config.home.homeDirectory}/.cache/wal/colors-kitty.conf:color4}
+      inactive_tab_foreground #${config.home.homeDirectory}/.cache/wal/colors-kitty.conf:color7}
+      inactive_tab_background #${config.home.homeDirectory}/.cache/wal/colors-kitty.conf:color0}
+      
+      # URL handling
+      url_color #${config.home.homeDirectory}/.cache/wal/colors-kitty.conf:color4}
+      
+      # Selection
+      selection_foreground none
+      selection_background #${config.home.homeDirectory}/.cache/wal/colors-kitty.conf:color4}
     '';
   };
+
+  
+  # Ensure pywal templates for kitty are properly set up
+  home.file.".config/wal/templates/colors-kitty.conf".text = ''
+    # Base colors
+    foreground           {foreground}
+    background           {background}
+    selection_foreground {background}
+    selection_background {foreground}
+    
+    # Cursor colors
+    cursor            {cursor}
+    cursor_text_color {background}
+    
+    # URL underline color when hovering with mouse
+    url_color {color4}
+    
+    # Window border colors
+    active_border_color   {color4}
+    inactive_border_color {color8}
+    bell_border_color     {color1}
+    
+    # Tab bar colors
+    active_tab_foreground   {background}
+    active_tab_background   {color4}
+    inactive_tab_foreground {foreground}
+    inactive_tab_background {background}
+    
+    # The 16 terminal colors
+    color0  {color0}
+    color1  {color1}
+    color2  {color2}
+    color3  {color3}
+    color4  {color4}
+    color5  {color5}
+    color6  {color6}
+    color7  {color7}
+    color8  {color8}
+    color9  {color9}
+    color10 {color10}
+    color11 {color11}
+    color12 {color12}
+    color13 {color13}
+    color14 {color14}
+    color15 {color15}
+  '';
+
+  # Add helper script for reloading kitty configuration
+  home.packages = with pkgs; [
+    (writeShellScriptBin "kitty-reload" ''
+      #!/usr/bin/env bash
+      # Reload kitty configuration
+      kill -SIGUSR1 $(pgrep -a kitty)
+    '')
+  ];
 }

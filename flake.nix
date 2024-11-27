@@ -96,7 +96,7 @@
       # Home Manager configuration for "username" on "system"
       homeConfigurations = {
        # Home Manager configuration for the user on the host
-       "nrew" = mkHomeConfiguration "aarch64-darwin" "MacBook-Pro";
+       "${username}" = mkHomeConfiguration "aarch64-darwin" "MacBook-Pro";
       };
 
       overlays = import ./overlays { inherit inputs; };
