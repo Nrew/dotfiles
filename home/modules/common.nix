@@ -2,12 +2,12 @@
   imports = [
     #../modules/fastfetch.nix
     ../modules/kitty.nix
-    ../modules/fzf.nix
-    ../modules/git.nix
-    ../modules/lazygit.nix
+    #../modules/fzf.nix
+    #../modules/git.nix
+    #../modules/lazygit.nix
     ../modules/neovim.nix
     #../modules/tmux.nix
-    ../modules/starship.nix
+    #../modules/starship.nix
     ../modules/zsh.nix
   ];
 

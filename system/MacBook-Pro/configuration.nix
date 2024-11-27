@@ -99,6 +99,7 @@
         casks = [
             "anki"
             "raycast"
+            "aerospace"
         ]; # Install GUI apps via Homebrew
         taps = [ "nikitabobko/tap" ]; # Add additional Homebrew taps
         masApps = {}; # Add any macOS App Store apps here
