@@ -34,7 +34,6 @@
       # Performance
       
       # Shell
-      shell = zsh;
       shell_integration = "enabled";
       allow_hyperlinks = "yes";
 
@@ -107,7 +106,7 @@
     '';
   };
 
-  
+
   # Ensure pywal templates for kitty are properly set up
   home.file.".config/wal/templates/colors-kitty.conf".text = ''
     # Base colors
