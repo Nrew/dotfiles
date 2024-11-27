@@ -2,63 +2,252 @@
 {pkgs, lib, config, ...}:
 
 let
-  # Helper function to create scripts
-  mkScript = name: content:
-    pkgs.writeShellScriptBin name content;
+  # Helper function to create scripts with content
+  mkScript = name: content: pkgs.writeShellScriptBin name ''
+    #!/usr/bin/env bash
+    ${content}
+  '';
 
-  # Scripts directory
-  scriptsDir = ./scripts;
+  # ────────────────────────────────────────────────────────────────
+  # Script Definitions
+  # ────────────────────────────────────────────────────────────────
+  
 
-  # Items directory
-  itemsDir = ./items;
-
-  # Define sketchybar packages
-  sketchybarPackages = with pkgs; [
-    sketchybar
-    jq            # Required for JSON processing in scripts
-    coreutils     # Required for basic utils
-    gnugrep      # Required for grep
-    (mkScript "sb-spaces" (builtins.readFile "${scriptsDir}/spaces.sh"))
-    (mkScript "sb-battery" (builtins.readFile "${scriptsDir}/battery.sh"))
-    (mkScript "sb-clock" (builtins.readFile "${scriptsDir}/clock.sh"))
-    (mkScript "sb-volume" (builtins.readFile "${scriptsDir}/volume.sh"))
-    (mkScript "sb-wifi" (builtins.readFile "${scriptsDir}/wifi.sh"))
-    (mkScript "sb-music" (builtins.readFile "${scriptsDir}/music.sh"))
-    (pkgs.writeShellScriptBin "sketchybar-reload" ''
+  # Define scripts content
+  scripts = {
+    battery = ''
       #!/usr/bin/env bash
-      # Source colors
-      source "$HOME/.cache/wal/colors-sketchybar.sh"
-      # Reload sketchybar
-      sketchybar --remove '/.*/'
-      source "$HOME/.config/sketchybar/sketchybarrc"
-    '')
-  ];
+      source "$HOME/.cache/wal/colors.sh"
+      
+      BATTERY_INFO="$(pmset -g batt)"
+      PERCENTAGE=$(echo "$BATTERY_INFO" | grep -Eo "\d+%" | cut -d% -f1)
+      CHARGING=$(echo "$BATTERY_INFO" | grep 'AC Power')
 
-in {
+      if [ "$PERCENTAGE" = "" ]; then
+        exit 0
+      fi
+
+       case ${PERCENTAGE} in
+        100) ICON="" ;;
+        9[0-9]) ICON="" ;;
+        [6-8][0-9]) ICON="" ;;
+        [3-5][0-9]) ICON="" ;;
+        [1-2][0-9]) ICON="" ;;
+        *) ICON=""
+      esac
+
+      if [[ $CHARGING != "" ]]; then
+        ICON=""
+      fi
+      
+      sketchybar --set $NAME icon="$ICON" label="$PERCENTAGE%"
+    '';
+
+    wifi = ''
+      #!/usr/bin/env bash
+      source "$HOME/.cache/wal/colors.sh"
+      
+      # Get WiFi information
+      WIFI=$(/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I)
+      SSID=$(echo "$WIFI" | grep -o "SSID: .*" | sed 's/^SSID: //')
+      SPEED=$(echo "$WIFI" | grep -o "lastTxRate: .*" | sed 's/^lastTxRate: //')
+
+      # Check if connected to WiFi
+      if [ "$SSID" = "" ]; then
+        sketchybar --set $NAME icon="󰖪" label="Disconnected"
+      else
+        # Signal strength icon based on TX rate
+        if [ "$SPEED" -gt 300 ]; then
+          ICON="󰖩"
+        elif [ "$SPEED" -gt 100 ]; then
+          ICON="󰖧"
+        elif [ "$SPEED" -gt 50 ]; then
+          ICON="󰖦"
+        else
+          ICON="󰖪"
+        fi
+        
+        sketchybar --set $NAME icon="$ICON" label="$SSID"
+      fi
+    '';
+
+    volume = ''
+      #!/usr/bin/env bash
+      source "$HOME/.cache/wal/colors.sh"
+      
+      # Get current volume and mute status
+      VOLUME=$(osascript -e 'output volume of (get volume settings)')
+      MUTED=$(osascript -e 'output muted of (get volume settings)')
+
+      # Volume icon based on level and mute status
+      if [[ $MUTED == "true" ]]; then
+        ICON="󰝟"
+      else
+        case ${VOLUME} in
+          100) ICON="󰕾";;
+          9[0-9]) ICON="󰕾";;
+          8[0-9]) ICON="󰕾";;
+          7[0-9]) ICON="󰖀";;
+          6[0-9]) ICON="󰖀";;
+          5[0-9]) ICON="󰖀";;
+          4[0-9]) ICON="󰕿";;
+          3[0-9]) ICON="󰕿";;
+          2[0-9]) ICON="󰕿";;
+          1[0-9]) ICON="󰕾";;
+          [0-9]) ICON="󰕿";;
+          *) ICON="󰖁";;
+        esac
+      fi
+
+      # Only update if there's a change
+      sketchybar --set $NAME icon="$ICON" label="${VOLUME}%"
+    '';
+clock = ''
+      #!/usr/bin/env bash
+      
+      # Clock icon based on time of day
+      CLOCK_ICONS=("" "" "" "")
+      CURRENT_HOUR=$(date '+%H')
+      
+      # Select icon based on time of day
+      if ((CURRENT_HOUR >= 6 && CURRENT_HOUR < 12)); then
+        ICON=''${CLOCK_ICONS[0]}  # Morning
+      elif ((CURRENT_HOUR >= 12 && CURRENT_HOUR < 17)); then
+        ICON=''${CLOCK_ICONS[1]}  # Afternoon
+      elif ((CURRENT_HOUR >= 17 && CURRENT_HOUR < 21)); then
+        ICON=''${CLOCK_ICONS[2]}  # Evening
+      else
+        ICON=''${CLOCK_ICONS[3]}  # Night
+      fi
+      
+      # Format the time and date
+      TIME=$(date '+%H:%M')
+      DATE=$(date '+%a %d %b')
+      
+      # Update the sketchybar items
+      sketchybar --set $NAME.time label="$TIME" icon="$ICON"
+      sketchybar --set $NAME.date label="$DATE"
+    '';
+
+    spotify = ''
+      #!/usr/bin/env bash
+      
+      # Default Spotify commands using osascript
+      PLAYER_STATE=$(osascript -e 'tell application "Spotify" to player state as string')
+      TRACK_NAME=$(osascript -e 'tell application "Spotify" to name of current track as string')
+      ARTIST_NAME=$(osascript -e 'tell application "Spotify" to artist of current track as string')
+      
+      # Cache the data to prevent unnecessary updates
+      CACHE_DIR="$HOME/.cache/sketchybar/spotify"
+      mkdir -p "$CACHE_DIR"
+      
+      # Only update if there's a change
+      if [ "$PLAYER_STATE" = "playing" ]; then
+        CURRENT_DATA="$TRACK_NAME - $ARTIST_NAME"
+        CACHED_DATA=$(cat "$CACHE_DIR/current" 2>/dev/null || echo "")
+        
+        if [ "$CURRENT_DATA" != "$CACHED_DATA" ]; then
+          echo "$CURRENT_DATA" > "$CACHE_DIR/current"
+          sketchybar --set $NAME icon="󰎈" label="$TRACK_NAME - $ARTIST_NAME"
+        fi
+      else
+        if [ -f "$CACHE_DIR/current" ]; then
+          rm "$CACHE_DIR/current"
+          sketchybar --set $NAME icon="󰎊" label="Not Playing"
+        fi
+      fi
+    '';
+
+    spaces = ''
+      #!/usr/bin/env bash
+      
+      SPACE_ICONS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
+      
+      for i in "''${!SPACE_ICONS[@]}"
+      do
+        sid=$(($i+1))
+        sketchybar --add space space.$sid left \
+                   --set space.$sid associated_space=$sid \
+                                    icon=''${SPACE_ICONS[i]} \
+                                    icon.padding_left=8 \
+                                    icon.padding_right=8 \
+                                    background.padding_left=5 \
+                                    background.padding_right=5 \
+                                    background.color=$BAR_COLOR \
+                                    background.border_color=$BAR_BORDER_COLOR \
+                                    background.border_width=2 \
+                                    background.drawing=off \
+                                    label.drawing=off \
+                                    script="$HOME/.config/sketchybar/scripts/space.sh" \
+                                    click_script="aerospace space $sid"
+      done
+    '';
+
+    space = ''
+      #!/usr/bin/env bash
+      
+      SPACE_ICONS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
+      
+      # Get the current space
+      CURRENT_SPACE=$(aerospace space current)
+      
+      # Update space appearances
+      for i in "''${!SPACE_ICONS[@]}"; do
+        sid=$(($i+1))
+        
+        if [ "$sid" = "$CURRENT_SPACE" ]; then
+          # Current space
+          sketchybar --set space.$sid \
+                     background.drawing=on \
+                     icon.color=$BAR_COLOR \
+                     background.color=$ICON_COLOR
+        else
+          # Inactive space
+          sketchybar --set space.$sid \
+                     background.drawing=off \
+                     icon.color=$ICON_COLOR \
+                     background.color=$BAR_COLOR
+        fi
+      done
+    '';
+  };
+
   # ────────────────────────────────────────────────────────────────
   # Package Configuration
   # ────────────────────────────────────────────────────────────────
   
-  # Use lib.mkMerge to merge package lists instead of redefining
-  home.packages = lib.mkMerge [
-    sketchybarPackages
-  ];
+  sketchybarPackages = with pkgs; [
+    sketchybar
+    jq
+    coreutils
+    gnugrep
+  ] ++ (lib.mapAttrsToList (name: content: mkScript "sb-${name}" content) scripts)
+    ++ [(pkgs.writeShellScriptBin "sketchybar-reload" ''
+      #!/usr/bin/env bash
+      source "$HOME/.cache/wal/colors-sketchybar.sh"
+      sketchybar --remove '/.*/'
+      source "$HOME/.config/sketchybar/sketchybarrc"
+    '')];
+
+in {
+  # ────────────────────────────────────────────────────────────────
+  # Package Installation
+  # ────────────────────────────────────────────────────────────────
+  
+  home.packages = sketchybarPackages;
 
   # ────────────────────────────────────────────────────────────────
   # Configuration Files
   # ────────────────────────────────────────────────────────────────
-  
-  # Ensure config directory exists with proper files
-  home.file.".config/sketchybar" = {
-    source = lib.mkForce (pkgs.runCommand "sketchybar-config" {} ''
-      mkdir -p $out
-      cp -r ${itemsDir}/* $out/
-      cp -r ${scriptsDir}/* $out/
-    '');
-    recursive = true;
-  };
 
-  # Main sketchybar configuration
+  home.file.".config/sketchybar/scripts".source = pkgs.runCommand "sketchybar-scripts" {} ''
+    mkdir -p $out
+    ${lib.concatStrings (lib.mapAttrsToList (name: content: ''
+      echo '${content}' > $out/${name}.sh
+      chmod +x $out/${name}.sh
+    '') scripts)}
+  '';
+
   home.file.".config/sketchybar/sketchybarrc" = {
     executable = true;
     text = ''
@@ -109,16 +298,16 @@ in {
                  popup.background.shadow.drawing=off
 
       # Left
-      source "$HOME/.config/sketchybar/items/spaces.sh"
+      source "$HOME/.config/sketchybar/scripts/spaces.sh"
       
       # Center
-      source "$HOME/.config/sketchybar/items/spotify.sh"
+      source "$HOME/.config/sketchybar/scripts/spotify.sh"
       
       # Right
-      source "$HOME/.config/sketchybar/items/calendar.sh"
-      source "$HOME/.config/sketchybar/items/wifi.sh"
-      source "$HOME/.config/sketchybar/items/battery.sh"
-      source "$HOME/.config/sketchybar/items/volume.sh"
+      source "$HOME/.config/sketchybar/scripts/clock.sh"
+      source "$HOME/.config/sketchybar/scripts/wifi.sh"
+      source "$HOME/.config/sketchybar/scripts/battery.sh"
+      source "$HOME/.config/sketchybar/scripts/volume.sh"
 
       # Finalizing Setup
       sketchybar --update
@@ -126,21 +315,6 @@ in {
       # Start Event Loop for Updates
       sketchybar --bar event=on
     '';
-  };
-
-  # Create necessary wal template for sketchybar
-  home.file.".config/wal/templates/colors-sketchybar.sh" = {
-    text = ''
-      # Sketchybar color definitions
-      export BAR_COLOR="0xff{background.strip}"
-      export BAR_BORDER_COLOR="0xff{color4.strip}"
-      export ICON_COLOR="0xff{color4.strip}"
-      export LABEL_COLOR="0xff{foreground.strip}"
-      export POPUP_BACKGROUND_COLOR="0xff{background.strip}"
-      export POPUP_BORDER_COLOR="0xff{color4.strip}"
-      export SHADOW_COLOR="0xff{background.strip}"
-    '';
-    executable = true;
   };
 
   # ────────────────────────────────────────────────────────────────
