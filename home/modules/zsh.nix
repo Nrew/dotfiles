@@ -67,8 +67,8 @@
       # Input/Output
       setopt CORRECT              # Command correction
       setopt INTERACTIVE_COMMENTS # Allow comments in interactive shell
-      setopt RC_QUOTES           # Allow 'Henry''s Garage' instead of 'Henry'\''s Garage'
-      unsetopt FLOW_CONTROL      # Disable start/stop characters in shell editor
+      setopt RC_QUOTES            # 
+      unsetopt FLOW_CONTROL       # Disable start/stop characters in shell editor
       
       # Load custom functions
       for func in ${config.xdg.configHome}/zsh/functions/*; do
