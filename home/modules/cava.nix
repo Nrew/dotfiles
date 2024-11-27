@@ -2,8 +2,6 @@
 { config, lib, pkgs, ... }:
 
 {
-  home.packages = [ pkgs.cava ];
-
   # Main cava configuration
   xdg.configFile."cava/config".text = ''
     [general]
