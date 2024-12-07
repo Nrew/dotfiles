@@ -28,8 +28,8 @@
 
     fonts = {
         packages = with pkgs; [
-            (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })  # JetBrainsMono Nerd Font
-            (nerdfonts.override { fonts = [ "FiraCode" ]; })       # FiraCode Nerd Font
+            nerd-fonts.jetbrains-mono  # JetBrainsMono Nerd Font
+            nerd-fonts.fira-code        # FiraCode Nerd Font
         ];
     };
 
@@ -52,14 +52,13 @@
     nix = {
         settings = {
             experimental-features = [ "nix-command" "flakes" ];
-            auto-optimise-store = true;
+            optimize-store = "automatic";
         };
         gc = {
-            automatic = true;
-            dates = "weekly";
-            randomizedDelaySec = "14m";
+            automatic = true; # Enable automatic garbage collection
+            interval = { Weekday = 0; Hour = 2; Minute = 0; }; # Run garbage collection every Sunday at 2:00 AM
             # Keep the last 5 generations
-            options = "--delete-older-than +5";
+            options = "--delete-older-than 30d"; # Delete generations older than 30 days
         };
   };
 

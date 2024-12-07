@@ -2,7 +2,13 @@
 { config, pkgs, username, ... }:
 
 {
-  home.packages = with pkgs; [ kitty ];
+  home.packages = with pkgs; [ 
+    kitty
+    (writeShellScriptBin "kitty-reload" ''
+      #!/usr/bin/env bash
+      # Reload kitty configuration
+      kill -SIGUSR1 $(pgrep -a kitty)
+    '') ];
 
   programs.kitty = {
     enable = true;
@@ -153,13 +159,4 @@
     color14 {color14}
     color15 {color15}
   '';
-
-  # Add helper script for reloading kitty configuration
-  home.packages = with pkgs; [
-    (writeShellScriptBin "kitty-reload" ''
-      #!/usr/bin/env bash
-      # Reload kitty configuration
-      kill -SIGUSR1 $(pgrep -a kitty)
-    '')
-  ];
 }

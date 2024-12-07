@@ -1,4 +1,3 @@
-# modules/cli/fzf.nix
 { config, lib, pkgs, ... }:
 
 {

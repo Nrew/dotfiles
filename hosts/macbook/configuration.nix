@@ -68,9 +68,7 @@
                 "${pkgs.kitty}/Applications/kitty.app"
             ];                                      
             tilesize = 30;                          # Set dock tile size
-            
-            wvous-all-corner = 1;                   # Instead of individual settings
-            
+                        
             # wvous-bl-corner = 1;                  # Configure hot corners (bottom-left: Mission Control)
             # wvous-br-corner = 1;                  # Configure hot corners (bottom-right: Mission Control)
             # wvous-tl-corner = 1;                  # Configure hot corners (top-left: Mission Control)

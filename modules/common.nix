@@ -1,23 +1,23 @@
-{outputs, ...}: {
+{ outputs, ... }: 
+
+{
   imports = [
-    #../modules/fastfetch.nix
     ../modules/kitty.nix
-    #../modules/fzf.nix
     ../modules/git.nix
-    #../modules/lazygit.nix
-    #../modules/tmux.nix
-    #../modules/starship.nix
     ../modules/zsh.nix
   ];
 
-  # Nixpkgs configuration
   nixpkgs = {
+    # Use the overlay from flake outputs
     overlays = [
       outputs.overlays.stable-packages
     ];
 
+    # Allow unfree packages
     config = {
       allowUnfree = true;
+      # Recommended for home-manager 24.11
+      allowUnfreePredicate = _: true;
     };
   };
 }
