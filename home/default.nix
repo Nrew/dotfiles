@@ -1,28 +1,52 @@
-{ pkgs, username, ... }: 
+{ config, pkgs, user, ... }: 
 
 {
+    #──────────────────────────────────────────────────────────────────
+    # Imports & Core Configuration
+    #──────────────────────────────────────────────────────────────────
     imports = [ 
-        #./modules/common.nix 
-        ./modules/sketchybar/sketchybar.nix
+        # Add your module imports here
+        ./modules/common.nix
+        ./modules/aerospace.nix
     ];
 
     # Enable home-manager
     programs.home-manager.enable = true;
 
+    #──────────────────────────────────────────────────────────────────
+    # Home Configuration
+    #──────────────────────────────────────────────────────────────────
     home = {
-        username = username;
+        username = user;
         homeDirectory =
             if pkgs.stdenv.isDarwin
-            then "/Users/${username}"
-            else "/home/${username}";
+            then "/Users/${user}"
+            else "/home/${user}";
 
-        # MacOs Specific
-        sessionPath = [ "/opt/homebrew/bin/" ];
+        # Path modifications
+        sessionPath = 
+            if pkgs.stdenv.isDarwin
+            then [ 
+                "/opt/homebrew/bin"
+            ] 
+            else [];
 
-        # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
+        # This value determines the Home Manager release that your
+        # configuration is compatible with. This helps avoid breakage
+        # when a new Home Manager release introduces backwards
+        # incompatible changes.
         stateVersion = "24.05";
     };
 
-    # Nicely reload system units when changing configs
-    systemd.user.startServices = "sd-switch";
+    #──────────────────────────────────────────────────────────────────
+    # System Specific Settings
+    #──────────────────────────────────────────────────────────────────
+    # Enable systemd service management on Linux only
+    systemd.user.startServices = 
+        if pkgs.stdenv.isDarwin
+        then false
+        else "sd-switch";
+
+    # Add any other system-specific configurations here using
+    # if pkgs.stdenv.isDarwin then ... else ...
 }

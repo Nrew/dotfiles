@@ -16,11 +16,10 @@
             pip
             virtualenv
         ]))
-        docker          # Requires system-level daemon
-        jq              # General-purpose command-line JSON processor
-        texinfo         # Needed for compiling tools like Emacs
-        htop            # System-wide resource monitor
-        lua5_4
+        docker      # Requires system-level daemon
+        jq          # General-purpose command-line JSON processor
+        texinfo     # Needed for compiling tools like Emacs
+        htop        # System-wide resource monitor
     ];
 
     # ────────────────────────────────────────────────────────────────
@@ -29,8 +28,8 @@
 
     fonts = {
         packages = with pkgs; [
-            (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })  # JetBrainsMono Nerd Font
-            (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; })       # FiraCode Nerd Font
+            (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })  # JetBrainsMono Nerd Font
+            (nerdfonts.override { fonts = [ "FiraCode" ]; })       # FiraCode Nerd Font
         ];
     };
 
@@ -38,35 +37,37 @@
     # Environment Variables
     # ────────────────────────────────────────────────────────────────
 
-    
     # Define system-wide environment variables
     environment.variables = {
-        EDITOR = "nvim";                 # Default editor
-        TERM = "kitty";                  # Terminal type
-        LANG = "en_US.UTF-8";            # Locale settings
-        LC_ALL = "en_US.UTF-8";          # Locale settings
+        LANG   = "en_US.UTF-8";  # Set the default system language
+        LC_ALL = "en_US.UTF-8";  # Set the default locale
     };
-
-    # sessionVariables = with pkgs; {
-    #    PATH = "${git}/bin:${neovim}/bin:${kitty}/bin:$PATH";
-    #    MANPATH = "${man-db}/share/man:$MANPATH";
-    #    INFOPATH = "${texinfo}/share/info:$INFOPATH";
-    # };
 
     # ────────────────────────────────────────────────────────────────
     # Core Nix Settings
     # ────────────────────────────────────────────────────────────────
 
-    nixpkgs.config.allowUnfree = true;
+    nixpkgs.config.allowUnfree = true; # Allow unfree packages to be installed
 
     nix = {
-    extraOptions = ''
-      auto-optimise-store = true
-      experimental-features = nix-command flakes
-    '';
-    };
+        settings = {
+            experimental-features = [ "nix-command" "flakes" ];
+            auto-optimise-store = true;
+        };
+        gc = {
+            automatic = true;
+            dates = "weekly";
+            randomizedDelaySec = "14m";
+            # Keep the last 5 generations
+            options = "--delete-older-than +5";
+        };
+  };
 
-    nix.package = pkgs.nix; # Set the Nix package as the default
+    # Set the Nix package as the default to ensure Nix commands are available system-wide
+    nix.package = pkgs.nix; 
 
-    system.stateVersion = 5; # Used for backwards compatibility
+    # The stateVersion attribute is used to specify the version of NixOS
+    # to maintain backwards compatibility with older configurations.
+    # Changing this value can affect the behavior of the system.
+    system.stateVersion = 5;
 }

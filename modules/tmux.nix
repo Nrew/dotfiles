@@ -1,4 +1,3 @@
-# modules/cli/tmux.nix
 { config, lib, pkgs, ... }:
 
 {

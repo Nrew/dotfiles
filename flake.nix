@@ -1,18 +1,14 @@
 {
   description = "Nrew's system configuration";
 
-  # ────────────────────────────────────────────────────────────────
+  #──────────────────────────────────────────────────────────────────
   # Inputs Configuration
-  # ────────────────────────────────────────────────────────────────
+  #──────────────────────────────────────────────────────────────────
 
   inputs = {
+    # NixPKGS
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
-
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
     # Nix Darwin (for macOS)
     darwin = {
@@ -20,84 +16,77 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Home-Manager
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Homebrew
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
   };
 
-  # ────────────────────────────────────────────────────────────────
+  #──────────────────────────────────────────────────────────────────
   # Outputs Configuration
-  # ────────────────────────────────────────────────────────────────
+  #──────────────────────────────────────────────────────────────────
 
-  outputs = {
-    self,
-    darwin,
-    home-manager,
-    nix-homebrew,
-    nixpkgs,
-    ...
-  } @ inputs: 
-  let
-    inherit (self) outputs;
+  outputs = { self, darwin, home-manager, nix-homebrew, nixpkgs, ... } @ inputs: 
+    let
+      inherit (self) outputs;
 
-    # ────────────────────────────────────────────────────────────────
-    # System Configuration
-    # ────────────────────────────────────────────────────────────────
+      #──────────────────────────────────────────────────────────────────
+      # System Configuration
+      #──────────────────────────────────────────────────────────────────
 
-    username = "nrew";
-
-    # Supported Systems
-    darwinSystem = "aarch64-darwin";
-
-    # ────────────────────────────────────────────────────────────────
-    # macOS (nix-darwin) Configuration
-    # ────────────────────────────────────────────────────────────────
-
-    mkDarwinConfiguration = hostname:
-      darwin.lib.darwinSystem {
-        system = darwinSystem;                     # macOS on Apple Silicon
-        specialArgs = {
-          inherit inputs outputs hostname username;
-        };
-        modules = [
-          ./system/${hostname}/configuration.nix   # Host-specific configuration
-
-          home-manager.darwinModules.home-manager  # Enable Home Manager
-          nix-homebrew.darwinModules.nix-homebrew  # Enable Homebrew
-        ];
+      user = "nrew";
+      
+      systems = {
+        darwin = ["aarch64-darwin"];
+        linux = ["x86_64-linux" "aarch64-linux"];
       };
 
-    # ────────────────────────────────────────────────────────────────
-    # Home Manager Configuration
-    # ────────────────────────────────────────────────────────────────
+      forAllSystems = nixpkgs.lib.genAttrs (systems.darwin ++ systems.linux);
 
-    mkHomeConfiguration = system: hostname:
-      home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs { inherit system; }; # Use system-specific nixpkgs
-        extraSpecialArgs = {
-          inherit inputs outputs username;           # Specific user configuration
+      #──────────────────────────────────────────────────────────────────
+      # macOS (nix-darwin) Configuration
+      #──────────────────────────────────────────────────────────────────
+
+      mkDarwinConfiguration = system: hostname:
+        darwin.lib.darwinSystem {
+          inherit system;
+          specialArgs = {
+            inherit inputs outputs system user;
+          };
+          modules = [
+            ./hosts/${hostname}/configuration.nix
+            
+            # Enable Home Manager
+            home-manager.darwinModules.home-manager {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                extraSpecialArgs = {
+                  inherit user;
+                };
+                users.${user} = import ./home;
+              };
+            } 
+
+            nix-homebrew.darwinModules.nix-homebrew
+          ];
         };
-        modules = [
-          ./home/default.nix       # User+host-specific configuration
-        ];
-    };
-
-    # ────────────────────────────────────────────────────────────────
-    # Outputs
-    # ────────────────────────────────────────────────────────────────
-
     in {
-      # Build darwin flake using:
-      # $ darwin-rebuild build --flake .#MacBook-Pro
+      #──────────────────────────────────────────────────────────────────
+      # Outputs
+      #──────────────────────────────────────────────────────────────────
+
       darwinConfigurations = {
-        # macOS configuration for this machine
-        "MacBook-Pro" = mkDarwinConfiguration "MacBook-Pro";
+        "MacBook-Pro" = mkDarwinConfiguration (builtins.head systems.darwin) "MacBook-Pro";
       };
 
-      # Home Manager configuration for "username" on "system"
-      homeConfigurations = {
-       # Home Manager configuration for the user on the host
-       "${username}" = mkHomeConfiguration "aarch64-darwin" "MacBook-Pro";
-      };
+      #──────────────────────────────────────────────────────────────────
+      # Overlays Configuration
+      #──────────────────────────────────────────────────────────────────
 
       overlays = import ./overlays { inherit inputs; };
     };

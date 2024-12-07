@@ -2,6 +2,8 @@
 { config, pkgs, username, ... }:
 
 {
+  home.packages = with pkgs; [ kitty ];
+
   programs.kitty = {
     enable = true;
 
@@ -123,9 +125,9 @@
     url_color {color4}
     
     # Window border colors
-    active_border_color   {color4}
+    active_border_color   {color7}
     inactive_border_color {color8}
-    bell_border_color     {color1}
+    bell_border_color     {color8}
     
     # Tab bar colors
     active_tab_foreground   {background}
