@@ -1,3 +1,4 @@
+# modules/aerospace.nix
 { config, lib, pkgs, ... }:
 
 let 
@@ -66,7 +67,7 @@ in
   };
 
   #─────────────────────────────────────────────────────────────────────────────
-  # Configuration
+  # Implementation
   #─────────────────────────────────────────────────────────────────────────────
   config = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
@@ -74,12 +75,13 @@ in
       (writeShellScriptBin "aerospace-restart" ''
         #!/usr/bin/env bash
         aerospace restart
-        ${lib.optionalString config.services.sketchybar.enable "sketchybar --reload"}
       '')
     ];
   
     home.file.".aerospace.toml".text = ''
-      # Core settings
+      #───────────────────────────────
+      # Core Settings
+      #───────────────────────────────
       start-at-login = true
       enable-normalization-flatten-containers = true
       enable-normalization-opposite-orientation-for-nested-containers = true
@@ -88,15 +90,33 @@ in
       default-root-container-orientation = 'auto'
       automatically-unhide-macos-hidden-apps = true
 
-      # Mouse settings
+      # Run Sketchybar together with AeroSpace
+      after-startup-command = [
+        'exec-and-forget sketchybar',
+      ]
+      
+      # Notify Sketchybar about workspace change
+      exec-on-workspace-change = [
+        '/bin/bash',
+        '-c',
+        'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE',
+      ]
+
+      #───────────────────────────────
+      # Mouse Settings
+      #───────────────────────────────
       on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
       on-focus-changed = ['move-mouse window-lazy-center']
 
-      # Key mapping
+      #───────────────────────────────
+      # Key Mapping
+      #───────────────────────────────
       [key-mapping]
       preset = 'qwerty'
 
+      #───────────────────────────────
       # Gaps
+      #───────────────────────────────
       [gaps]
       inner.horizontal = ${toString cfg.settings.gaps.inner}
       inner.vertical = ${toString cfg.settings.gaps.inner}
@@ -105,7 +125,9 @@ in
       outer.top = ${toString cfg.settings.gaps.outer}
       outer.right = ${toString cfg.settings.gaps.outer}
 
-      # Main mode bindings
+      #───────────────────────────────
+      # Main Mode Bindings
+      #───────────────────────────────
       [mode.main.binding]
       # Launch applications
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: app: lib.optionalString app.enable ''
@@ -118,15 +140,19 @@ in
       alt-comma = 'layout accordion horizontal vertical'
       alt-m = 'fullscreen'
 
-      # Focus & Movement
+      # Focus movement
       alt-h = 'focus left'
       alt-j = 'focus down'
       alt-k = 'focus up'
       alt-l = 'focus right'
+
+      # Window movement
       alt-shift-h = 'move left'
       alt-shift-j = 'move down'
       alt-shift-k = 'move up'
       alt-shift-l = 'move right'
+
+      # Resize windows
       alt-shift-minus = 'resize smart -50'
       alt-shift-equal = 'resize smart +50'
 
@@ -135,23 +161,39 @@ in
       alt-${toString i} = 'workspace ${toString i}'
       alt-shift-${toString i} = 'move-node-to-workspace ${toString i}'
       '') (lib.range 1 9))}
+
+      # Workspace navigation
       alt-tab = 'workspace-back-and-forth'
       alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
-      # Service mode
+      # Enter service mode
       alt-shift-semicolon = 'mode service'
 
+      #───────────────────────────────
+      # Service Mode Bindings
+      #───────────────────────────────
       [mode.service.binding]
+      # Reload config and exit service mode
       esc = ['reload-config', 'mode main']
+
+      # Reset layout
       r = ['flatten-workspace-tree', 'mode main']
+
+      # Toggle floating/tiling layout
       f = ['layout floating tiling', 'mode main']
+
+      # Close all windows but current
       backspace = ['close-all-windows-but-current', 'mode main']
+
+      # Join with adjacent windows
       alt-shift-h = ['join-with left', 'mode main']
       alt-shift-j = ['join-with down', 'mode main']
       alt-shift-k = ['join-with up', 'mode main']
       alt-shift-l = ['join-with right', 'mode main']
 
-      # Window detection rules
+      #───────────────────────────────
+      # Window Detection Rules
+      #───────────────────────────────
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: app: lib.optionalString app.enable ''
       [[on-window-detected]]
       if.app-id = '${app.app-id}'
@@ -159,13 +201,18 @@ in
       '') cfg.settings.apps)}
     '';
 
-    # Sketchybar integration
+    #───────────────────────────────
+    # Sketchybar Integration
+    #───────────────────────────────
     xdg.configFile = lib.mkIf config.services.sketchybar.enable {
       "sketchybar/scripts/aerospace_space_windows.sh" = {
         executable = true;
         text = ''
           #!/usr/bin/env bash
+          
           SPACE_ICONS=("1" "2" "3" "4" "5")
+          
+          # Get current space from aerospace
           CURRENT_SPACE=$(aerospace current-workspace)
           SPACE_WINDOWS=$(aerospace list-windows --workspace "$CURRENT_SPACE" | wc -l)
           

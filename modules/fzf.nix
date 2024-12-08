@@ -31,26 +31,4 @@
       "--exact"
     ];
   };
-
-  # Create pywal template for fzf colors
-  home.file.".config/wal/templates/colors-fzf.sh".text = ''
-    # FZF color scheme using pywal colors
-    export FZF_DEFAULT_OPTS="
-      --color=bg:-1,bg+:-1
-      --color=fg:{foreground},fg+:{color15}
-      --color=hl:{color4},hl+:{color4}
-      --color=info:{color2},prompt:{color1}
-      --color=pointer:{color5},marker:{color6}
-      --color=spinner:{color3},header:{color8}
-      $FZF_DEFAULT_OPTS
-    "
-  '';
-
-  # Source FZF colors in shell
-  programs.zsh.initExtra = ''
-    # Source FZF colors from pywal
-    if [ -f ~/.cache/wal/colors-fzf.sh ]; then
-      source ~/.cache/wal/colors-fzf.sh
-    fi
-  '';
 }
