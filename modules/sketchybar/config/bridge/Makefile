@@ -1,3 +1,13 @@
-all:
-	(cd network_load && $(MAKE)) >/dev/null
-	(cd menus && $(MAKE)) >/dev/null
+.PHONY: all clean
+
+SUBDIRS = network_load menus
+
+all: $(SUBDIRS)
+
+$(SUBDIRS):
+	@$(MAKE) -C $@ >/dev/null
+
+clean:
+	@for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir clean >/dev/null; \
+	done

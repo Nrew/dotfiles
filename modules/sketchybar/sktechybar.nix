@@ -1,4 +1,3 @@
-# modules/sketchybar.nix
 { config, lib, pkgs, ... }:
 
 let
