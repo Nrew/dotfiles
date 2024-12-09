@@ -14,7 +14,7 @@ local padding <const> = {
     },
     background = {
       height = 24,
-      corner_radius = 8,
+      corner_radius = 9,
     },
     slider = {
       height = 20,

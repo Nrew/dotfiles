@@ -17,6 +17,7 @@
 #define SKETCHYBAR_DEFAULT_NAME "sketchybar"
 #define SKETCHYBAR_SERVICE_PREFIX "git.felix."
 #define INITIAL_PORT_VALUE 0
+#define MAX_MESSAGE_SIZE 4096
 
 typedef char* env;
 typedef void (*mach_handler)(env env);
@@ -141,6 +142,10 @@ static inline uint32_t format_message(const char* message, char* formatted_messa
     char outer_quote = 0;
     uint32_t caret = 0;
     size_t message_length = strlen(message) + 1;
+    
+    if (message_length > MAX_MESSAGE_SIZE) {
+        message_length = MAX_MESSAGE_SIZE;
+    }
 
     for (size_t i = 0; i < message_length; ++i) {
         if (message[i] == '"' || message[i] == '\'') {

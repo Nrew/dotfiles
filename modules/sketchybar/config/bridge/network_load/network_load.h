@@ -23,7 +23,7 @@ typedef enum {
 } NetworkUnit;
 
 static char unit_str[3][6] = {
-  " Bps",
+  "Bps",
   "KBps",
   "MBps",
 };

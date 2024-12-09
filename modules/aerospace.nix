@@ -106,7 +106,12 @@ in
       # Mouse Settings
       #───────────────────────────────
       on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
-      on-focus-changed = ['move-mouse window-lazy-center']
+      
+      on-focus-changed = [
+      'move-mouse window-lazy-center'
+      'exec-and-forget /bin/bash -c sketchybar --trigger front_app_switched',
+      'exec-and-forget sketchybar --trigger update_windows'
+      ]
 
       #───────────────────────────────
       # Key Mapping
