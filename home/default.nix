@@ -1,5 +1,7 @@
 { config, pkgs, user, ... }: 
-
+let
+    isDarwin = pkgs.stdenv.isDarwin;
+in
 {
     #──────────────────────────────────────────────────────────────────
     # Imports & Core Configuration
@@ -52,7 +54,7 @@
     home = {
         username = user;
         homeDirectory =
-            if pkgs.stdenv.isDarwin
+            if isDarwin
             then "/Users/${user}"
             else "/home/${user}";
 

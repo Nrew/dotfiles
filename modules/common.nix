@@ -5,6 +5,7 @@
     ../modules/kitty.nix
     ../modules/git.nix
     ../modules/zsh.nix
+    ../modules/pywal.nix
   ];
 
   nixpkgs = {
@@ -19,5 +20,16 @@
       # Recommended for home-manager 24.11
       allowUnfreePredicate = _: true;
     };
+  };
+
+  options.pywal = {
+    enable = true;
+    backend = "wal";
+    wallpaper = null;
+    reloadServices = [
+      "sketchybar"
+      "kitty"
+      "tmux"
+      ];
   };
 }
