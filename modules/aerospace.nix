@@ -205,29 +205,5 @@ in
       run = 'move-node-to-workspace ${toString app.workspace}'
       '') cfg.settings.apps)}
     '';
-
-    #───────────────────────────────
-    # Sketchybar Integration
-    #───────────────────────────────
-    xdg.configFile = lib.mkIf config.services.sketchybar.enable {
-      "sketchybar/scripts/aerospace_space_windows.sh" = {
-        executable = true;
-        text = ''
-          #!/usr/bin/env bash
-          
-          SPACE_ICONS=("1" "2" "3" "4" "5")
-          
-          # Get current space from aerospace
-          CURRENT_SPACE=$(aerospace current-workspace)
-          SPACE_WINDOWS=$(aerospace list-windows --workspace "$CURRENT_SPACE" | wc -l)
-          
-          if [ "$SPACE_WINDOWS" -eq 0 ]; then
-            sketchybar --set space."$CURRENT_SPACE" icon.color="$ICON_COLOR"
-          else
-            sketchybar --set space."$CURRENT_SPACE" icon.color="$LABEL_COLOR"
-          fi
-        '';
-      };
-    };
   };
 }

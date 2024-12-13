@@ -1,11 +1,27 @@
-# modules/cli/git.nix
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, user, ... }:
 
 {
+  # ────────────────────────────────────────────────────────────────
+  # Core Git Package and Extensions
+  # ────────────────────────────────────────────────────────────────
+  home.packages = with pkgs; [
+    git-absorb     # automatically absorb staged changes into previous commits
+    git-revise     # rewrite git commit history
+    git-branchless # streamlined workflow for stacked changes
+  ];
+
   programs.git = {
     enable = true;
+    username = user;
+
+    # ────────────────────────────────────────────────────────────────
+    # Git LFS Configuration
+    # ────────────────────────────────────────────────────────────────
+    lfs.enable = true;
     
-    # Delta for better diffs
+    # ────────────────────────────────────────────────────────────────
+    # Diff & Merge Tools Configuration
+    # ────────────────────────────────────────────────────────────────
     delta = {
       enable = true;
       options = {
@@ -18,151 +34,133 @@
       };
     };
 
-    # Basic configuration
+    # ────────────────────────────────────────────────────────────────
+    # Core Git Configuration
+    # ────────────────────────────────────────────────────────────────
     extraConfig = {
       init.defaultBranch = "main";
       pull.rebase = true;
       push.autoSetupRemote = true;
+      
+      # Core settings
       core = {
-        editor = "nvim";
         whitespace = "trailing-space,space-before-tab";
+        autocrlf = "input";
       };
+
+      # UI configuration
       color = {
         ui = true;
         diff = "auto";
         status = "auto";
         branch = "auto";
       };
-      help = {
-        autocorrect = 1;
-      };
-      diff = {
-        colorMoved = "default";
-      };
-      merge = {
-        conflictstyle = "diff3";
-      };
+
+      # Helper settings
+      help.autocorrect = 1;
+
+      # Diff and merge settings
+      diff.colorMoved = "default";
+      merge.conflictstyle = "diff3";
+
+      # Rebase configuration
       rebase = {
         autosquash = true;
         autostash = true;
       };
-      url = {
-        "git@github.com:" = {
-          insteadOf = "gh:";
-        };
-      };
+
+      # Security settings
+      commit.gpgSign = true;
+
+      # Remote URL shortcuts
+      url."git@github.com:".insteadOf = "gh:";
     };
 
-    # Useful aliases
+    # ────────────────────────────────────────────────────────────────
+    # Git Aliases
+    # ────────────────────────────────────────────────────────────────
     aliases = {
-      # Basic shortcuts
-      co = "checkout";
+      # Basic operations
       br = "branch";
       ci = "commit";
+      co = "checkout";
       st = "status -sb";
+      
+      # Diff operations
       df = "diff";
       dc = "diff --cached";
+
+      # Log viewing
       lg = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit";
       lga = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all";
       ls = "log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cblue [%cn]' --decorate";
       
-      # Work with branches
+      # Branch management
       bb = "branch -v";
       bd = "branch -d";
       bdd = "branch -D";
       
-      # Commit related
+      # Commit operations
       amend = "commit --amend -C HEAD";
       undo = "reset HEAD~1 --mixed";
       unstage = "reset HEAD --";
       
       # Stash operations
-      sl = "stash list";
       sa = "stash apply";
-      ss = "stash save";
+      sl = "stash list";
       sp = "stash pop";
+      ss = "stash save";
       
-      # Show
-      who = "shortlog -s --";
-      
-      # Find
-      find = "!git ls-files | grep -i";
-      
-      # List aliases
+      # Utility
       aliases = "!git config --get-regexp '^alias\\.' | sed 's/alias\\.\\([^ ]*\\) \\(.*\\)/\\1\\\t => \\2/' | sort";
-      
-      # Show files ignored by git
+      find = "!git ls-files | grep -i";
       ign = "ls-files -o -i --exclude-standard";
+      who = "shortlog -s --";
     };
 
-    # Sign commits if GPG key is available
-    signing = {
-      key = null;
-      signByDefault = false;
-    };
-
-    # LFS support
-    lfs.enable = true;
-
-    # Useful ignores
+    # ────────────────────────────────────────────────────────────────
+    # Git Ignore Patterns
+    # ────────────────────────────────────────────────────────────────
     ignores = [
-      # macOS
-      ".DS_Store"
-      "*.swp"
-      ".Spotlight-V100"
-      ".Trashes"
-
-      # Editor specific
-      ".vscode/"
-      ".idea/"
-      "*.sublime-workspace"
-      "*.sublime-project"
-      ".vim/"
-      "*.swp"
-      "*.swo"
-      "*~"
-
-      # Node
-      "node_modules/"
-      "npm-debug.log"
-      "yarn-error.log"
-      ".npm/"
-      ".yarn/"
-
-      # Python
-      "__pycache__/"
-      "*.py[cod]"
-      "*$py.class"
-      ".Python"
-      "env/"
-      "venv/"
-      ".env"
-      ".venv"
-      "pip-log.txt"
-      "pip-delete-this-directory.txt"
-      ".tox/"
-      ".coverage"
-      ".coverage.*"
-      ".cache"
-      "nosetests.xml"
-      "coverage.xml"
-      "*.cover"
-      
-      # Nix
-      "result"
-      "result-*"
+      # Version control
+      ".git/"
 
       # Build outputs
       "dist/"
       "build/"
       "*.egg-info/"
+      "result"
+      "result-*"
+
+      # Development environments
+      ".env"
+      ".venv"
+      "env/"
+      "venv/"
+      "__pycache__/"
+      "node_modules/"
+      ".npm/"
+      ".yarn/"
+
+      # Logs and databases
+      "*.log"
+      "*.sqlite"
+      ".coverage"
+      ".coverage.*"
+      "coverage.xml"
+      "nosetests.xml"
+
+      # OS generated files
+      ".DS_Store"
+      ".Spotlight-V100"
+      ".Trashes"
+      "Thumbs.db"
+
+      # Temporary files
+      "*~"
+      "*.swp"
+      "*.swo"
+      ".cache"
     ];
   };
-
-  # Install additional git tools
-  home.packages = with pkgs; [
-    git-absorb    # automatically absorb staged changes into previous commits
-    git-revise    # rewrite git commit history
-    git-branchless # streamlined workflow for stacked changes
-  ];
 }

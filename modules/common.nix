@@ -11,14 +11,13 @@
   nixpkgs = {
     # Use the overlay from flake outputs
     overlays = [
-      outputs.overlays.stable-packages
+      outputs.overlays.stable-packages # Use the stable packages overlay
     ];
 
-    # Allow unfree packages
+
     config = {
-      allowUnfree = true;
-      # Recommended for home-manager 24.11
-      allowUnfreePredicate = _: true;
+      allowUnfree = true;             # Allow all unfree packages
+      allowUnfreePredicate = _: true; # Predicate for allowing unfree packages
     };
   };
 

@@ -1,15 +1,6 @@
-# modules/kitty.nix
-{ config, pkgs, username, ... }:
+{ ... }:
 
 {
-  home.packages = with pkgs; [ 
-    kitty
-    (writeShellScriptBin "kitty-reload" ''
-      #!/usr/bin/env bash
-      # Reload kitty configuration
-      kill -SIGUSR1 $(pgrep -a kitty)
-    '') ];
-
   programs.kitty = {
     enable = true;
 
