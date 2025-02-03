@@ -5,7 +5,6 @@
     ../modules/kitty.nix
     ../modules/git.nix
     ../modules/zsh.nix
-    ../modules/pywal.nix
   ];
 
   nixpkgs = {
@@ -19,16 +18,5 @@
       allowUnfree = true;             # Allow all unfree packages
       allowUnfreePredicate = _: true; # Predicate for allowing unfree packages
     };
-  };
-
-  options.pywal = {
-    enable = true;
-    backend = "wal";
-    wallpaper = null;
-    reloadServices = [
-      "sketchybar"
-      "kitty"
-      "tmux"
-      ];
   };
 }

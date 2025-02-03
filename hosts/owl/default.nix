@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, outputs, system, user, ... }:
+{ config, pkgs, lib, inputs, outputs, system, user, host, ... }:
 
 {
     # ───────────────────────────────────────────────────────────────────────────────
@@ -17,7 +17,7 @@
     nix-homebrew = {
         enable = true;
         enableRosetta = true;                       # Enable Rosetta for compatibility with x86 Homebrew packages
-        user = "${user}";                           # Homebrew installed for the current user
+        user = user;                                # Homebrew installed for the current user
         autoMigrate = true;                         # Automatically migrate old Homebrew packages
     };
 
@@ -28,6 +28,8 @@
     users.users.${user} = {
         name = "${user}";
         home = "/Users/${user}";
+        isHidden = false;
+        shell = pkgs.zsh;
     };
 
     # Enable TouchID for sudo
@@ -35,6 +37,8 @@
 
     # ───────────────────────────────────────────────────────────────────────────────
     # macOS System Settings
+    # NOTE: Some options are not supported by nix-darwin directly, manually configure
+    #   1. To avoid conflicts with neovim, disable ctrl + up/down/left/right 
     # ───────────────────────────────────────────────────────────────────────────────
 
     system.defaults = {
@@ -95,16 +99,41 @@
     # ────────────────────────────────────────────────────────────────
     # Homebrew-Specific Settings
     # ────────────────────────────────────────────────────────────────
+    # @see:
+    #   - https://github.com/ryan4yin/nix-config
+    #   
+    #  NOTE: Your can find all available options in:
+    #    https://daiderd.com/nix-darwin/manual/index.html
+    #
+    #  NOTE：To remove the uninstalled APPs icon from Launchpad:
+    #    1. `sudo nix store gc --debug` & `sudo nix-collect-garbage --delete-old`
+    #    2. click on the uninstalled APP's icon in Launchpad, it will show a question mark
+    #    3. if the app starts normally:
+    #        1. right click on the running app's icon in Dock, select "Options" -> "Show in Finder" and delete it
+    #    4. hold down the Option key, a `x` button will appear on the icon, click it to remove the icon
+    # ────────────────────────────────────────────────────────────────
 
     homebrew = {
         enable = true;
-        brews = [ "mas" ];                          # Install CLI tools via Homebrew
+        brews = [                                   # Install CLI tools via Homebrew
+            # `brew install`
+            "mas"
+            "lua"
+            "sketchybar"
+        ];                                
         casks = [                                   # Install GUI apps via Homebrew
-            "anki"
-            "raycast"
-            "aerospace"
+            # `brew install --cask`
+            "aerospace"           
+            "anki"                
+            "discord"             
+            "obsidian"            
+            "raycast"             
+            "visual-studio-code"  
         ]; 
-        taps = [ "nikitabobko/tap" ];               # Add additional Homebrew taps
+        taps = [                                    # Add additional Homebrew taps
+            "nikitabobko/tap"                       # Aerospace tap
+            "felixkratz/formulae"                   # Sketchybar tap
+        ];               
         masApps = {};                               # Add any macOS App Store apps here
         onActivation = {
             cleanup = "zap";                        # Cleanup unused Homebrew packages on activation

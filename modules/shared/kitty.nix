@@ -87,7 +87,7 @@
     # ────────────────────────────────────────────────────────────────
 
     extraConfig = ''
-      # Load pywal colors
+      # Load colors
       include ${config.home.homeDirectory}/.cache/wal/colors-kitty.conf
       
       # Additional styling
@@ -104,50 +104,4 @@
       selection_background #${config.home.homeDirectory}/.cache/wal/colors-kitty.conf:color4}
     '';
   };
-
-
-  # Ensure pywal templates for kitty are properly set up
-  home.file.".config/wal/templates/colors-kitty.conf".text = ''
-    # Base colors
-    foreground           {foreground}
-    background           {background}
-    selection_foreground {background}
-    selection_background {foreground}
-    
-    # Cursor colors
-    cursor            {cursor}
-    cursor_text_color {background}
-    
-    # URL underline color when hovering with mouse
-    url_color {color4}
-    
-    # Window border colors
-    active_border_color   {color7}
-    inactive_border_color {color8}
-    bell_border_color     {color8}
-    
-    # Tab bar colors
-    active_tab_foreground   {background}
-    active_tab_background   {color4}
-    inactive_tab_foreground {foreground}
-    inactive_tab_background {background}
-    
-    # The 16 terminal colors
-    color0  {color0}
-    color1  {color1}
-    color2  {color2}
-    color3  {color3}
-    color4  {color4}
-    color5  {color5}
-    color6  {color6}
-    color7  {color7}
-    color8  {color8}
-    color9  {color9}
-    color10 {color10}
-    color11 {color11}
-    color12 {color12}
-    color13 {color13}
-    color14 {color14}
-    color15 {color15}
-  '';
 }

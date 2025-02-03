@@ -1,4 +1,3 @@
-# modules/aerospace.nix
 { config, lib, pkgs, ... }:
 
 let 

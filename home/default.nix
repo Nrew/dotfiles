@@ -1,5 +1,6 @@
-{ config, pkgs, user, ... }: 
+{ config, pkgs, lib, home-manager, ... }:
 let
+    user = "%USER%";
     isDarwin = pkgs.stdenv.isDarwin;
 in
 {
@@ -8,50 +9,17 @@ in
     #──────────────────────────────────────────────────────────────────
     imports = [ 
         # Add your module imports here
-        ../modules/common.nix
-        ../modules/aerospace.nix
-        ../modules/sketchybar.nix
+        ../modules/shared
     ];
 
     # Enable home-manager
     programs.home-manager.enable = true;
 
     #──────────────────────────────────────────────────────────────────
-    # Module Configuration
-    #──────────────────────────────────────────────────────────────────
-
-    darwin.wm.aerospace = {
-        enable = true;
-        settings.apps = {
-            # terminal = {
-            #     enable = true;
-            #     package = pkgs.alacritty;
-            #     app-id = "org.alacritty";
-            #     workspace = 2;
-            #     key = "enter";
-            # };
-            # browser = {
-            #     enable = true;
-            #     package = pkgs.brave;
-            #     app-id = "com.brave.Browser";
-            #     workspace = 1;
-            #     key = "b";
-            # };
-        };
-        settings.gaps = {
-            inner = 6;
-            outer = 6;
-        };
-    };
-
-    services.sketchybar = {
-        enable = true;
-    }
-
-    #──────────────────────────────────────────────────────────────────
     # Home Configuration
     #──────────────────────────────────────────────────────────────────
     home = {
+        enableNixpkgsReleaseCheck = false;
         username = user;
         homeDirectory =
             if isDarwin
