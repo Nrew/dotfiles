@@ -1,5 +1,10 @@
 { config, lib, pkgs, ... }:
 
+let
+  theme = import ./theme/default.nix { inherit lib; };
+  colors = theme.theme;
+in
+
 {
   programs.tmux = {
     enable = true;
@@ -13,9 +18,27 @@
     mouse = true;
 
     extraConfig = ''
-      # Source pywal colors
-      source-file ~/.cache/wal/colors-tmux.conf
-      
+      # Define color scheme
+      set -g @background "${colors.base}"
+      set -g @foreground "${colors.text}"
+      set -g @cursor "${colors.text}"
+      set -g @color0 "${colors.base}"
+      set -g @color1 "${colors.love}"
+      set -g @color2 "${colors.foam}"
+      set -g @color3 "${colors.gold}"
+      set -g @color4 "${colors.pine}"
+      set -g @color5 "${colors.iris}"
+      set -g @color6 "${colors.foam}"
+      set -g @color7 "${colors.text}"
+      set -g @color8 "${colors.overlay}"
+      set -g @color9 "${colors.love}"
+      set -g @color10 "${colors.foam}"
+      set -g @color11 "${colors.gold}"
+      set -g @color12 "${colors.pine}"
+      set -g @color13 "${colors.iris}"
+      set -g @color14 "${colors.foam}"
+      set -g @color15 "${colors.text}"
+
       # True color support
       set -as terminal-features ",xterm-256color:RGB"
       set -g default-terminal "tmux-256color"
@@ -89,30 +112,5 @@
     ];
   };
 
-  # Create pywal template for tmux
-  home.file.".config/wal/templates/colors-tmux.conf".text = ''
-    # Set tmux colors from pywal
-    set -g @background "{background}"
-    set -g @foreground "{foreground}"
-    set -g @cursor "{cursor}"
-    set -g @color0 "{color0}"
-    set -g @color1 "{color1}"
-    set -g @color2 "{color2}"
-    set -g @color3 "{color3}"
-    set -g @color4 "{color4}"
-    set -g @color5 "{color5}"
-    set -g @color6 "{color6}"
-    set -g @color7 "{color7}"
-    set -g @color8 "{color8}"
-    set -g @color9 "{color9}"
-    set -g @color10 "{color10}"
-    set -g @color11 "{color11}"
-    set -g @color12 "{color12}"
-    set -g @color13 "{color13}"
-    set -g @color14 "{color14}"
-    set -g @color15 "{color15}"
-    
-    # Status bar colors
-    set -g status-style "bg=#{@background}"
-  '';
+
 }

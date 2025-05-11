@@ -1,25 +1,28 @@
 { config, lib, pkgs, ... }:
 
+let
+  theme = import ../theme/default.nix { inherit lib; };
+  colors = theme.theme;
+in
 {
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
 
-    # https://github.com/catppuccin/fzf
-    # catppuccin-mocha
+    # Rose Pine colors for fzf
     colors = {
-      "bg+" = "#313244";
-      "bg"  = "#1e1e2e";
-      "spinner" = "#f5e0dc";
-      "hl"  = "#f38ba8";
-      "fg"  = "#cdd6f4";
-      "header"  = "#f38ba8";
-      "info"    = "#cba6f7";
-      "pointer" = "#f5e0dc";
-      "marker"  = "#f5e0dc";
-      "fg+"     = "#cdd6f4";
-      "prompt"  = "#cba6f7";
-      "hl+"     = "#f38ba8"; 
+      "bg+" = colors.overlay;
+      "bg"  = colors.base;
+      "spinner" = colors.rose;
+      "hl"  = colors.love;
+      "fg"  = colors.text;
+      "header"  = colors.love;
+      "info"    = colors.iris;
+      "pointer" = colors.rose;
+      "marker"  = colors.rose;
+      "fg+"     = colors.text;
+      "prompt"  = colors.iris;
+      "hl+"     = colors.love; 
     };
   };
 }

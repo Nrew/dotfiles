@@ -1,5 +1,5 @@
 {
-  description = "Nrew's flake";
+  description = "Owl NixOS Configuration";
 
   #──────────────────────────────────────────────────────────────────
   # Inputs Configuration
@@ -33,9 +33,9 @@
   outputs = { self, darwin, home-manager, nix-homebrew, nixpkgs, ... } @ inputs: 
     let
       inherit (self) inputs;
-      user = "nrew";
 
-      linuxSystems = ["x86_64-linux" "aarch64-linux"];
+      user = "nrew";
+      linuxSystems = ["x86_64-linux"];
       darwinSystems = ["aarch64-darwin"];
       
       forAllSystems = f: nixpkgs.lib.genAttrs (darwinSystems ++ linuxSystems) f;
@@ -123,7 +123,22 @@
             nix-homebrew.darwinModules.nix-homebrew
           ];
         };
+    
+      #──────────────────────────────────────────────────────────────────
+      #  Configuration
+      #──────────────────────────────────────────────────────────────────
+      
+      legacyPackages = forAllSystems (
+        system:
+        import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        }
+      );
+
+
     in {
+      inherit legacyPackages;
       devShells = forAllSystems devShell;
 
       apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;

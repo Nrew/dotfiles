@@ -1,97 +1,156 @@
 { config, lib, pkgs, ... }:
 
-let 
-  inherit (config.colorscheme) colors;
-
-  variantIcons = [
-   "「ヨルハ」"
-   "『ヨルハ』" 
-   "【ヨルハ】"
-   "［ヨルハ］"
-   "〈ヨルハ〉"
-   "《ヨルハ》"
- ];
-
+let
+  theme = import ./theme/default.nix { inherit lib; };
+  colors = theme.theme;
 in
 {
   home.packages = [ pkgs.fastfetch ];
 
-  xdg.configFile."fastfetch/config.jsonc".text = ''
+  home.file.".config/fastfetch/config.jsonc".text = ''
     {
       "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+      
       "modules": [
-        "title",
-        "separator",
-        "os",
-        "host",
-        "kernel",
-        "uptime",
-        "packages",
-        "shell",
-        "display",
-        "memory",
-        "cpu",
-        "gpu",
-        "battery",
-        "locale",
-        "break",
-        "colors"
+        {
+          "type": "title",
+          "format": "{1}@{2}"
+        },
+        {
+          "type": "separator",
+          "string": "─────────────────────────────────"
+        },
+        {
+          "type": "os",
+          "key": "OS",
+          "format": "{2} {9}"
+        },
+        {
+          "type": "host",
+          "key": "Host",
+          "format": "{1}"
+        },
+        {
+          "type": "kernel",
+          "key": "Kernel",
+          "format": "{1} {2}"
+        },
+        {
+          "type": "uptime",
+          "key": "Uptime",
+          "format": "{?1}{1} days{?} {?2}{2} hours{?} {?3}{3} min{?}"
+        },
+        {
+          "type": "packages",
+          "key": "Packages",
+          "format": "{1}"
+        },
+        {
+          "type": "shell",
+          "key": "Shell"
+        },
+        {
+          "type": "separator",
+          "string": "─────────────────────────────────"
+        },
+        {
+          "type": "cpu",
+          "key": "CPU",
+          "format": "{1}"
+        },
+        {
+          "type": "gpu",
+          "key": "GPU",
+          "format": "{1}"
+        },
+        {
+          "type": "memory",
+          "key": "Memory",
+          "format": "{1} / {2} ({3})"
+        },
+        {
+          "type": "battery",
+          "key": "Battery",
+          "format": "{1}% [{3}]"
+        },
+        {
+          "type": "separator",
+          "string": "─────────────────────────────────"
+        },
+        {
+          "type": "display",
+          "key": "Display",
+          "format": "{1}x{2}@{5}Hz"
+        },
+        {
+          "type": "de",
+          "key": "DE"
+        },
+        {
+          "type": "wm",
+          "key": "WM"
+        },
+        {
+          "type": "terminal",
+          "key": "Terminal"
+        },
+        {
+          "type": "separator",
+          "string": "─────────────────────────────────"
+        },
+        {
+          "type": "locale",
+          "key": "Locale"
+        },
+        {
+          "type": "theme",
+          "key": "Theme"
+        },
+        {
+          "type": "icons",
+          "key": "Icons"
+        },
+        {
+          "type": "break"
+        },
+        {
+          "type": "colors",
+          "block": {
+            "width": 2,
+            "height": 1,
+            "paddingLeft": 1
+          }
+        }
       ],
       
       "display": {
-        "separator": "→",
-        "keyWidth": 15,
-        "percentType": "bar"
+        "separator": " ",
+        "keyWidth": 10,
+        "percentType": "hiding"
       },
       
       "logo": {
-        "type": "image",
-        "source": "~/.config/fastfetch/waifu.png",
-        "width": 35,
-        "height": 35,
+        "type": "builtin",
+        "source": "apple",
+        "width": 30,
+        "height": 30,
         "padding": {
+          "top": 1,
           "left": 2,
           "right": 3
+        },
+        "color": {
+          "1": "${colors.base}",
+          "2": "${colors.pine}"
         }
-      },
-      
-      "title": {
-        "format": "{1}サン @ {2}",
-        "key": "システム",
-        "keyColor": "${colors.base0D}"
-      },
-      
-      "separator": {
-        "string": "──────",
-        "color": "${colors.base0D}"
-      },
-
-      "battery": {
-       "key": "バッテリー状態",
-       "format": "【{1}%】"
-     },
-      
-      "colors": {
-        "keys": "${colors.base0D}",
-        "title": "${colors.base0D}",
-        "separator": "${colors.base0D}",
-        "text": "${colors.base05}"
       }
     }
   '';
 
-  # Create XDG directory and download image if it doesn't exist
-  home.activation.fetchWaifu = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    mkdir -p ~/.config/fastfetch
-    if [ ! -f ~/.config/fastfetch/waifu.png ]; then
-      curl -L "https://raw.githubusercontent.com/fastfetch-cli/fastfetch/dev/data/logos/small/arch.png" -o ~/.config/fastfetch/waifu.png
-    fi
-  '';
-
-  # Add shell alias
+  # Add shell aliases
   programs.zsh.shellAliases = {
-    fetch = "fastfetch";
     scan = "fastfetch";
-    "pod-scan" = "fastfetch";
+    neofetch = "fastfetch";
+    info = "fastfetch";
   };
 }

@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 
-let user = "%USER%"; in
+let user = "nrew"; in
 
 {
     # ────────────────────────────────────────────────────────────────
@@ -78,12 +78,17 @@ let user = "%USER%"; in
             experimental-features = [ "nix-command" "flakes" ];
             optimize-store = "automatic";
         };
+
         gc = {
-            user = "root";    # Run garbage collection as the root user
-            automatic = true; # Enable automatic garbage collection
+            user = "root";                                     # Run garbage collection as the root user
+            automatic = true;                                  # Enable automatic garbage collection
             interval = { Weekday = 0; Hour = 2; Minute = 0; }; # Run garbage collection every Sunday at 2:00 AM
-            options = "--delete-older-than 30d"; # Delete generations older than 30 days
+            options = "--delete-older-than 30d";               # Delete generations older than 30 days
         };
+
+        extraOptions = ''
+            experimental-features = nix-command flakes;
+        '';
     };
 
     # The stateVersion attribute is used to specify the version of NixOS

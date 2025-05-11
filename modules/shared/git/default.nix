@@ -1,4 +1,4 @@
-{ config, lib, pkgs, user, ... }:
+{ config, lib, pkgs, ... }:
 let
     name = "Nrew";
     user = "nrew";
@@ -7,7 +7,9 @@ in
 {
 
   home.activation.removeExistingGitconfig = lib.hm.dag.entryBefore ["checkLinkTargets"] ''
-    rm -f ${config.home.homeDirectory}/.gitconfig
+    if [ -f "${config.home.homeDirectory}/.gitconfig" ]; then
+      rm -f "${config.home.homeDirectory}/.gitconfig"
+    fi
   '';
 
   # ────────────────────────────────────────────────────────────────

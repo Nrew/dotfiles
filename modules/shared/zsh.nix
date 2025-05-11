@@ -20,11 +20,6 @@
 
     # Initialize plugins
     initExtra = ''
-      # Load pywal colors
-      if [ -f ~/.cache/wal/sequences ]; then
-        (cat ~/.cache/wal/sequences &)
-      fi
-
       # Better history search
       autoload -U up-line-or-beginning-search
       autoload -U down-line-or-beginning-search
@@ -119,7 +114,6 @@
       rebuild = "darwin-rebuild switch --flake .";
       
       # Utils
-      update-colors = "wal -R && sketchybar-reload";
       h = "history";
       j = "jobs -l";
       path = "echo -e \${PATH//:/\\n}";
@@ -152,8 +146,5 @@
   };
 
   # Directory for custom functions
-  home.file.".config/zsh/functions" = {
-    recursive = true;
-    source = ./functions;
-  };
+  home.file.".config/zsh/functions/.keep".text = ''# This file keeps the functions directory'';
 }

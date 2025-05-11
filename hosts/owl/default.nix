@@ -9,7 +9,6 @@ let user = "nrew"; in
 
     imports = [
         ../shared.nix
-	../../home
     ];
 
     # ───────────────────────────────────────────────────────────────────────────────
@@ -97,7 +96,9 @@ let user = "nrew"; in
     # macOS-Specific System-Level Packages
     # ────────────────────────────────────────────────────────────────
 
-    environment.systemPackages = with pkgs; [];
+    environment.systemPackages = with pkgs; [
+        btop
+    ];
 
     # ────────────────────────────────────────────────────────────────
     # Homebrew-Specific Settings
@@ -123,6 +124,7 @@ let user = "nrew"; in
             "mas"
             "lua"
             "sketchybar"
+            "spicetify-cli"
         ];                                
         casks = [                                   # Install GUI apps via Homebrew
             # `brew install --cask`
@@ -132,6 +134,7 @@ let user = "nrew"; in
             "obsidian"            
             "raycast"             
             "visual-studio-code"  
+            "ghostty"
         ]; 
         taps = [                                    # Add additional Homebrew taps
             "nikitabobko/tap"                       # Aerospace tap

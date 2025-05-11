@@ -1,5 +1,11 @@
 { lib, pkgs, ... }:
 
+let
+  theme = import ../theme/default.nix { inherit lib; };
+  colors = theme.theme;
+  palette = theme.colorPalette;
+in
+
 {
   programs.kitty = {
     enable = true;
@@ -21,19 +27,39 @@
     # ────────────────────────────────────────────────────────────────
 
     settings = {
+      # Colors
+      background = colors.base;
+      foreground = colors.text;
+      
+      # Terminal colors
+      color0 = palette.black;
+      color1 = palette.red;
+      color2 = palette.green;
+      color3 = palette.yellow;
+      color4 = palette.blue;
+      color5 = palette.magenta;
+      color6 = palette.cyan;
+      color7 = palette.white;
+      color8 = palette.brightBlack;
+      color9 = palette.brightRed;
+      color10 = palette.brightGreen;
+      color11 = palette.brightYellow;
+      color12 = palette.brightBlue;
+      color13 = palette.brightMagenta;
+      color14 = palette.brightCyan;
+      color15 = palette.brightWhite;
+      
+      # Cursor colors
+      cursor = colors.text;
+      cursor_text_color = colors.base;
 
       # Window
       window_padding_width = "16";
       single_window_margin_width = "0";
       confirm_os_window_close = 0;
 
-
       # URLs
       detect_urls = "yes";
-
-      # Mouse
-
-      # Performance
       
       # Shell
       shell_integration = "enabled";
@@ -84,10 +110,5 @@
       "cmd+k" = "clear_terminal scrollback active";
       "cmd+l" = "clear_terminal scroll active";
     };
-
-    # ────────────────────────────────────────────────────────────────
-    # Theme Integration
-    # ────────────────────────────────────────────────────────────────
-    themeFile = "Catppuccin-Mocha";
   };
 }
