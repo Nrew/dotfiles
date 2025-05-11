@@ -24,7 +24,7 @@
       neo-tree-nvim
       trouble-nvim
       noice-nvim
-      notify-nvim
+      nvim-notify
       dressing-nvim
       indent-blankline-nvim
       nvim-ufo

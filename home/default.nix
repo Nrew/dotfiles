@@ -1,7 +1,6 @@
 { config, pkgs, lib, user, home-manager, ... }:
 let
     user = "nrew";
-    theme = import ../modules/shared/theme/default.nix { inherit lib; };
 in
 {
     #──────────────────────────────────────────────────────────────────
@@ -43,7 +42,4 @@ in
             TERM = "xterm-256color";
         };
     };
-    
-    # Export theme for modules
-    colorscheme = theme.catppuccin;
 }

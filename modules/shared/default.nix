@@ -10,9 +10,10 @@
     ./kitty
     ./neovim
     ./starship
+    ./ghostty
     ./spicetify
     ./raycast
-    ./ghostty
     ./btop
+    ./spotify-player
   ];
 }

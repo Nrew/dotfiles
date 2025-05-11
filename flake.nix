@@ -22,6 +22,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Catppuccin
+    catppuccin.url = "github:catppuccin/nix";
+    
+    rose-pine-hyprcursor = {
+      url = "github:ndom91/rose-pine-hyprcursor";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Homebrew
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
   };

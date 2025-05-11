@@ -97,7 +97,6 @@ let user = "nrew"; in
     # ────────────────────────────────────────────────────────────────
 
     environment.systemPackages = with pkgs; [
-        btop
     ];
 
     # ────────────────────────────────────────────────────────────────
@@ -125,6 +124,7 @@ let user = "nrew"; in
             "lua"
             "sketchybar"
             "spicetify-cli"
+            "gowall"
         ];                                
         casks = [                                   # Install GUI apps via Homebrew
             # `brew install --cask`

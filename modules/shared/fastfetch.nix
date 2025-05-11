@@ -14,101 +14,101 @@ in
       "modules": [
         {
           "type": "title",
-          "format": "{1}@{2}"
+          "format": "{1}サン @ {2}"
         },
         {
           "type": "separator",
-          "string": "─────────────────────────────────"
+          "string": "──────────────────────────────────"
         },
         {
           "type": "os",
-          "key": "OS",
+          "key": "オペレーティングシステム",
           "format": "{2} {9}"
         },
         {
           "type": "host",
-          "key": "Host",
+          "key": "ホスト",
           "format": "{1}"
         },
         {
           "type": "kernel",
-          "key": "Kernel",
+          "key": "カーネル",
           "format": "{1} {2}"
         },
         {
           "type": "uptime",
-          "key": "Uptime",
-          "format": "{?1}{1} days{?} {?2}{2} hours{?} {?3}{3} min{?}"
+          "key": "アップタイム",
+          "format": "{?1}{1} 日{?} {?2}{2} 時間{?} {?3}{3} 分{?}"
         },
         {
           "type": "packages",
-          "key": "Packages",
+          "key": "パッケージ",
           "format": "{1}"
         },
         {
           "type": "shell",
-          "key": "Shell"
+          "key": "シェル"
         },
         {
           "type": "separator",
-          "string": "─────────────────────────────────"
+          "string": "──────────────────────────────────"
         },
         {
           "type": "cpu",
-          "key": "CPU",
+          "key": "ＣＰＵ",
           "format": "{1}"
         },
         {
           "type": "gpu",
-          "key": "GPU",
+          "key": "ＧＰＵ",
           "format": "{1}"
         },
         {
           "type": "memory",
-          "key": "Memory",
+          "key": "メモリ",
           "format": "{1} / {2} ({3})"
         },
         {
           "type": "battery",
-          "key": "Battery",
+          "key": "バッテリー",
           "format": "{1}% [{3}]"
         },
         {
           "type": "separator",
-          "string": "─────────────────────────────────"
+          "string": "──────────────────────────────────"
         },
         {
           "type": "display",
-          "key": "Display",
+          "key": "ディスプレイ",
           "format": "{1}x{2}@{5}Hz"
         },
         {
           "type": "de",
-          "key": "DE"
+          "key": "デスクトップ環境"
         },
         {
           "type": "wm",
-          "key": "WM"
+          "key": "ウィンドウマネージャ"
         },
         {
           "type": "terminal",
-          "key": "Terminal"
+          "key": "ターミナル"
         },
         {
           "type": "separator",
-          "string": "─────────────────────────────────"
+          "string": "──────────────────────────────────"
         },
         {
           "type": "locale",
-          "key": "Locale"
+          "key": "ロケール"
         },
         {
           "type": "theme",
-          "key": "Theme"
+          "key": "テーマ"
         },
         {
           "type": "icons",
-          "key": "Icons"
+          "key": "アイコン"
         },
         {
           "type": "break"
@@ -125,23 +125,19 @@ in
       
       "display": {
         "separator": " ",
-        "keyWidth": 10,
+        "keyWidth": 15,
         "percentType": "hiding"
       },
       
       "logo": {
-        "type": "builtin",
-        "source": "apple",
-        "width": 30,
-        "height": 30,
+        "type": "file",
+        "source": "~/.config/fastfetch/tuchany.png",
+        "width": 35,
+        "height": 35,
         "padding": {
           "top": 1,
           "left": 2,
           "right": 3
-        },
-        "color": {
-          "1": "${colors.base}",
-          "2": "${colors.pine}"
         }
       }
     }
@@ -153,4 +149,13 @@ in
     neofetch = "fastfetch";
     info = "fastfetch";
   };
+
+  # Create XDG directory for tuchany image
+  home.activation.setupTuchanyImage = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    mkdir -p ~/.config/fastfetch
+    # You should place your tuchany.png image at ~/.config/fastfetch/tuchany.png
+    if [ ! -f ~/.config/fastfetch/tuchany.png ]; then
+      echo "Please copy your tuchany.png image to ~/.config/fastfetch/tuchany.png" > ~/.config/fastfetch/README_TUCHANY.txt
+    fi
+  '';
 }
