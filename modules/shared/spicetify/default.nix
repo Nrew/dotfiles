@@ -11,7 +11,7 @@ in
     [Setting]
     spotify_path                = ${pkgs.spotify}/Applications/Spotify.app/Contents/Resources
     prefs_path                  = ${config.home.homeDirectory}/Library/Application Support/Spotify/prefs
-    current_theme               = text
+    current_theme               = Ziro
     color_scheme                = rose-pine-moon
     inject_css                  = 1
     inject_theme_js             = 1
@@ -19,99 +19,29 @@ in
     overwrite_assets            = 0
     spotify_launch_flags        = 
     check_spicetify_upgrade     = 0
+    always_enable_devtools      = 0
+    check_spicetify_update      = 1
 
-    ; DO NOT CHANGE!
     [Preprocesses]
+    remove_rtl_rule             = 1
+    expose_apis                 = 1
+    disable_upgrade_check       = 1
+    disable_sentry              = 1
+    disable_ui_logging          = 1
     
     [AdditionalOptions]
-    extensions                  = shuffle+.js|playlistIcons.js
-    custom_apps                 = 
-    disable_upgrade_check       = 1
-    custom_code                 = 
-  '';
+    extensions                  = trashbin.js|shuffle+.js|playlistIcons.js
+    custom_apps                 = marketplace
+    sidebar_config              = 1
+    home_config                 = 1
+    experimental_features       = 1
 
-  # Custom Rose Pine theme
-  home.file.".config/spicetify/Themes/RosePine/theme.js".text = ''
-// Rose Pine Theme for Spicetify
-(function rosePine() {
-  if (!Spicetify || !Spicetify.Platform) {
-    setTimeout(rosePine, 100);
-    return;
-  }
-
-  // Custom styling
-  Spicetify.injectCSS(`
-    .Root__main-view {
-      background-color: ${colors.base};
-    }
+    [Patch]
     
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: ${colors.surface};
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: ${colors.overlay};
-      border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: ${colors.muted};
-    }
-    
-    /* Play button styling */
-    .control-button-wrapper .progress-bar {
-      height: 4px;
-    }
-    
-    /* Card hover effects */
-    .main-card-card {
-      transition: all 0.3s ease;
-    }
-    
-    .main-card-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-    
-    /* Glass effect for main view */
-    .Root__main-view {
-      backdrop-filter: blur(10px);
-    }
-  `);
-})();
-  '';
-
-  # Rose Pine color scheme
-  home.file.".config/spicetify/Themes/RosePine/color.ini".text = ''
-[dark]
-main               = ${colors.base}
-sidebar            = ${colors.surface}
-player             = ${colors.base}
-subtext            = ${colors.subtle}
-navbar             = ${colors.surface}
-main-secondary     = ${colors.surface}
-sidebar-secondary  = ${colors.overlay}
-player-secondary   = ${colors.surface}
-main-elevated      = ${colors.overlay}
-highlight-elevated = ${colors.foam}
-highlight          = ${colors.pine}
-accent             = ${colors.iris}
-accent-secondary   = ${colors.rose}
-text               = ${colors.text}
-selected-row       = ${colors.overlay}
-button             = ${colors.iris}
-button-secondary   = ${colors.surface}
-button-disabled    = ${colors.muted}
-warning            = ${colors.gold}
-error              = ${colors.love}
-success            = ${colors.foam}
-playlist           = ${colors.pine}
-card               = ${colors.surface}
+    ; DO NOT CHANGE!
+    [Backup]
+    version = 1.2.62.580.gb27ad23e
+    with    = 2.39.7
   '';
 
   # Install script

@@ -107,5 +107,9 @@
   };
 
   # Link the neovim config directory
-  home.file.".config/nvim".source = ./config;
+  home.file.".config/nvim" = {
+    source = ./config;
+    recursive = true;
+    executable = false;
+  };
 }

@@ -6,9 +6,6 @@ let
 in
 
 {
-  # Install btop
-  home.packages = [ pkgs.btop ];
-
   # btop configuration
   home.file.".config/btop/btop.conf".text = ''
     # btop configuration file

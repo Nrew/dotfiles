@@ -4,8 +4,10 @@
 {
   programs.zsh = {
     enable = true;
-    autosuggestion.enable = true;
+
     enableCompletion = true;
+    enableBashCompletion = true;
+    autosuggestions.enable = true;
     syntaxHighlighting.enable = true;
 
     # History configuration
@@ -79,13 +81,6 @@
       "...." = "cd ../../..";
       "....." = "cd ../../../..";
       
-      # List directory contents
-      ls = "exa";
-      l = "exa -l";
-      la = "exa -la";
-      lt = "exa --tree";
-      ll = "exa -l";
-      
       # Git
       g = "git";
       ga = "git add";
@@ -109,9 +104,6 @@
       cp = "cp -i";
       mv = "mv -i";
       mkdir = "mkdir -p";
-      
-      # Nix
-      rebuild = "darwin-rebuild switch --flake .";
       
       # Utils
       h = "history";

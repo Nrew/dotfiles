@@ -8,7 +8,7 @@ in
     #──────────────────────────────────────────────────────────────────
     imports = [ 
         # Add your module imports here
-        ../modules/shared
+        ../modules/owl
     ];
 
     # Enable home-manager
