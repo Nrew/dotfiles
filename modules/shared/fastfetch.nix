@@ -2,152 +2,15 @@
 
 let
   theme = import ./theme/default.nix { inherit lib; };
-  colors = theme.theme;
+  colors = theme.catppuccin;
 in
 {
-  home.packages = [ pkgs.fastfetch ];
+  #──────────────────────────────────────────────────────────────────
+  # Fastfetch Logo Image Management
+  #──────────────────────────────────────────────────────────────────
 
-  home.file.".config/fastfetch/config.jsonc".text = ''
-    {
-      "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
-      
-      "modules": [
-        {
-          "type": "title",
-          "format": "{1}サン @ {2}"
-        },
-        {
-          "type": "separator",
-          "string": "──────────────────────────────────"
-        },
-        {
-          "type": "os",
-          "key": "オペレーティングシステム",
-          "format": "{2} {9}"
-        },
-        {
-          "type": "host",
-          "key": "ホスト",
-          "format": "{1}"
-        },
-        {
-          "type": "kernel",
-          "key": "カーネル",
-          "format": "{1} {2}"
-        },
-        {
-          "type": "uptime",
-          "key": "アップタイム",
-          "format": "{?1}{1} 日{?} {?2}{2} 時間{?} {?3}{3} 分{?}"
-        },
-        {
-          "type": "packages",
-          "key": "パッケージ",
-          "format": "{1}"
-        },
-        {
-          "type": "shell",
-          "key": "シェル"
-        },
-        {
-          "type": "separator",
-          "string": "──────────────────────────────────"
-        },
-        {
-          "type": "cpu",
-          "key": "ＣＰＵ",
-          "format": "{1}"
-        },
-        {
-          "type": "gpu",
-          "key": "ＧＰＵ",
-          "format": "{1}"
-        },
-        {
-          "type": "memory",
-          "key": "メモリ",
-          "format": "{1} / {2} ({3})"
-        },
-        {
-          "type": "battery",
-          "key": "バッテリー",
-          "format": "{1}% [{3}]"
-        },
-        {
-          "type": "separator",
-          "string": "──────────────────────────────────"
-        },
-        {
-          "type": "display",
-          "key": "ディスプレイ",
-          "format": "{1}x{2}@{5}Hz"
-        },
-        {
-          "type": "de",
-          "key": "デスクトップ環境"
-        },
-        {
-          "type": "wm",
-          "key": "ウィンドウマネージャ"
-        },
-        {
-          "type": "terminal",
-          "key": "ターミナル"
-        },
-        {
-          "type": "separator",
-          "string": "──────────────────────────────────"
-        },
-        {
-          "type": "locale",
-          "key": "ロケール"
-        },
-        {
-          "type": "theme",
-          "key": "テーマ"
-        },
-        {
-          "type": "icons",
-          "key": "アイコン"
-        },
-        {
-          "type": "break"
-        },
-        {
-          "type": "colors",
-          "block": {
-            "width": 2,
-            "height": 1,
-            "paddingLeft": 1
-          }
-        }
-      ],
-      
-      "display": {
-        "separator": " ",
-        "keyWidth": 15,
-        "percentType": "hiding"
-      },
-      
-      "logo": {
-        "type": "file",
-        "source": "~/.config/fastfetch/tuchany.png",
-        "width": 35,
-        "height": 35,
-        "padding": {
-          "top": 1,
-          "left": 2,
-          "right": 3
-        }
-      }
-    }
-  '';
-
-  # Add shell aliases
-  programs.zsh.shellAliases = {
-    scan = "fastfetch";
-    neofetch = "fastfetch";
-    info = "fastfetch";
+  home.file.".config/fastfetch/tuchany.png" = {
+    source = ./tuchany.png; # Or the correct relative path to your image
   };
 
   # Create XDG directory for tuchany image
@@ -158,4 +21,169 @@ in
       echo "Please copy your tuchany.png image to ~/.config/fastfetch/tuchany.png" > ~/.config/fastfetch/README_TUCHANY.txt
     fi
   '';
+
+  #──────────────────────────────────────────────────────────────────
+  # Required Packages
+  #──────────────────────────────────────────────────────────────────
+  home.packages = [ pkgs.fastfetch ];
+
+
+  #──────────────────────────────────────────────────────────────────
+  # Fastfetch Program Configuration
+  #──────────────────────────────────────────────────────────────────
+  programs.fastfetch = {
+    enable = true;
+    enableZshIntegration = true;   
+    enableBashIntegration = true;
+
+    settings = {
+      logo = {
+        type = "kitty";
+        source = "${pkgs.fastfetch}/share/fastfetch/logo/tuchany.png";
+        width = 30;
+        padding = {
+          top = 1;
+        };
+      };
+
+      display = {
+        separator = "  ";
+        keyWidth = 22;
+        color.keys = colors.lavender;
+      };
+
+      modules = [
+        {
+          type = "title";
+          format: "${colors.pink}{1}${colors.text}サン @ ${colors.mauve}{2}${colors.text}";
+        }
+        {
+          type = "separator";
+          string = "⋅ ⋅ ⋅ ⋅ ⋆˙⊹°.⋆˖°.⋆˙⊹°.⋆ ⋅ ⋅ ⋅ ⋅";
+          color = colors.mauve;
+        }
+        {
+          type = "os";
+          key = "オペレーティングシステム";
+          keyColor = colors.pink;
+          format = "{2} {9}";
+        }
+        {
+          type = "host";
+          key = "ホスト (フクロウ)";
+          keyColor = colors.flamingo;
+          format = "{1}";
+        }
+                {
+          type = "kernel";
+          key = "カーネル";
+          keyColor = colors.rosewater;
+          format = "{1} {2}";
+        }
+        {
+          type = "uptime";
+          key = "アップタイム";
+          keyColor = colors.mauve;
+          format = "{?1}{1} 日{?} {?2}{2} 時間{?} {?3}{3} 分{?}";
+        }
+        {
+          type = "packages";
+          key = "パッケージ";
+          keyColor = colors.pink;
+          format = "{1}";
+        }
+        {
+          type = "shell";
+          key = "シェル";
+          keyColor = colors.flamingo;
+        }
+        {
+          type = "separator";
+          string = "⋅ ⋅ ⋅ ⋅ ⋆˙⊹°.⋆˖°.⋆˙⊹°.⋆ ⋅ ⋅ ⋅ ⋅";
+          color = colors.mauve;
+        }
+        {
+          type = "cpu";
+          key = "ＣＰＵ";
+          keyColor = colors.rosewater;
+          format = "{1} ({5}%)";
+        }
+         {
+          type = "gpu";
+          key = "ＧＰＵ";
+          keyColor = colors.mauve;
+          format = "{1}";
+        }
+        {
+          type = "memory";
+          key = "メモリ";
+          keyColor = colors.pink;
+          format = "{1} / {2} ({3})";
+        }
+        {
+          type = "battery";
+          key = "バッテリー";
+          keyColor = colors.flamingo;
+          format = "{1}% [{3}]";
+        }
+        {
+          type = "separator";
+          string = "⋅ ⋅ ⋅ ⋅ ⋆˙⊹°.⋆˖°.⋆˙⊹°.⋆ ⋅ ⋅ ⋅ ⋅";
+          color = colors.mauve;
+        }
+        {
+          type = "display";
+          key = "ディスプレイ";
+          keyColor = colors.rosewater;
+          format = "{1}x{2}@{5}Hz";
+        }
+        {
+          type = "de";
+          key = "デスクトップ環境";
+          keyColor = colors.mauve; 
+        }
+        {
+          type = "wm";
+          key = "ウィンドウマネージャ";
+          keyColor = colors.pink;
+        }
+        {
+          type = "terminal";
+          key = "ターミナル";
+          keyColor = colors.flamingo;
+        }
+        {
+          type = "separator";
+          string = "⋅ ⋅ ⋅ ⋅ ⋆˙⊹°.⋆˖°.⋆˙⊹°.⋆ ⋅ ⋅ ⋅ ⋅";
+          color = colors.mauve;
+        }
+        {
+          type: "icons";
+          key: "アイコン";
+          keyColor = colors.pink or "#f5c2e7";
+        }
+        {
+          type = "break";
+        }
+        {
+          type: "colors";
+          keyColor = colors.flamingo or "#f2cdcd";
+          block: {
+            width: 2;
+            height: 1;
+            paddingLeft: 1;
+          };
+        }
+      ];
+    };
+  };
+
+  #──────────────────────────────────────────────────────────────────
+  # Shell Aliases
+  #──────────────────────────────────────────────────────────────────
+  programs.zsh.shellAliases = {
+    scan = "fastfetch";
+    neofetch = "fastfetch";
+    info = "fastfetch";
+  };
 }
