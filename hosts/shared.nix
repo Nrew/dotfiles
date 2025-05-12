@@ -26,7 +26,7 @@ let user = "nrew"; in
         texinfo     # Needed for compiling tools like Emacs
         btop        # System-wide resource monitor
         neovim      # Modern text editor
-	    git         # Version control system
+        git         # Version control system
         git-lfs     # Git extension for large files
         tmux        # Terminal multiplexer
         starship    # Cross-shell prompt
@@ -42,21 +42,12 @@ let user = "nrew"; in
 
     fonts = {
         packages = with pkgs; [
-            maple-mono-NF 
-	        (nerdfonts.override { 
-                fonts = [
-                    "JetBrainsMono"
-                    "FiraCode"
-                    "Iosevka"
-                    "NerdFontsSymbolsOnly"
-	            ];
-            })
-
-	        # Nix 25.05 
-	        #nerd-fonts.symbols-only     # Symbols Nerd Font
-            #nerd-fonts.jetbrains-mono   # JetBrainsMono Nerd Font
-            #nerd-fonts.fira-code        # FiraCode Nerd Font
-            #nerd-fonts.iosevka          # Iosevka Nerd Font
+	    # Nix 25.05
+	    maple-mono.NF-unhinted 
+	    nerd-fonts.symbols-only     # Symbols Nerd Font
+            nerd-fonts.jetbrains-mono   # JetBrainsMono Nerd Font
+            nerd-fonts.fira-code        # FiraCode Nerd Font
+            nerd-fonts.iosevka          # Iosevka Nerd Font
         ];
     };
 
@@ -88,7 +79,6 @@ let user = "nrew"; in
         };
 
         gc = {
-            user = "root";                                     # Run garbage collection as the root user
             automatic = true;                                  # Enable automatic garbage collection
             interval = { Weekday = 0; Hour = 2; Minute = 0; }; # Run garbage collection every Sunday at 2:00 AM
             options = "--delete-older-than 30d";               # Delete generations older than 30 days
@@ -102,5 +92,5 @@ let user = "nrew"; in
     # The stateVersion attribute is used to specify the version of NixOS
     # to maintain backwards compatibility with older configurations.
     # Changing this value can affect the behavior of the system.
-    system.stateVersion = 5;
+    system.stateVersion = 4;
 }

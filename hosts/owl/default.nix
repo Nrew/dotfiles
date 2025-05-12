@@ -23,9 +23,6 @@ let user = "nrew"; in
         autoMigrate = true;                         # Automatically migrate old Homebrew packages
     };
 
-    # Enable Nix Daemon for system-wide package management
-    services.nix-daemon.enable = true;
-
     # User configuration
     users.users.${user} = {
         name = "${user}";
@@ -35,7 +32,7 @@ let user = "nrew"; in
     };
 
     # Enable TouchID for sudo
-    security.pam.enableSudoTouchIdAuth = true;
+    security.pam.services.sudo_local.touchIdAuth = true;
 
     # ───────────────────────────────────────────────────────────────────────────────
     # macOS System Settings

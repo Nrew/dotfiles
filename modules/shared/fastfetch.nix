@@ -2,7 +2,7 @@
 
 let
   theme = import ./theme/default.nix { inherit lib; };
-  colors = theme.theme;
+  colors = theme.catppuccin;
 in
 {
   #──────────────────────────────────────────────────────────────────

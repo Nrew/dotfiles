@@ -1,13 +1,10 @@
-# modules/cli/zsh/default.nix
 { config, lib, pkgs, ... }:
-
 {
   programs.zsh = {
     enable = true;
 
     enableCompletion = true;
-    enableBashCompletion = true;
-    autosuggestions.enable = true;
+    autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
     # History configuration
