@@ -9,18 +9,9 @@ in
   # Fastfetch Logo Image Management
   #──────────────────────────────────────────────────────────────────
 
-  home.file.".config/fastfetch/tuchany.png" = {
-    source = ../../images/tuchany.png;
+  home.file.".config/fastfetch/tvchany.jpg" = {
+    source = ../../images/logo.jpg;
   };
-
-  # Create XDG directory for tuchany image
-  home.activation.setupTuchanyImage = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    mkdir -p ~/.config/fastfetch
-    # You should place your tuchany.png image at ~/.config/fastfetch/tuchany.png
-    if [ ! -f ~/.config/fastfetch/tuchany.png ]; then
-      echo "Please copy your tuchany.png image to ~/.config/fastfetch/tuchany.png" > ~/.config/fastfetch/README_TUCHANY.txt
-    fi
-  '';
 
   #──────────────────────────────────────────────────────────────────
   # Required Packages
@@ -37,7 +28,7 @@ in
     settings = {
       logo = {
         type = "kitty";
-        source = "${config.home.homeDirectory}/.config/fastfetch/tuchany.png";
+        source = "${config.home.homeDirectory}/.config/fastfetch/tvchany.jpg";
         width = 30;
         padding = {
           top = 1;

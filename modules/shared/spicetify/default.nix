@@ -1,37 +1,24 @@
 { config, pkgs, lib, ... }:
 
 let
-  spicetifyPkgs = pkgs.spicetify-cli.overrideAttrs(old: rec {
-      src = pkgs.fetchFromGitHub {
-        owner  = "khanhas";
-        repo   = "spicetify-cli";
-        rev    = "2.27.1";
-        hash   = "sha256-lU80OASlsrOr3xRXrIgJNI7gP9xXQZI86mOWLgXZBGA=";
-      };
-  });
-
   theme = import ../theme/default.nix { inherit lib; };
   colors = theme.theme;
 in
 
 {
-  # Install spicetify-cli
-  home.packages = [ spicetifyPkgs ];
-
   # Spicetify configuration
   home.file.".config/spicetify/config-xpui.ini".text = ''
     [Setting]
-    spotify_path                = ${pkgs.spotify}/Applications/Spotify.app
+    spotify_path                = ${pkgs.spotify}/Applications/Spotify.app/Contents/Resources
     prefs_path                  = ${config.home.homeDirectory}/Library/Application Support/Spotify/prefs
-    current_theme               = RosePine
-    color_scheme                = dark
+    current_theme               = text
+    color_scheme                = rose-pine-moon
     inject_css                  = 1
     inject_theme_js             = 1
     replace_colors              = 1
     overwrite_assets            = 0
     spotify_launch_flags        = 
     check_spicetify_upgrade     = 0
-    version                     = 2.27.1
 
     ; DO NOT CHANGE!
     [Preprocesses]

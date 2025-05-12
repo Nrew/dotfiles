@@ -24,14 +24,14 @@ let user = "nrew"; in
         
         jq          # A lightweight and flexible command-line JSON processor
         texinfo     # Needed for compiling tools like Emacs
-        htop        # System-wide resource monitor
+        btop        # System-wide resource monitor
         neovim      # Modern text editor
-        cava        # Visualizer for audio output
-        git         # Version control system
+	git         # Version control system
         git-lfs     # Git extension for large files
         tmux        # Terminal multiplexer
         starship    # Cross-shell prompt
         kitty       # Modern terminal emulator
+  
         fastfetch   # Fast system information tool
         fzf         # Fuzzy finder for the terminal
     ];
@@ -42,13 +42,19 @@ let user = "nrew"; in
 
     fonts = {
         packages = with pkgs; [
-            material-design-icons       # Material Design Icons
-            font-awesome                # Font Awesome
+            maple-mono-NF 
+	    (nerdfonts.override { fonts = [
+		"JetBrainsMono"
+		"FiraCode"
+		"Iosevka"
+		"NerdFontsSymbolsOnly"
+	    ]; })
 
-            nerd-fonts.symbols-only     # Symbols Nerd Font
-            nerd-fonts.jetbrains-mono   # JetBrainsMono Nerd Font
-            nerd-fonts.fira-code        # FiraCode Nerd Font
-            nerd-fonts.iosevka          # Iosevka Nerd Font
+	    # Nix 25.05 
+	    #nerd-fonts.symbols-only     # Symbols Nerd Font
+            #nerd-fonts.jetbrains-mono   # JetBrainsMono Nerd Font
+            #nerd-fonts.fira-code        # FiraCode Nerd Font
+            #nerd-fonts.iosevka          # Iosevka Nerd Font
         ];
     };
 
