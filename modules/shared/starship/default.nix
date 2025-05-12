@@ -1,6 +1,6 @@
 { config, lib, pkgs, ... }:
 let
-  pallette = "rose_pine";
+  palette = "rose_pine";
 in
 {
   programs.starship = {
@@ -12,9 +12,9 @@ in
 
     settings = {
       #───────────────────────────────────────────────────────────────────────────────
-      # Palette (Ensure this is defined BEFORE it's referenced, or at least in the same scope)
+      # Palette
       #───────────────────────────────────────────────────────────────────────────────
-      palette = "rose_pine"; # This tells Starship which palette to use by default
+      palette = palette;
 
       palettes.rose_pine = {
         rose = "#ebbcba";
@@ -169,10 +169,10 @@ in
         empty_symbol = "󰂎 ";
         disabled = false;
         display = [
-          { threshold = 10, style = "bold love"; } # Using love for critical
-          { threshold = 30, style = "bold gold"; } # Using gold for warning
+          { threshold = 10; style = "bold love"; } # Using love for critical
+          { threshold = 30; style = "bold gold"; } # Using gold for warning
           # No need for 100 threshold if the default is fine, or set it explicitly:
-          { threshold = 100, style = "pine"; } # Using pine for normal/good
+          { threshold = 100; style = "pine"; } # Using pine for normal/good
         ];
       };
 
@@ -206,7 +206,7 @@ in
       # This is where you define the order and spacing of your prompt elements.
       # Note: I've added spaces between modules for better readability.
       # You might want to remove some modules if your prompt gets too long.
-      format = """
+      format = ''
       $username\
       $hostname\
       $directory\
@@ -224,9 +224,9 @@ in
       $jobs\
       $cmd_duration\
       $battery\
-      $time \
+      $time\
       $character\
-      """; # Added a space before $character for visual separation
+      ''; # Added a space before $character for visual separation
     };
   };
 }

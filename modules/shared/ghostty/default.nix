@@ -7,9 +7,6 @@ let
 in
 
 {
-  # Install ghostty
-  home.packages = [ pkgs.ghostty ];
-
   # Ghostty configuration
   home.file.".config/ghostty/config".text = ''
     theme = "rose-pine"

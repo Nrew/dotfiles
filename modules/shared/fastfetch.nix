@@ -33,8 +33,6 @@ in
   #──────────────────────────────────────────────────────────────────
   programs.fastfetch = {
     enable = true;
-    enableZshIntegration = true;   
-    enableBashIntegration = true;
 
     settings = {
       logo = {
@@ -55,7 +53,7 @@ in
       modules = [
         {
           type = "title";
-          format: "${colors.pink}{1}${colors.text}サン @ ${colors.mauve}{2}${colors.text}";
+          format = "${colors.pink}{1}${colors.text}サン @ ${colors.mauve}{2}${colors.text}";
         }
         {
           type = "separator";
@@ -158,20 +156,20 @@ in
           color = colors.mauve;
         }
         {
-          type: "icons";
-          key: "アイコン";
-          keyColor = colors.pink or "#f5c2e7";
+          type = "icons";
+          key = "アイコン";
+          keyColor = colors.pink;
         }
         {
           type = "break";
         }
         {
-          type: "colors";
-          keyColor = colors.flamingo or "#f2cdcd";
-          block: {
-            width: 2;
-            height: 1;
-            paddingLeft: 1;
+          type = "colors";
+          keyColor = colors.flamingo;
+          block = {
+            width = 2;
+            height = 1;
+            paddingLeft = 1;
           };
         }
       ];

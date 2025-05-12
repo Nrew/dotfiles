@@ -1,9 +1,5 @@
 { pkgs, ... }:
 {
-  home.packages = with pkgs; [
-    beatprints
-  ];
-
   programs.spotify-player = {
     enable = true;
     settings = {
