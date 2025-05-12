@@ -10,7 +10,7 @@ in
   #──────────────────────────────────────────────────────────────────
 
   home.file.".config/fastfetch/tuchany.png" = {
-    source = ./tuchany.png; # Or the correct relative path to your image
+    source = ../../images/tuchany.png;
   };
 
   # Create XDG directory for tuchany image
@@ -37,7 +37,7 @@ in
     settings = {
       logo = {
         type = "kitty";
-        source = "${pkgs.fastfetch}/share/fastfetch/logo/tuchany.png";
+        source = "${config.home.homeDirectory}/.config/fastfetch/tuchany.png";
         width = 30;
         padding = {
           top = 1;
@@ -80,19 +80,19 @@ in
         }
         {
           type = "uptime";
-          key = "アップタイム";
+          key = " アップタイム";
           keyColor = colors.mauve;
           format = "{?1}{1} 日{?} {?2}{2} 時間{?} {?3}{3} 分{?}";
         }
         {
           type = "packages";
-          key = "パッケージ";
+          key = " パッケージ";
           keyColor = colors.pink;
-          format = "{1}";
+          format = "{} (nix)";
         }
         {
           type = "shell";
-          key = "シェル";
+          key = " シェル";
           keyColor = colors.flamingo;
         }
         {
@@ -147,7 +147,7 @@ in
         }
         {
           type = "terminal";
-          key = "ターミナル";
+          key = " ターミナル";
           keyColor = colors.flamingo;
         }
         {
