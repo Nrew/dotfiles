@@ -42,9 +42,10 @@ let user = "nrew"; in
 
     fonts = {
         packages = with pkgs; [
-	    # Nix 25.05
-	    maple-mono.NF-unhinted 
-	    nerd-fonts.symbols-only     # Symbols Nerd Font
+            # Nix 25.05
+            maple-mono.truetype         # Maple Mono font
+            maple-mono.NF-unhinted      # Maple Mono Nerd Font
+            nerd-fonts.symbols-only     # Symbols Nerd Font
             nerd-fonts.jetbrains-mono   # JetBrainsMono Nerd Font
             nerd-fonts.fira-code        # FiraCode Nerd Font
             nerd-fonts.iosevka          # Iosevka Nerd Font

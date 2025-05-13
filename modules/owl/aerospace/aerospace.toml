@@ -1,3 +1,6 @@
+# Start Aerospace at login
+start-at-login = true
+
 # Window workspace assignments
 on-window-detected = 'move-node-to-workspace 1'
 

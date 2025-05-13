@@ -23,6 +23,12 @@
 
     # Catppuccin
     catppuccin.url = "github:catppuccin/nix";
+
+    # NixCats
+    nixCats.url = "github:BirdeeHub/nixCats-nvim";
+
+    # Textfox
+    textfox.url = "github:adriankarlen/textfox";
     
     rose-pine-hyprcursor = {
       url = "github:ndom91/rose-pine-hyprcursor";
@@ -115,6 +121,12 @@
             specialArgs = sharedSpecialArgs;
             modules = [
               (./. + "/hosts/${hostname}")
+
+              {
+                nixpkgs.overlays = [
+                  nixCats.overlays.default
+                ];
+              }
 
               home-manager.darwinModules.home-manager {
                 home-manager = {
