@@ -18,9 +18,9 @@ let user = "nrew"; in
     # Enable Nix-Homebrew configuration
     nix-homebrew = {
         enable = true;
-        enableRosetta = true;                       # Enable Rosetta for compatibility with x86 Homebrew packages
         user = user;                                # Homebrew installed for the current user
         autoMigrate = true;                         # Automatically migrate old Homebrew packages
+        mutableTaps = false;                        # Disable mutable taps
     };
 
     # User configuration
