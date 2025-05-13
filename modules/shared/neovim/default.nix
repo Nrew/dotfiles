@@ -198,7 +198,7 @@ in
             vim-bbye
             project-nvim
             nvim-spectre
-            yazi
+            yazi-nvim
 
             # Session and persistence
             persistence-nvim 
@@ -290,7 +290,7 @@ in
             wrapRc = true;
             # IMPORTANT:
             # your alias may not conflict with your other packages.
-            aliases = [ "vim", "vi" ];
+            aliases = [ "vim" ];
             # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.system}.neovim;
             hosts.python3.enable = true;
             hosts.node.enable = true;

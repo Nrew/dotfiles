@@ -122,12 +122,6 @@
             modules = [
               (./. + "/hosts/${hostname}")
 
-              {
-                nixpkgs.overlays = [
-                  nixCats.overlays.default
-                ];
-              }
-
               home-manager.darwinModules.home-manager {
                 home-manager = {
                   useGlobalPkgs = true;

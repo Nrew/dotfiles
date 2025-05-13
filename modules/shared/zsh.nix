@@ -111,26 +111,6 @@
 
     # ZSH plugins
     plugins = [
-      {
-        name = "zsh-nix-shell";
-        file = "nix-shell.plugin.zsh";
-        src = pkgs.fetchFromGitHub {
-          owner = "chisui";
-          repo = "zsh-nix-shell";
-          rev = "v0.7.0";
-          sha256 = "149zh2rm59blr2q458a5irkfh82y3dwdich60s9670kl3cl5h2m1";
-        };
-      }
-      {
-        name = "zsh-vi-mode";
-        file = "zsh-vi-mode.plugin.zsh";
-        src = pkgs.fetchFromGitHub {
-          owner = "jeffreytse";
-          repo = "zsh-vi-mode";
-          rev = "v0.10.0";
-          sha256 = "1rj1pmgmq8bfv1p5dx5n6h02zl56wms3h8nrxbw5k3lj1qjpgylc";
-        };
-      }
     ];
   };
 

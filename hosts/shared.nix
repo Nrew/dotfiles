@@ -75,8 +75,6 @@ let user = "nrew"; in
             trusted-users = [ "@admin" "${user}" ];
             substituters = [ "https://nix-community.cachix.org" "https://cache.nixos.org" ];
             trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
-            experimental-features = [ "nix-command" "flakes" ];
-            optimize-store = "automatic";
         };
 
         gc = {
@@ -86,7 +84,7 @@ let user = "nrew"; in
         };
 
         extraOptions = ''
-            experimental-features = nix-command flakes;
+            experimental-features = nix-command flakes
         '';
     };
 
