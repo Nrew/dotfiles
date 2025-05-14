@@ -12,7 +12,6 @@
     ./starship
     ./ghostty
     ./spicetify
-    ./raycast
     ./btop
     ./spotify-player
   ];

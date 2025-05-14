@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, outputs, system, user, host, ... }:
+{ config, pkgs, user, ... }:
 
 let user = "nrew"; in
 

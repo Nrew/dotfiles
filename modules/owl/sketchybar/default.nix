@@ -1,6 +1,4 @@
-{ homeManagerConfig, config, ... }:
-
+{ config, lib, pkgs, ... }:
 {
-  home.file.".config/sketchybar".source = 
-    homeManagerConfig.linkHostApp config "sketchybar";
+	home.file.".config/sketchybar".source = ./config;
 }

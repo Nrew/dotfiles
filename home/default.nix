@@ -1,23 +1,23 @@
-{ config, pkgs, lib, user, home-manager, ... }:
+{ config, pkgs, lib, user, ... }:
 let
     user = "nrew";
+    isDarwin = pkgs.stdenv.isDarwin;
+    isLinux = pkgs.stdenv.isLinux;
 in
 {
     #──────────────────────────────────────────────────────────────────
     # Imports & Core Configuration
     #──────────────────────────────────────────────────────────────────
     imports = [ 
-        # Add your module imports here
+        ../modules/shared
+    ] ++ lib.optionals isDarwin [
         ../modules/owl
+    ] ++ lib.optionals isLinux [
+        ../modules/crow
     ];
 
     # Enable home-manager
     programs.home-manager.enable = true;
-    
-    # Fix PATH for home-manager activation (ensures defaults command is found)
-    home.activation.fixPath = lib.hm.dag.entryBefore ["writeBoundary"] ''
-        export PATH="/usr/bin:/usr/sbin:/bin:/sbin:$PATH"
-    '';
 
     # XDG Configuration
     xdg = {
@@ -46,13 +46,5 @@ in
         sessionVariables = {
             TERM = "xterm-256color";
         };
-        
-        # Ensure macOS system tools are in PATH
-        sessionPath = [
-            "/usr/bin"
-            "/usr/sbin"
-            "/bin"
-            "/sbin"
-        ];
     };
 }

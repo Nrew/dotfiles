@@ -43,27 +43,4 @@ in
     version = 1.2.62.580.gb27ad23e
     with    = 2.39.7
   '';
-
-  # Install script
-  home.file.".config/spicetify/install.sh".text = ''
-    #!/bin/bash
-    
-    # Apply spicetify theme
-    spicetify backup apply
-    
-    # Enable theme
-    spicetify config current_theme RosePine
-    spicetify config color_scheme dark
-    
-    # Install extensions
-    spicetify config extensions shuffle+.js playlistIcons.js
-    
-    # Apply changes
-    spicetify apply
-  '';
-
-  # Make install script executable
-  home.activation.makeSpicetifyExecutable = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    chmod +x ${config.home.homeDirectory}/.config/spicetify/install.sh
-  '';
 }

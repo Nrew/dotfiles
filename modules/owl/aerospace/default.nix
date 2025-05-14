@@ -1,5 +1,4 @@
-{ homeManagerConfig, config, ... }:
+{ config, lib, pkgs, ... }:
 {
-    home.file.".config/aerospace/aerospace.toml".source =
-        homeManagerConfig.linkHostApp config "aerospace";
+    home.file.".config/aerospace/aerospace.toml".source = ./aerospace.toml;
 }

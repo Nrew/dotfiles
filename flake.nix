@@ -91,22 +91,6 @@
       };
 
       #──────────────────────────────────────────────────────────────────
-      # Home Manager Configuration
-      #──────────────────────────────────────────────────────────────────
-
-      buildHomeManagerConfig =
-        hostname:
-        let
-          rootPath = "/etc/nixos/modules/home-manager";
-          hostPath = "${rootPath}/hosts/${hostname}";
-          sharedPath = "${rootPath}/shared";
-        in
-        {
-          linkHostApp = config: app: config.lib.file.mkOutOfStoreSymlink "${hostPath}/${app}/config";
-          linkSharedApp = config: app: config.lib.file.mkOutOfStoreSymlink "${sharedPath}/${app}/config";
-        };
-
-      #──────────────────────────────────────────────────────────────────
       # macOS (nix-darwin) Configuration
       #──────────────────────────────────────────────────────────────────
 
@@ -126,9 +110,7 @@
                 home-manager = {
                   useGlobalPkgs = true;
                   useUserPackages = true;
-                  extraSpecialArgs = sharedSpecialArgs // {
-                    homeManagerConfig = buildHomeManagerConfig hostname;
-                  };
+                  extraSpecialArgs = sharedSpecialArgs;
                   users.${user} = import ./home;
                 };
               } 
