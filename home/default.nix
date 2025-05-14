@@ -13,13 +13,19 @@ in
 
     # Enable home-manager
     programs.home-manager.enable = true;
+    
+    # Fix PATH for home-manager activation (ensures defaults command is found)
+    home.activation.fixPath = lib.hm.dag.entryBefore ["writeBoundary"] ''
+        export PATH="/usr/bin:/usr/sbin:/bin:/sbin:$PATH"
+    '';
 
     # XDG Configuration
     xdg = {
         enable = true;
-        xdg_configHome = "${config.users.users.${user}.home}/.config";
-        xdg_dataHome   = "${config.users.users.${user}.home}/.local/share";
-        xdg_stateHome  = "${config.users.users.${user}.home}/.local/state";
+        configHome = "${config.home.homeDirectory}/.config";
+        cacheHome = "${config.home.homeDirectory}/.cache";
+        dataHome = "${config.home.homeDirectory}/.local/share";
+        stateHome = "${config.home.homeDirectory}/.local/state";
     };
 
     #──────────────────────────────────────────────────────────────────
@@ -27,7 +33,7 @@ in
     #──────────────────────────────────────────────────────────────────
     home = {
         enableNixpkgsReleaseCheck = false;
-        username = ${user};
+        username = user;
         homeDirectory = "/Users/${user}";
 
         # This value determines the Home Manager release that your
@@ -40,5 +46,13 @@ in
         sessionVariables = {
             TERM = "xterm-256color";
         };
+        
+        # Ensure macOS system tools are in PATH
+        sessionPath = [
+            "/usr/bin"
+            "/usr/sbin"
+            "/bin"
+            "/sbin"
+        ];
     };
 }
