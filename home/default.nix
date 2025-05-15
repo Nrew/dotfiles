@@ -10,10 +10,10 @@ in
     #──────────────────────────────────────────────────────────────────
     imports = [ 
         ../modules/shared
-    ] ++ lib.optionals isDarwin [
+   # ] ++ lib.optionals isDarwin [
         ../modules/owl
-    ] ++ lib.optionals isLinux [
-        ../modules/crow
+   # ] ++ lib.optionals isLinux [
+   #     ../modules/crow
     ];
 
     # Enable home-manager

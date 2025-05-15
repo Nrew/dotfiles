@@ -20,7 +20,6 @@ let user = "nrew"; in
         enable = true;
         user = user;                                # Homebrew installed for the current user
         autoMigrate = true;                         # Automatically migrate old Homebrew packages
-        mutableTaps = false;                        # Disable mutable taps
     };
 
     # User configuration

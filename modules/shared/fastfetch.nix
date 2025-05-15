@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, self, ... }:
 
 let
   theme = import ./theme/default.nix { inherit lib; };
@@ -9,15 +9,10 @@ in
   # Fastfetch Logo Image Management
   #──────────────────────────────────────────────────────────────────
 
-  home.file.".config/fastfetch/tvchany.jpg" = {
-    source = ../../images/logo.jpg;
+  home.file.".config/fastfetch/logo/tvchany.jpg" = {
+    source = "${self}/images/tvchany.jpg";
+    recursive = true;
   };
-
-  #──────────────────────────────────────────────────────────────────
-  # Required Packages
-  #──────────────────────────────────────────────────────────────────
-  home.packages = [ pkgs.fastfetch ];
-
 
   #──────────────────────────────────────────────────────────────────
   # Fastfetch Program Configuration
@@ -28,7 +23,7 @@ in
     settings = {
       logo = {
         type = "kitty";
-        source = "${config.home.homeDirectory}/.config/fastfetch/tvchany.jpg";
+        source = "${config.home.homeDirectory}/.config/fastfetch/logo/tvchany.jpg";
         width = 30;
         padding = {
           top = 1;
@@ -37,7 +32,7 @@ in
 
       display = {
         separator = "  ";
-        keyWidth = 22;
+        key.width = 22;
         color.keys = colors.lavender;
       };
 
@@ -165,14 +160,5 @@ in
         }
       ];
     };
-  };
-
-  #──────────────────────────────────────────────────────────────────
-  # Shell Aliases
-  #──────────────────────────────────────────────────────────────────
-  programs.zsh.shellAliases = {
-    scan = "fastfetch";
-    neofetch = "fastfetch";
-    info = "fastfetch";
   };
 }

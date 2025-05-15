@@ -31,7 +31,7 @@ let user = "nrew"; in
         tmux        # Terminal multiplexer
         starship    # Cross-shell prompt
         kitty       # Modern terminal emulator
-  
+        imagemagick # Image rendering  
         fastfetch   # Fast system information tool
         fzf         # Fuzzy finder for the terminal
     ];

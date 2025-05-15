@@ -82,7 +82,7 @@ in
       };
 
       # Security settings
-      commit.gpgSign = true;
+      # commit.gpgSign = true;
 
       # Remote URL shortcuts
       url."git@github.com:".insteadOf = "gh:";
