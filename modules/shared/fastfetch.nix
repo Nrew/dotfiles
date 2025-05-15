@@ -13,7 +13,7 @@ in
     source = "${self}/images/tvchany.jpg";
     recursive = true;
   };
-
+  
   #──────────────────────────────────────────────────────────────────
   # Fastfetch Program Configuration
   #──────────────────────────────────────────────────────────────────
@@ -22,7 +22,7 @@ in
 
     settings = {
       logo = {
-        type = "kitty";
+        type = "kitty-icat";
         source = "${config.home.homeDirectory}/.config/fastfetch/logo/tvchany.jpg";
         width = 30;
         padding = {

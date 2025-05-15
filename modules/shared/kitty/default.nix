@@ -61,6 +61,7 @@ in
       # Shell
       shell_integration = "enabled";
       allow_hyperlinks = "yes";
+      allow_remote_control = "yes";
 
       # Bell
       enable_audio_bell = "no";
