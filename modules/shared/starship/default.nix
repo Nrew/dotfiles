@@ -21,15 +21,21 @@ in
       #───────────────────────────────────────────────────────────────────────────────
 
       "$schema" = "https://starship.rs/config-schema.json";
-
+      
+      #───────────────────────────────────────────────────────────────────────────────
+      # Palette
+      #───────────────────────────────────────────────────────────────────────────────
       palette = "rose-pine";
-      overlay = colors.overlay;
-      love    = colors.love;
-      gold    = colors.gold;
-      rose    = colors.rose;
-      pine    = colors.pine;
-      foam    = colors.foam;
-      iris    = colors.iris;
+
+      palettes.rose-pine = {
+        overlay = colors.overlay;
+        love    = colors.love;
+        gold    = colors.gold;
+        rose    = colors.rose;
+        pine    = colors.pine;
+        foam    = colors.foam;
+        iris    = colors.iris;
+      };
 
       #───────────────────────────────────────────────────────────────────────────────
       # Global Settings
@@ -85,15 +91,15 @@ in
         style = "bg:overlay fg:love";
         format = "[](fg:overlay)([$all_status$ahead_behind]($style))[](fg:overlay) ";
         up_to_date = "[ ✓ ](bg:overlay fg:iris)";
-        untracked = "[?\($count\)](bg:overlay fg:gold)";
-        stashed = "[\$](bg:overlay fg:iris)";
-        modified = "[!\($count\)](bg:overlay fg:gold)";
-        renamed = "[»\($count\)](bg:overlay fg:iris)";
-        deleted = "[✘\($count\)](style)";
-        staged = "[++\($count\)](bg:overlay fg:gold)";
-        ahead = "[⇡\($count\)](bg:overlay fg:foam)";
-        diverged = "⇕[\[](bg:overlay fg:iris)[⇡\($ahead_count\)](bg:overlay fg:foam)[⇣\($behind_count\)](bg:overlay fg:rose)[\]](bg:overlay fg:iris)";
-        behind = "[⇣\($count\)](bg:overlay fg:rose)";
+        untracked = "[?($count)](bg:overlay fg:gold)";
+        stashed = "[\\$](bg:overlay fg:iris)";
+        modified = "[!($count)](bg:overlay fg:gold)";
+        renamed = "[»($count)](bg:overlay fg:iris)";
+        deleted = "[✘($count)](style)";
+        staged = "[++($count)](bg:overlay fg:gold)";
+        ahead = "[⇡($count)](bg:overlay fg:foam)";
+        diverged = "⇕[\\[](bg:overlay fg:iris)[⇡($ahead_count)](bg:overlay fg:foam)[⇣($behind_count)](bg:overlay fg:rose)[\\]](bg:overlay fg:iris)";
+        behind = "[⇣($count)](bg:overlay fg:rose)";
       };
 
       #───────────────────────────────────────────────────────────────────────────────
@@ -265,7 +271,6 @@ in
         display = [
           { threshold = 10; style = "bold love"; } # Using love for critical
           { threshold = 30; style = "bold gold"; } # Using gold for warning
-          # No need for 100 threshold if the default is fine, or set it explicitly:
           { threshold = 100; style = "pine"; } # Using pine for normal/good
         ];
       };
@@ -280,9 +285,6 @@ in
       #───────────────────────────────────────────────────────────────────────────────
       # Prompt Format
       #───────────────────────────────────────────────────────────────────────────────
-      # This is where you define the order and spacing of your prompt elements.
-      # Note: I've added spaces between modules for better readability.
-      # You might want to remove some modules if your prompt gets too long.
       format = ''
       $username\
       $hostname\
@@ -303,15 +305,14 @@ in
       $scala\
       $python\
       $conda\
-      $nix\
+      $nix_shell\
       $lua\
       $gcloud\
       $aws\
-      $jobs\
       $cmd_duration\
       $battery\
-      $time\n  \
-      [󱞪](fg:iris) \
+      $time
+        [󱞪](fg:iris) \
       '';
     };
   };

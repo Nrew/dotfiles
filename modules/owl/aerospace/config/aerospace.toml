@@ -1,160 +1,229 @@
-# Start Aerospace at login
+# AeroSpace Configuration File
+#
+# For more details on available commands and settings, see:
+# https://nikitabobko.github.io/AeroSpace/guide
+# https://nikitabobko.github.io/AeroSpace/commands
+# https://nikitabobko.github.io/AeroSpace/guide#key-mapping
+# https://nikitabobko.github.io/AeroSpace/guide#on-focus-changed-callbacks
+# https://nikitabobko.github.io/AeroSpace/commands#move-mouse
+
+#─────────────────────────────────────────────────────────────────────
+# Global Settings
+#─────────────────────────────────────────────────────────────────────
+
+# Start Aerospace automatically when the user logs in.
 start-at-login = true
 
-# You can use it to add commands that run after login to macOS user session.
-# 'start-at-login' needs to be 'true' for 'after-login-command' to work
-# Available commands: https://nikitabobko.github.io/AeroSpace/commands
+# Commands to run after the macOS user session starts and AeroSpace is running.
+# 'start-at-login' must be true for this to work.
 after-login-command = []
 
-# Start sketchybar when starting aerospace
+# Commands to run immediately after AeroSpace successfully starts up.
 after-startup-command = ['exec-and-forget sketchybar']
 
 # Notify Sketchybar about workspace change
-exec-on-workspace-change = ['/bin/bash', '-c',
+exec-on-workspace-change = [
+  '/bin/bash',
+  '-c',
   'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE'
 ]
 
+# ─────────────────────────────────────────────────────────────────────
+# Normalization Settings
+#
+# These settings control how AeroSpace automatically adjusts the layout
+# tree to maintain a clean and efficient structure.
+# ─────────────────────────────────────────────────────────────────────
+
+# Flatten containers: When a container only has one child, remove the container.
 enable-normalization-flatten-containers = true
+
+# Opposite orientation for nested containers: Ensures that children of a
+# split container have the opposite orientation, preventing long chains
+# of containers with the same orientation.
 enable-normalization-opposite-orientation-for-nested-containers = true
 
-# Window workspace assignments
+#─────────────────────────────────────────────────────────────────────
+# Default Layout & Behavior Settings
+#─────────────────────────────────────────────────────────────────────
+
+# Possible values: horizontal|vertical|auto
+# 'auto' means: wide monitor (anything wider than high) gets horizontal orientation,
+#               tall monitor (anything higher than wide) gets vertical orientation
+default-root-container-orientation = 'auto'
+
+# Set the default key mapping preset (e.g., for different keyboard layouts).
+# Possible values: (qwerty|dvorak)
+key-mapping.preset = 'qwerty'
+
+on-focused-monitor-changed = ["move-mouse", "monitor-lazy-center"]
+on-focus-changed = ["move-mouse", "window-lazy-center"]
+
+# ─────────────────────────────────────────────────────────────────────
+# Visual Settings (for r/unixporn aesthetics)
+# ─────────────────────────────────────────────────────────────────────
+
+[gaps]
+  inner = 10  # Gap between windows
+  outer = 10 # Gap between windows and screen edge
+  # padding = [top, right, bottom, left] # Padding inside borders, outside gaps
+
+[window-borders]
+  enable = true       # Enable or disable borders
+  width = 2           # Border width in pixels
+  color = '0xff7aa2f7'
+
+# ─────────────────────────────────────────────────────────────────────
+# Global Window Rules
+#
+# These rules are checked for every new window.
+# ─────────────────────────────────────────────────────────────────────
+
+# Default rule: 
+#  - Move any new window (that doesn't match a more specific rule) to workspace 1.
 on-window-detected = 'move-node-to-workspace 1'
 
+# ─────────────────────────────────────────────────────────────────────
+# Keybindings - Main Mode
+#
+# Define keyboard shortcuts for actions in the default tiling mode.
+# ─────────────────────────────────────────────────────────────────────
+
 [mode.main.binding]
-# All possible keys:
-# - Letters.        a, b, c, ..., z
-# - Numbers.        0, 1, 2, ..., 9
-# - Keypad numbers. keypad0, keypad1, keypad2, ..., keypad9
-# - F-keys.         f1, f2, ..., f20
-# - Special keys.   minus, equal, period, comma, slash, backslash, quote, semicolon, backtick,
-#                   leftSquareBracket, rightSquareBracket, space, enter, esc, backspace, tab
-# - Keypad special. keypadClear, keypadDecimalMark, keypadDivide, keypadEnter, keypadEqual,
-#                   keypadMinus, keypadMultiply, keypadPlus
-# - Arrows.         left, down, up, right
+  # All possible keys:
+  # - Letters.        a, b, c, ..., z
+  # - Numbers.        0, 1, 2, ..., 9
+  # - Keypad numbers. keypad0, keypad1, keypad2, ..., keypad9
+  # - F-keys.         f1, f2, ..., f20
+  # - Special keys.   minus, equal, period, comma, slash, backslash, quote, semicolon, backtick,
+  #                   leftSquareBracket, rightSquareBracket, space, enter, esc, backspace, tab
+  # - Keypad special. keypadClear, keypadDecimalMark, keypadDivide, keypadEnter, keypadEqual,
+  #                   keypadMinus, keypadMultiply, keypadPlus
+  # - Arrows.         left, down, up, right
 
-# All possible modifiers: cmd, alt, ctrl, shift
+  # All possible modifiers: cmd, alt, ctrl, shift
 
-# All possible commands: https://nikitabobko.github.io/AeroSpace/commands
+  
+  # You can uncomment this line to open up terminal with alt + enter shortcut
+  # See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
+  # alt-enter = 'exec-and-forget open -n /System/Applications/Utilities/Terminal.app'
 
-# You can uncomment this line to open up terminal with alt + enter shortcut
-# See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
-# alt-enter = 'exec-and-forget open -n /System/Applications/Utilities/Terminal.app'
+  alt-enter = 'workspace 1'
+  alt-1 = 'workspace 1'
+  alt-2 = 'workspace 2'
+  alt-3 = 'workspace 3'
+  alt-4 = 'workspace 4'
+  alt-5 = 'workspace 5'
+  alt-6 = 'workspace 6'
+  alt-7 = 'workspace 7'
+  alt-8 = 'workspace 8'
+  alt-9 = 'workspace 9'
+  alt-0 = 'workspace 10'
 
-alt-enter = 'workspace 1'
-alt-1 = 'workspace 1'
-alt-2 = 'workspace 2'
-alt-3 = 'workspace 3'
-alt-4 = 'workspace 4'
-alt-5 = 'workspace 5'
-alt-6 = 'workspace 6'
-alt-7 = 'workspace 7'
-alt-8 = 'workspace 8'
-alt-9 = 'workspace 9'
-alt-0 = 'workspace 10'
+  # Window movement
+  alt-shift-1 = 'move-node-to-workspace 1'
+  alt-shift-2 = 'move-node-to-workspace 2'
+  alt-shift-3 = 'move-node-to-workspace 3'
+  alt-shift-4 = 'move-node-to-workspace 4'
+  alt-shift-5 = 'move-node-to-workspace 5'
+  alt-shift-6 = 'move-node-to-workspace 6'
+  alt-shift-7 = 'move-node-to-workspace 7'
+  alt-shift-8 = 'move-node-to-workspace 8'
+  alt-shift-9 = 'move-node-to-workspace 9'
+  alt-shift-0 = 'move-node-to-workspace 10'
 
-# Window movement
-alt-shift-1 = 'move-node-to-workspace 1'
-alt-shift-2 = 'move-node-to-workspace 2'
-alt-shift-3 = 'move-node-to-workspace 3'
-alt-shift-4 = 'move-node-to-workspace 4'
-alt-shift-5 = 'move-node-to-workspace 5'
-alt-shift-6 = 'move-node-to-workspace 6'
-alt-shift-7 = 'move-node-to-workspace 7'
-alt-shift-8 = 'move-node-to-workspace 8'
-alt-shift-9 = 'move-node-to-workspace 9'
-alt-shift-0 = 'move-node-to-workspace 10'
+  # Window focus
+  alt-h = 'focus left'
+  alt-j = 'focus down'
+  alt-k = 'focus up'
+  alt-l = 'focus right'
 
-# Window focus
-alt-h = 'focus left'
-alt-j = 'focus down'
-alt-k = 'focus up'
-alt-l = 'focus right'
+  # Window moving within workspace
+  alt-shift-h = 'move left'
+  alt-shift-j = 'move down'
+  alt-shift-k = 'move up'
+  alt-shift-l = 'move right'
 
-# Window moving within workspace
-alt-shift-h = 'move left'
-alt-shift-j = 'move down'
-alt-shift-k = 'move up'
-alt-shift-l = 'move right'
+  # Layout modes
+  alt-f = 'layout floating tiling'
+  alt-t = 'layout tiles vertical horizontal'
+  alt-s = 'layout v_accordion h_accordion'
 
-# Layout modes
-alt-f = 'layout floating tiling'
-alt-t = 'layout tiles vertical horizontal'
-alt-s = 'layout v_accordion h_accordion'
+  # Resize mode
+  alt-r = 'mode resize'
 
-# Resize mode
-alt-r = 'mode resize'
+# ─────────────────────────────────────────────────────────────────────
+# Keybindings - Resize Mode
+#
+# Define keyboard shortcuts specifically for resizing windows.
+# ─────────────────────────────────────────────────────────────────────
 
 [mode.resize.binding]
-escape = 'mode main'
-enter = 'mode main'
-h = 'resize smart -50'
-j = 'resize smart +0 +50'
-k = 'resize smart +0 -50'
-l = 'resize smart +50'
+  # Press Escape or Enter to return to the main mode.
+  escape = 'mode main'
+  enter = 'mode main'
+  # Resize the focused window using H/J/K/L.
+  # 'smart' adjusts size based on the container's orientation.
+  h = 'resize smart -50' 
+  l = 'resize smart +50'
+  k = 'resize smart +0 -50'
+  j = 'resize smart +0 +50'
+  b = 'balance-sizes'
 
-# Special settings for workspace 1
-[[workspace]]
-id = 1
-on-space-enter = 'sketchybar --trigger aerospace_workspace_change WORKSPACE=1'
+  minus = 'resize smart -50'
+  equal = 'resize smart +50'
 
-[[workspace]]
-id = 2
-on-space-enter = 'sketchybar --trigger aerospace_workspace_change WORKSPACE=2'
+# ─────────────────────────────────────────────────────────────────────
+# Workspace Specific Configuration
+#
+# Configuration applied only when specific workspaces are active.
+# NOTE: If different actions were needed per workspace, these blocks would be used here.
+# ─────────────────────────────────────────────────────────────────────
 
-[[workspace]]
-id = 3
-on-space-enter = 'sketchybar --trigger aerospace_workspace_change WORKSPACE=3'
+# Example (commented out):
+# [[workspace]]
+#   id = 1
+#   on-space-enter = 'exec-and-forget echo "Entered workspace 1" >> /tmp/aerospace_ws.log'
 
-[[workspace]]
-id = 4
-on-space-enter = 'sketchybar --trigger aerospace_workspace_change WORKSPACE=4'
-
-[[workspace]]
-id = 5
-on-space-enter = 'sketchybar --trigger aerospace_workspace_change WORKSPACE=5'
-
-[[workspace]]
-id = 6
-on-space-enter = 'sketchybar --trigger aerospace_workspace_change WORKSPACE=6'
-
-[[workspace]]
-id = 7
-on-space-enter = 'sketchybar --trigger aerospace_workspace_change WORKSPACE=7'
-
-[[workspace]]
-id = 8
-on-space-enter = 'sketchybar --trigger aerospace_workspace_change WORKSPACE=8'
-
-[[workspace]]
-id = 9
-on-space-enter = 'sketchybar --trigger aerospace_workspace_change WORKSPACE=9'
-
-[[workspace]]
-id = 10
-on-space-enter = 'sketchybar --trigger aerospace_workspace_change WORKSPACE=10'
+# ─────────────────────────────────────────────────────────────────────
+# Application-Specific Window Rules
+#
+# Rules applied when a window for a specific application is detected.
+# These take precedence over the global 'on-window-detected' rule.
+# App IDs can be found using tools like "macos-application-id" or "aerospace list-windows".
+# ─────────────────────────────────────────────────────────────────────
 
 # App specific workspace assignments
 [[on-window-detected]]
-if.app-id = 'com.discord.Discord'
-run = 'move-node-to-workspace 2'
+  if.app-id = 'com.discord.Discord'
+  run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
-if.app-id = 'com.microsoft.VSCode'
-run = 'move-node-to-workspace 3'
+  if.app-id = 'com.microsoft.VSCode'
+  run = 'move-node-to-workspace 3'
 
 [[on-window-detected]]
-if.app-id = 'com.github.delocalized.Kitty'
-run = 'move-node-to-workspace 1'
+  if.app-id = 'com.github.delocalized.Kitty'
+  run = 'move-node-to-workspace 1'
 
+# ─────────────────────────────────────────────────────────────────────
+# Monitor Assignment
+#
+# Force specific workspaces to always appear on specific monitors.
+# Monitor IDs can be found using 'aerospace list-monitors'.
+# ─────────────────────────────────────────────────────────────────────
+
+# Assign all workspaces 1-10 to monitor ID 1.
+# This is often redundant if you only have one monitor, as that's the default behavior.
+# It is useful in multi-monitor setups if you want all workspaces to stay on a single monitor.
 [workspace-to-monitor-force-assignment]
-1 = 1
-2 = 1
-3 = 1
-4 = 1
-5 = 1
-6 = 1
-7 = 1
-8 = 1
-9 = 1
-10 = 1
-
+  1 = 1
+  2 = 1
+  3 = 1
+  4 = 1
+  5 = 1
+  6 = 1
+  7 = 1
+  8 = 1
+  9 = 1
+  10 = 1

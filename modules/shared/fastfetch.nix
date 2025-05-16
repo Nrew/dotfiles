@@ -2,7 +2,7 @@
 
 let
   theme = import ./theme/default.nix { inherit lib; };
-  colors = theme.catppuccin;
+  colors = theme.theme;
 in
 {
   #──────────────────────────────────────────────────────────────────
@@ -24,101 +24,100 @@ in
       logo = {
         type = "kitty-icat";
         source = "${config.home.homeDirectory}/.config/fastfetch/logo/tvchany.png";
-        width = 30;
+        width = 40;
         padding = {
           top = 1;
+          left = 2;
         };
       };
 
       display = {
         separator = "  ";
-        key.width = 22;
-        color.keys = colors.lavender;
+        key.width = 18;
+        color.keys = colors.iris;
       };
 
       modules = [
+        # ───────────────────────────────────────────────────────────────────────────────
+        # システム識別 (System Identity)
+        # ───────────────────────────────────────────────────────────────────────────────
         {
           type = "title";
-          format = "${colors.pink}{1}${colors.text}サン @ ${colors.mauve}{2}${colors.text}";
+          format = "${colors.love}{1}${colors.text}サン @ ${colors.iris}{2}${colors.text}";
         }
         {
           type = "separator";
-          string = "⋅ ⋅ ⋅ ⋅ ⋆˙⊹°.⋆˖°.⋆˙⊹°.⋆ ⋅ ⋅ ⋅ ⋅";
-          color = colors.mauve;
+          string = "▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼";
+          color = colors.pine;
         }
+        # ───────────────────────────────────────────────────────────────────────────────
+        # システム情報 (System Information)
+        # ───────────────────────────────────────────────────────────────────────────────
         {
           type = "os";
-          key = "オペレーティングシステム";
-          keyColor = colors.pink;
+          key = "󰒋 オペレーティングシステム";
+          keyColor = colors.love;
           format = "{2} {9}";
         }
         {
-          type = "host";
-          key = "ホスト (フクロウ)";
-          keyColor = colors.flamingo;
-          format = "{1}";
-        }
-                {
           type = "kernel";
-          key = "カーネル";
-          keyColor = colors.rosewater;
+          key = "❯ カーネル";
+          keyColor = colors.foam;
           format = "{1} {2}";
+        }
+        {
+          type = "host";
+          key = " ホスト";
+          keyColor = colors.rose;
+          format = "{1}";
         }
         {
           type = "uptime";
           key = " アップタイム";
-          keyColor = colors.mauve;
+          keyColor = colors.iris;
           format = "{?1}{1} 日{?} {?2}{2} 時間{?} {?3}{3} 分{?}";
         }
         {
+          type = "separator";
+          string = " ≫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━≪";
+          color = colors.subtle;
+        }
+        
+        # ───────────────────────────────────────────────────────────────────────────────
+        # 環境・リソース (Environment & Resources)
+        # ───────────────────────────────────────────────────────────────────────────────
+
+        {
           type = "packages";
           key = " パッケージ";
-          keyColor = colors.pink;
+          keyColor = colors.gold;
           format = "{} (nix)";
         }
         {
           type = "shell";
           key = " シェル";
-          keyColor = colors.flamingo;
-        }
-        {
-          type = "separator";
-          string = "⋅ ⋅ ⋅ ⋅ ⋆˙⊹°.⋆˖°.⋆˙⊹°.⋆ ⋅ ⋅ ⋅ ⋅";
-          color = colors.mauve;
-        }
-        {
-          type = "cpu";
-          key = "ＣＰＵ";
-          keyColor = colors.rosewater;
-          format = "{1} ({5}%)";
-        }
-         {
-          type = "gpu";
-          key = "ＧＰＵ";
-          keyColor = colors.mauve;
-          format = "{1}";
+          keyColor = colors.pine;
         }
         {
           type = "memory";
           key = "メモリ";
-          keyColor = colors.pink;
+          keyColor = colors.love;
           format = "{1} / {2} ({3})";
         }
         {
-          type = "battery";
-          key = "バッテリー";
-          keyColor = colors.flamingo;
-          format = "{1}% [{3}]";
-        }
-        {
           type = "separator";
-          string = "⋅ ⋅ ⋅ ⋅ ⋆˙⊹°.⋆˖°.⋆˙⊹°.⋆ ⋅ ⋅ ⋅ ⋅";
-          color = colors.mauve;
+          string = " ≫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━≪";
+          color = colors.subtle;
         }
+
+        # ═══════════════════════════════════════════════════════════════
+        # 表示環境 (Display Environment)
+        # ═══════════════════════════════════════════════════════════════
+
         {
           type = "display";
           key = "ディスプレイ";
-          keyColor = colors.rosewater;
+          keyColor = colors.iris;
           format = "{1}x{2}@{5}Hz";
         }
         {
@@ -129,33 +128,34 @@ in
         {
           type = "wm";
           key = "ウィンドウマネージャ";
-          keyColor = colors.pink;
+          keyColor = colors.gold;
         }
         {
           type = "terminal";
           key = " ターミナル";
-          keyColor = colors.flamingo;
+          keyColor = colors.foam;
         }
         {
           type = "separator";
-          string = "⋅ ⋅ ⋅ ⋅ ⋆˙⊹°.⋆˖°.⋆˙⊹°.⋆ ⋅ ⋅ ⋅ ⋅";
-          color = colors.mauve;
+          string = "▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼";
+          color = colors.pine;
         }
+        # ═══════════════════════════════════════════════════════════════
+        # システム状態 (System Status)
+        # ═══════════════════════════════════════════════════════════════
         {
-          type = "icons";
-          key = "アイコン";
-          keyColor = colors.pink;
+          type = "text";
+          text = "${colors.subtle}╔══ ${colors.foam}システム状態${colors.subtle}: ${colors.love}動作中 ${colors.subtle}═══ ${colors.iris}AI ノード${colors.subtle}: ${colors.gold}アクティブ ${colors.subtle}══╗";
         }
         {
           type = "break";
         }
         {
           type = "colors";
-          keyColor = colors.flamingo;
+          paddingLeft = 2;
           block = {
-            width = 2;
+            width = 3;
             height = 1;
-            paddingLeft = 1;
           };
         }
       ];

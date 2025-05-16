@@ -60,26 +60,6 @@ in
   # Helper function to add transparency to hex colors
   withAlpha = color: alpha: "${color}${alpha}";
   
-  # Color palette for terminals
-  colorPalette = {
-    black = roseTheme.base;
-    red = roseTheme.love;
-    green = roseTheme.foam;
-    yellow = roseTheme.gold;
-    blue = roseTheme.pine;
-    magenta = roseTheme.iris;
-    cyan = roseTheme.foam;
-    white = roseTheme.text;
-    brightBlack = roseTheme.overlay;
-    brightRed = roseTheme.love;
-    brightGreen = roseTheme.foam;
-    brightYellow = roseTheme.gold;
-    brightBlue = roseTheme.pine;
-    brightMagenta = roseTheme.iris;
-    brightCyan = roseTheme.foam;
-    brightWhite = roseTheme.text;
-  };
-  
   # Catppuccin-compatible exports
   catppuccin = {
     rosewater = roseTheme.rose;
