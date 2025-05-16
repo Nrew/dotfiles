@@ -9,8 +9,8 @@ in
   # Fastfetch Logo Image Management
   #──────────────────────────────────────────────────────────────────
 
-  home.file.".config/fastfetch/logo/tvchany.jpg" = {
-    source = "${self}/images/tvchany.jpg";
+  home.file.".config/fastfetch/logo/tvchany.png" = {
+    source = "${self}/images/tvchany.png";
     recursive = true;
   };
   
@@ -23,7 +23,7 @@ in
     settings = {
       logo = {
         type = "kitty-icat";
-        source = "${config.home.homeDirectory}/.config/fastfetch/logo/tvchany.jpg";
+        source = "${config.home.homeDirectory}/.config/fastfetch/logo/tvchany.png";
         width = 30;
         padding = {
           top = 1;
