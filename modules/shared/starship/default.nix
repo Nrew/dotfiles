@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 let
-  theme = import ./theme/default.nix { inherit lib; };
-  colors = theme;
+  theme = import ../theme/default.nix { inherit lib; };
+  colors = theme.theme;
 in
 {
   programs.starship = {
@@ -23,13 +23,13 @@ in
       "$schema" = "https://starship.rs/config-schema.json";
 
       palette = "rose-pine";
-      overlay = theme.overlay;
-      love = theme.love;
-      gold = theme.gold;
-      rose = theme.rose;
-      pine = theme.pine;
-      foam = theme.foam;
-      iris = theme.iris;
+      overlay = colors.overlay;
+      love    = colors.love;
+      gold    = colors.gold;
+      rose    = colors.rose;
+      pine    = colors.pine;
+      foam    = colors.foam;
+      iris    = colors.iris;
 
       #───────────────────────────────────────────────────────────────────────────────
       # Global Settings
@@ -91,9 +91,9 @@ in
         renamed = "[»\($count\)](bg:overlay fg:iris)";
         deleted = "[✘\($count\)](style)";
         staged = "[++\($count\)](bg:overlay fg:gold)";
-        ahead = "[⇡\(${count}\)](bg:overlay fg:foam)";
-        diverged = "⇕[\[](bg:overlay fg:iris)[⇡\(${ahead_count}\)](bg:overlay fg:foam)[⇣\(${behind_count}\)](bg:overlay fg:rose)[\]](bg:overlay fg:iris)";
-        behind = "[⇣\(${count}\)](bg:overlay fg:rose)";
+        ahead = "[⇡\($count\)](bg:overlay fg:foam)";
+        diverged = "⇕[\[](bg:overlay fg:iris)[⇡\($ahead_count\)](bg:overlay fg:foam)[⇣\($behind_count\)](bg:overlay fg:rose)[\]](bg:overlay fg:iris)";
+        behind = "[⇣\($count\)](bg:overlay fg:rose)";
       };
 
       #───────────────────────────────────────────────────────────────────────────────
@@ -127,105 +127,105 @@ in
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = " ";
-      }
+      };
 
       elixir = { 
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = " ";
-      }
+      };
 
       elm = {
-        style = "bg:overlay fg:pine"
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)"
-        disabled = false
-        symbol = " "
-      }
+        style = "bg:overlay fg:pine";
+        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
+        disabled = false;
+        symbol = " ";
+      };
 
       golang = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = " ";
-      }
+      };
 
       haskell = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = " ";
-      }
+      };
 
       java = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = "󰈤 ";
-      }
+      };
 
       julia = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = "󰌈 ";
-      }
+      };
 
       nodejs = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = "󰋘 ";
-      }
+      };
 
       nim = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = "󰈙 ";
-      }
+      };
 
       rust = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = " ";
-      }
+      };
 
       scala = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = "󰚧 ";
-      }
+      };
 
       python = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = " ";
-      }
+      };
 
       conda = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$environment ]($style)[](fg:overlay)";
         disabled = false;
-        symbol = '🅒 ';
-      }
+        symbol = "🅒  ";
+      };
 
       nix = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = " ";
-      }
+      };
 
       lua = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
         symbol = " ";
-      }
+      };
 
       #───────────────────────────────────────────────────────────────────────────────
       # Cloud Platforms
@@ -235,14 +235,14 @@ in
         format = " [](fg:overlay)[ $symbol$active ]($style)[](fg:overlay)";
         disabled = false;
         symbol = "󱇶 ";
-      }
+      };
 
       aws = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$active ]($style)[](fg:overlay)";
         disabled = false;
         symbol = "󰸏 ";
-      }
+      };
 
       #───────────────────────────────────────────────────────────────────────────────
       # System Information
@@ -254,7 +254,6 @@ in
         min_time = 1000;
         show_milliseconds = false;
       };
-
 
       battery = {
         full_symbol = "󰁹 ";
