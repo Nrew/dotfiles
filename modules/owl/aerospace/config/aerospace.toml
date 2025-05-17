@@ -56,16 +56,20 @@ default-root-container-orientation = 'auto'
 # Possible values: (qwerty|dvorak)
 key-mapping.preset = 'qwerty'
 
-on-focused-monitor-changed = ["move-mouse", "monitor-lazy-center"]
-on-focus-changed = ["move-mouse", "window-lazy-center"]
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+on-focus-changed = ['move-mouse window-lazy-center']
 
 # ─────────────────────────────────────────────────────────────────────
 # Visual Settings (for r/unixporn aesthetics)
 # ─────────────────────────────────────────────────────────────────────
 
 [gaps]
-  inner = 10  # Gap between windows
-  outer = 10 # Gap between windows and screen edge
+  inner.horizontal = 10
+  inner.vertical   = 10
+  outer.left       = 18
+  outer.bottom     = 18
+  outer.top        = 18
+  outer.right      = 18
   # padding = [top, right, bottom, left] # Padding inside borders, outside gaps
 
 [window-borders]
@@ -160,14 +164,14 @@ on-window-detected = 'move-node-to-workspace 1'
 
 [mode.resize.binding]
   # Press Escape or Enter to return to the main mode.
-  escape = 'mode main'
+  esc = 'mode main'
   enter = 'mode main'
   # Resize the focused window using H/J/K/L.
   # 'smart' adjusts size based on the container's orientation.
-  h = 'resize smart -50' 
-  l = 'resize smart +50'
-  k = 'resize smart +0 -50'
-  j = 'resize smart +0 +50'
+  h = 'resize height -50' 
+  l = 'resize height +50'
+  k = 'resize width -50'
+  j = 'resize width +50'
   b = 'balance-sizes'
 
   minus = 'resize smart -50'
