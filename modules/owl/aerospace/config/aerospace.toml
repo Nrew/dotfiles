@@ -72,21 +72,6 @@ on-focus-changed = ['move-mouse window-lazy-center']
   outer.right      = 18
   # padding = [top, right, bottom, left] # Padding inside borders, outside gaps
 
-[window-borders]
-  enable = true       # Enable or disable borders
-  width = 2           # Border width in pixels
-  color = '0xff7aa2f7'
-
-# ─────────────────────────────────────────────────────────────────────
-# Global Window Rules
-#
-# These rules are checked for every new window.
-# ─────────────────────────────────────────────────────────────────────
-
-# Default rule: 
-#  - Move any new window (that doesn't match a more specific rule) to workspace 1.
-on-window-detected = 'move-node-to-workspace 1'
-
 # ─────────────────────────────────────────────────────────────────────
 # Keybindings - Main Mode
 #
