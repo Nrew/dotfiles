@@ -1,4 +1,5 @@
 local colors = require("config.colors")
+local settings = require("config.settings")
 
 local whitelist = {
   ["Psst"] = true,
@@ -55,19 +56,19 @@ local media_title = sbar.add("item", {
 
 sbar.add("item", {
   position = "popup." .. media_cover.name,
-  icon = { string = icons.media.back },
+  icon = { string = settings.icons.text.media.back },
   label = { drawing = false },
   click_script = "nowplaying-cli previous",
 })
 sbar.add("item", {
   position = "popup." .. media_cover.name,
-  icon = { string = icons.media.play_pause },
+  icon = { string = settings.icons.text.media.play_pause },
   label = { drawing = false },
   click_script = "nowplaying-cli togglePlayPause",
 })
 sbar.add("item", {
   position = "popup." .. media_cover.name,
-  icon = { string = icons.media.forward },
+  icon = { string = settings.icons.text.media.forward },
   label = { drawing = false },
   click_script = "nowplaying-cli next",
 })
