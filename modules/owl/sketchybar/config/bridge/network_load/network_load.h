@@ -1,3 +1,6 @@
+#ifndef NETWORK_LOAD_H
+#define NETWORK_LOAD_H
+
 #include "../sketchybar.h"
 #include <math.h>
 #include <net/if.h>

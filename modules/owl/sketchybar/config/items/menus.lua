@@ -31,6 +31,10 @@ local function createPlaceholders()
     menuItems[index] = menu
   end
 
+  sbar.add("item", constants.items.MENU .. ".padding", {
+    width = settings.dimens.padding.label
+  })
+
   sbar.add("bracket", { "/" .. constants.items.MENU .. "\\..*/" }, {
     background = {
       color = settings.colors.bg1,

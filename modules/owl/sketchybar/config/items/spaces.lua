@@ -46,7 +46,7 @@ end
 
 local function addWorkspaceItem(workspaceName)
   local spaceName = constants.items.SPACES .. "." .. workspaceName
-  local spaceConfig = spaceConfigs[workspaceName]
+  local spaceConfig = spaceConfigs[workspaceName] or { icon = settings.icons.apps["default"], name = workspaceName }
 
   spaces[spaceName] = sbar.add("item", spaceName, {
     label = {

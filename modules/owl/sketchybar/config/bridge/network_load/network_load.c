@@ -7,13 +7,13 @@
 static inline int ifdata(uint32_t net_row, struct ifmibdata *data) {
     if (!data) return -1;
     
-    static const size_t size = sizeof(struct ifmibdata);
     static int32_t data_option[] = {
         CTL_NET, PF_LINK, NETLINK_GENERIC,
         IFMIB_IFDATA, 0, IFDATA_GENERAL
     };
     data_option[4] = net_row;
-    
+
+    static const size_t size = sizeof(struct ifmibdata);
     return sysctl(data_option, 6, data, &size, NULL, 0);
 }
 
@@ -34,11 +34,12 @@ static inline int network_init(struct network *net, const char *ifname) {
         return -1;
     }
     
-    for (int i = 0; i < interface_count; i++) {
+    for (uint32_t i = 0; i < interface_count; i++) {
         if (ifdata(i, &net->data) != 0) continue;
 
         if (strcmp(net->data.ifmd_name, ifname) == 0) {
             net->row = i;
+            gettimeofday(&net->tv_nm1, NULL);
             return 0;
         }
     }
@@ -46,23 +47,25 @@ static inline int network_init(struct network *net, const char *ifname) {
     return -1;
 }
 
-static inline void calculate_network_metrics(double delta_bytes, NetworkUnit *unit, double *value) {
+static inline void calculate_network_metrics(double delta_bytes, NetworkUnit *unit, int *value) {
+    double value_double = 0;
     if (delta_bytes > 0) {
         double exponent = log10(delta_bytes);
         if (exponent < 3) {
             *unit = UNIT_BPS;
-            *value = delta_bytes;
+            value_double = delta_bytes;
         } else if (exponent < 6) {
             *unit = UNIT_KBPS;
-            *value = delta_bytes / 1000.0;
+            value_double = delta_bytes / 1000.0;
         } else {
             *unit = UNIT_MBPS;
-            *value = delta_bytes / 1000000.0;
+            value_double = delta_bytes / 1000000.0;
         }
     } else {
         *unit = UNIT_BPS;
-        *value = 0;
+        value_double = 0;
     }
+    *value_out = (int)round(value_double);
 }
 
 static inline void network_update(struct network *net) {
