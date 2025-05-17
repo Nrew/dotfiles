@@ -24,16 +24,14 @@ in
       logo = {
         type = "kitty-icat";
         source = "${config.home.homeDirectory}/.config/fastfetch/logo/tvchany.png";
-        width = 40;
         padding = {
           top = 1;
-          left = 2;
         };
       };
 
       display = {
         separator = "  ";
-        key.width = 18;
+        key.width = 16;
         color.keys = colors.iris;
       };
 
@@ -123,7 +121,7 @@ in
         {
           type = "de";
           key = "デスクトップ環境";
-          keyColor = colors.mauve; 
+          keyColor = colors.iris; 
         }
         {
           type = "wm";
@@ -154,7 +152,7 @@ in
           type = "colors";
           paddingLeft = 2;
           block = {
-            width = 3;
+            width = 2;
             height = 1;
           };
         }

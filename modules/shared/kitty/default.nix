@@ -3,7 +3,6 @@
 let
   theme = import ../theme/default.nix { inherit lib; };
   colors = theme.theme;
-  palette = theme.colorPalette;
 in
 
 {
@@ -29,22 +28,22 @@ in
       foreground = colors.text;
       
       # Terminal colors
-      color0 = palette.black;
-      color1 = palette.red;
-      color2 = palette.green;
-      color3 = palette.yellow;
-      color4 = palette.blue;
-      color5 = palette.magenta;
-      color6 = palette.cyan;
-      color7 = palette.white;
-      color8 = palette.brightBlack;
-      color9 = palette.brightRed;
-      color10 = palette.brightGreen;
-      color11 = palette.brightYellow;
-      color12 = palette.brightBlue;
-      color13 = palette.brightMagenta;
-      color14 = palette.brightCyan;
-      color15 = palette.brightWhite;
+      color0 = colors.base;
+      color1 = colors.love;
+      color2 = colors.foam;
+      color3 = colors.gold;
+      color4 = colors.pine;
+      color5 = colors.iris;
+      color6 = colors.foam;
+      color7 = colors.text;
+      color8 = colors.overlay;
+      color9 = colors.love;
+      color10 = colors.foam;
+      color11 = colors.gold;
+      color12 = colors.pine;
+      color13 = colors.iris;
+      color14 = colors.foam;
+      color15 = colors.text;
       
       # Cursor colors
       cursor = colors.text;

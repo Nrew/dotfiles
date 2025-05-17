@@ -10,7 +10,7 @@
     # History configuration
     history = {
       size = 10000;
-      path = "${config.xdg.dataHome}/zsh/history";
+      path = "${config.home.homeDirectory}/zsh/history";
       save = 10000;
       ignoreDups = true;
       share = true;
@@ -65,9 +65,9 @@
       unsetopt FLOW_CONTROL       # Disable start/stop characters in shell editor
       
       # Load custom functions
-      for func in ${config.xdg.configHome}/zsh/functions/*; do
-        source $func
-      done
+      #for func in ${config.home.homeDirectory}/zsh/functions/*; do
+      #  source $func
+      #done
     '';
 
     # Shell aliases
@@ -113,7 +113,4 @@
     plugins = [
     ];
   };
-
-  # Directory for custom functions
-  home.file.".config/zsh/functions/.keep".text = ''# This file keeps the functions directory'';
 }

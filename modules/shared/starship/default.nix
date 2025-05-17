@@ -11,7 +11,6 @@ in
     # Starship Configuration
     #───────────────────────────────────────────────────────────────────────────────
 
-    enableBashIntegration = true;
     enableZshIntegration = true;
 
     settings = {
@@ -92,13 +91,13 @@ in
         format = "[](fg:overlay)([$all_status$ahead_behind]($style))[](fg:overlay) ";
         up_to_date = "[ ✓ ](bg:overlay fg:iris)";
         untracked = "[?($count)](bg:overlay fg:gold)";
-        stashed = "[\\$](bg:overlay fg:iris)";
+        stashed = "[S](bg:overlay fg:iris)";
         modified = "[!($count)](bg:overlay fg:gold)";
         renamed = "[»($count)](bg:overlay fg:iris)";
         deleted = "[✘($count)](style)";
         staged = "[++($count)](bg:overlay fg:gold)";
         ahead = "[⇡($count)](bg:overlay fg:foam)";
-        diverged = "⇕[\\[](bg:overlay fg:iris)[⇡($ahead_count)](bg:overlay fg:foam)[⇣($behind_count)](bg:overlay fg:rose)[\\]](bg:overlay fg:iris)";
+        diverged = "⇕[[](bg:overlay fg:iris)[⇡($ahead_count)](bg:overlay fg:foam)[⇣($behind_count)](bg:overlay fg:rose)[]](bg:overlay fg:iris)";
         behind = "[⇣($count)](bg:overlay fg:rose)";
       };
 
@@ -219,7 +218,7 @@ in
         symbol = "🅒  ";
       };
 
-      nix = {
+      nix_shell = {
         style = "bg:overlay fg:pine";
         format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
         disabled = false;
@@ -285,35 +284,7 @@ in
       #───────────────────────────────────────────────────────────────────────────────
       # Prompt Format
       #───────────────────────────────────────────────────────────────────────────────
-      format = ''
-      $username\
-      $hostname\
-      $directory\
-      $git_branch\
-      $git_status\
-      $fill\
-      $c\
-      $elixir\
-      $elm\
-      $golang\
-      $haskell\
-      $java\
-      $julia\
-      $nodejs\
-      $nim\
-      $rust\
-      $scala\
-      $python\
-      $conda\
-      $nix_shell\
-      $lua\
-      $gcloud\
-      $aws\
-      $cmd_duration\
-      $battery\
-      $time
-        [󱞪](fg:iris) \
-      '';
+      format = "$username$hostname$directory$git_branch$git_status$fill$c$elixir$elm$golang$haskell$java$julia$nodejs$nim$rust$scala$python$conda$nix_shell$lua$gcloud$aws$cmd_duration$battery$time\n [󱞪](fg:iris) ";
     };
   };
 }
