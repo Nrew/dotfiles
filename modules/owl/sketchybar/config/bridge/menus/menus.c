@@ -1,4 +1,4 @@
-#include "menu_controller.h"
+#include "menus.h"
 
 /*********************************
  * Private SLS API Declarations
@@ -9,6 +9,8 @@ extern void SLSSetMenuBarInsetAndAlpha(int cid, double u1, double u2, float alph
 extern void _SLPSGetFrontProcess(ProcessSerialNumber *psn);
 extern void SLSGetConnectionIDForPSN(int cid, ProcessSerialNumber *psn, int *cid_out);
 extern void SLSConnectionGetPID(int cid, pid_t *pid_out);
+
+typedef void (^ClickCompletionHandler)(void);
 
 /*********************************
  * Core Helper Functions
@@ -31,7 +33,7 @@ static void safe_release(CFTypeRef ref) {
  * @return AXError code
  */
 static AXError ax_get_attribute(AXUIElementRef element, CFStringRef attribute, CFTypeRef *value) {
-    if (!element || !value) return kAXErrorInvalidParameter;
+    if (!element || !value) return kAXErrorIllegalArgument;
     return AXUIElementCopyAttributeValue(element, attribute, value);
 }
 
@@ -42,7 +44,7 @@ static AXError ax_get_attribute(AXUIElementRef element, CFStringRef attribute, C
  * @return AXError code
  */
 static AXError ax_get_menubar_children(AXUIElementRef app, CFArrayRef *children) {
-    if (!app || !children) return kAXErrorInvalidParameter;
+    if (!app || !children) return kAXErrorIllegalArgument;
     
     CFTypeRef menubar = NULL;
     AXError error = ax_get_attribute(app, kAXMenuBarAttribute, &menubar);
@@ -104,7 +106,7 @@ MenuError ax_init(void) {
   CFDictionaryRef options;
   options = CFDictionaryCreate(             // Create dictionary
     kCFAllocatorDefault,                    // Allocator
-    keys,                                   // Leys
+    keys,                                   // keys
     values,                                 // Values
     sizeof(keys) / sizeof(*keys),           // Key count
     &kCFCopyStringDictionaryKeyCallBacks,   // Key callbacks
@@ -149,7 +151,7 @@ MenuError ax_print_menu_options(AXUIElementRef app) {
 
     uint32_t count = CFArrayGetCount(children);
     for (uint32_t i = 1; i < count; i++) {
-        AXUIElementRef item = CFArrayGetValueAtIndex(children_ref, i);
+        AXUIElementRef item = CFArrayGetValueAtIndex(children, i);
         CFTypeRef title = ax_get_title(item);
 
         if (title) {
@@ -181,10 +183,10 @@ MenuError ax_select_menu_option(AXUIElementRef app, int id) {
     if (error != kAXErrorSuccess) return MENU_ERROR_ACCESSIBILITY;
 
     MenuError result = MENU_SUCCESS;
-    uint32_t count = CFArrayGetCount(children_ref);
+    uint32_t count = CFArrayGetCount(children);
 
     if (id < (int)count) {
-        AXUIElementRef item = CFArrayGetValueAtIndex(children_ref, id);
+        AXUIElementRef item = CFArrayGetValueAtIndex(children, id);
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
         
         ax_perform_click(item, ^{
@@ -200,7 +202,7 @@ MenuError ax_select_menu_option(AXUIElementRef app, int id) {
     else {
         result = MENU_ERROR_NOT_FOUND;
     }
-  
+
   CFRelease(children);
   return result;
 }
@@ -362,7 +364,11 @@ int main(int argc, char **argv) {
       return 0;
   }
 
-  ax_init(); // Will exit if not trusted
+  MenuError error = ax_init(); // Will exit if not trusted
+  if (error != MENU_SUCCESS) {
+      fprintf(stderr, "Error: %s\n", menu_error_to_string(error));
+      return 1;
+  }
 
   if (strcmp(argv[1], "-l") == 0) {
       AXUIElementRef app = ax_get_front_app();

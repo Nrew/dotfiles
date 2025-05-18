@@ -5,6 +5,8 @@ BINDIR = bin
 SRCS = network_load.c
 HEADERS = network_load.h ../sketchybar.h
 
+all: $(BINDIR)/$(TARGET)
+
 $(BINDIR)/$(TARGET): $(SRCS) $(HEADERS) | $(BINDIR)
 	$(CC) $(CFLAGS) $(SRCS) -o $@
 

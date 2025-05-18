@@ -7,13 +7,13 @@
 static inline int ifdata(uint32_t net_row, struct ifmibdata *data) {
     if (!data) return -1;
     
-    static int32_t data_option[] = {
+    int32_t data_option[] = {
         CTL_NET, PF_LINK, NETLINK_GENERIC,
         IFMIB_IFDATA, 0, IFDATA_GENERAL
     };
     data_option[4] = net_row;
 
-    static const size_t size = sizeof(struct ifmibdata);
+    size_t size = sizeof(struct ifmibdata);
     return sysctl(data_option, 6, data, &size, NULL, 0);
 }
 
@@ -34,7 +34,7 @@ static inline int network_init(struct network *net, const char *ifname) {
         return -1;
     }
     
-    for (uint32_t i = 0; i < interface_count; i++) {
+    for (uint32_t i = 1; i < interface_count; i++) {
         if (ifdata(i, &net->data) != 0) continue;
 
         if (strcmp(net->data.ifmd_name, ifname) == 0) {
@@ -48,24 +48,24 @@ static inline int network_init(struct network *net, const char *ifname) {
 }
 
 static inline void calculate_network_metrics(double delta_bytes, NetworkUnit *unit, int *value) {
-    double value_double = 0;
+    double double_value = 0;
     if (delta_bytes > 0) {
         double exponent = log10(delta_bytes);
         if (exponent < 3) {
             *unit = UNIT_BPS;
-            value_double = delta_bytes;
+            double_value = delta_bytes;
         } else if (exponent < 6) {
             *unit = UNIT_KBPS;
-            value_double = delta_bytes / 1000.0;
+            double_value = delta_bytes / 1000.0;
         } else {
             *unit = UNIT_MBPS;
-            value_double = delta_bytes / 1000000.0;
+            double_value = delta_bytes / 1000000.0;
         }
     } else {
         *unit = UNIT_BPS;
-        value_double = 0;
+        double_value = 0;
     }
-    *value_out = (int)round(value_double);
+    *value = (int)round(double_value);
 }
 
 static inline void network_update(struct network *net) {
@@ -79,6 +79,9 @@ static inline void network_update(struct network *net) {
   uint64_t obytes_nm1 = net->data.ifmd_data.ifi_obytes;
 
   if (ifdata(net->row, &net->data) != 0) return;
+
+  double time_scale = (net->tv_delta.tv_sec + MIN_TIME_SCALE * net->tv_delta.tv_usec);
+  if (time_scale < MIN_TIME_SCALE || time_scale > MAX_TIME_SCALE) return;
 
   double delta_ibytes = (double)(net->data.ifmd_data.ifi_ibytes - ibytes_nm1) / time_scale;
   double delta_obytes = (double)(net->data.ifmd_data.ifi_obytes - obytes_nm1) / time_scale;
@@ -106,7 +109,7 @@ int main(int argc, char **argv) {
   alarm(0);
 
   char event_message[EVENT_MESSAGE_SIZE];
-  if (snprintf(event_message, EVENT_MESSAGE_SIZE, "--add event '%s'", argv[2]) >= EVENT_MESSAGE_SIZE 0) {
+  if (snprintf(event_message, EVENT_MESSAGE_SIZE, "--add event '%s'", argv[2]) >= EVENT_MESSAGE_SIZE) {
     printf("Event name too long\n");
     return EXIT_FAILURE;
   }
@@ -114,12 +117,14 @@ int main(int argc, char **argv) {
   sketchybar(event_message);
 
   // Initialize network monitoring
-  struct network network;
+  __block struct network network;
   if (network_init(&network, argv[1]) != 0) {
     printf("Failed to initialize network monitoring for interface: %s\n", argv[1]);
     return EXIT_FAILURE;
   }
-  char trigger_message[EVENT_MESSAGE_SIZE];
+  
+  const char* event_name = argv[2];
+
   dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
   dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
 
@@ -133,10 +138,11 @@ int main(int argc, char **argv) {
 
   dispatch_source_set_event_handler(timer, ^{
     network_update(&network);
-
+    
+    char trigger_message[EVENT_MESSAGE_SIZE];
     if (snprintf(trigger_message, EVENT_MESSAGE_SIZE,
                 "--trigger '%s' upload='%03d%s' download='%03d%s'",
-                argv[2], network.up, unit_str[network.up_unit],
+                event_name, network.up, unit_str[network.up_unit],
                 network.down, unit_str[network.down_unit]) < EVENT_MESSAGE_SIZE) {
         sketchybar(trigger_message);
     }

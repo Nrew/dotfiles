@@ -1,8 +1,13 @@
-#ifndef MENU_CONTROLLER_H
-#define MENU_CONTROLLER_H
+#ifndef MENUS_H
+#define MENUS_H
 
 #include <Carbon/Carbon.h>
 #include <dispatch/dispatch.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <limits.h>
 
 /*********************************
  * Constants and Types
@@ -92,4 +97,4 @@ static AXError ax_get_attribute(AXUIElementRef element, CFStringRef attribute, C
  */
 static AXError ax_get_menubar_children(AXUIElementRef app, CFArrayRef *children);
 
-#endif /* MENU_CONTROLLER_H */
+#endif /* MENUS_H */

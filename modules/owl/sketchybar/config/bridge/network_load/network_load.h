@@ -1,16 +1,18 @@
 #ifndef NETWORK_LOAD_H
 #define NETWORK_LOAD_H
 
-#include "../sketchybar.h"
 #include <math.h>
 #include <net/if.h>
 #include <net/if_mib.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/select.h>
 #include <sys/sysctl.h>
+#include <sys/time.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <dispatch/dispatch.h>
+#include <errno.h>
+#include "../sketchybar.h"
 
 /*********************************
  * Constants and Types
@@ -26,7 +28,7 @@ typedef enum {
 } NetworkUnit;
 
 static char unit_str[3][6] = {
-  "Bps",
+  "Bps ",
   "KBps",
   "MBps",
 };
@@ -66,7 +68,7 @@ static inline void network_update(struct network *net);
  * @param value The value of the network data
  * @return void
  */
-static inline void calculate_network_metrics(double delta_bytes, NetworkUnit *unit, double *value);
+static inline void calculate_network_metrics(double delta_bytes, NetworkUnit *unit, int *value);
 
 /**
  * Get the network data for the given network row

@@ -121,6 +121,7 @@ let user = "nrew"; in
             "sketchybar"
             "spicetify-cli"
             "gowall"
+	    "switchaudio-osx"
         ];                                
         casks = [                                   # Install GUI apps via Homebrew
             # `brew install --cask`

@@ -5,6 +5,8 @@ SRC := menus.c
 OBJ := $(SRC:.c=.o)
 BIN_DIR := bin
 
+all: $(TARGET)
+
 $(TARGET): $(SRC) | $(BIN_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
