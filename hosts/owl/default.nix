@@ -39,6 +39,8 @@ let user = "nrew"; in
     #   1. To avoid conflicts with neovim, disable ctrl + up/down/left/right 
     # ───────────────────────────────────────────────────────────────────────────────
 
+    system.primaryUser = user;
+
     system.defaults = {
         ".GlobalPreferences" = { };
         NSGlobalDomain = {

@@ -1,18 +1,18 @@
 CC := clang
 CFLAGS := -std=c99 -O3 -F/System/Library/PrivateFrameworks/ -framework Carbon -framework SkyLight
-TARGET := bin
+TARGET := menus
 SRC := menus.c
-BIN_DIR := bin
+BINDIR := bin
 HEADERS := menus.h
 
-all: $(TARGET)
+all: $(BINDIR)/$(TARGET)
 
-$(TARGET): $(SRC) $(HEADERS) | $(BIN_DIR)
+$(BINDIR)/$(TARGET): $(SRC) $(HEADERS) | $(BINDIR)
 	$(CC) $(CFLAGS) $(SRC) -o $@
 
-$(BIN_DIR):
-	mkdir -p $(BIN_DIR)
+$(BINDIR):
+	mkdir -p $(BINDIR)
 
 .PHONY: clean
 clean:
-	rm -rf $(BIN_DIR)
+	rm -rf $(BINDIR)

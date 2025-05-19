@@ -15,4 +15,4 @@ $(BINDIR):
 
 .PHONY: clean
 clean:
-	rm -rf $(BINDIR)
+	rm -rf $(BINDIR)/$(TARGET)
