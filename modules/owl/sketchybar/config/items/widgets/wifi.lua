@@ -72,7 +72,9 @@ local ssid = sbar.add("item", {
   align = "center",
   position = "popup." .. wifiBracket.name,
   width = popupWidth,
-  height = 16,
+  background = {
+    height = 16,
+  },
   icon = {
     string = settings.icons.text.wifi.router,
     font = {

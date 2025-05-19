@@ -27,18 +27,6 @@ volumeValue:subscribe("volume_change", function(env)
   local volume = tonumber(env.INFO)
 
   sbar.exec("SwitchAudioSource -t output -c", function(result)
-    -- local currentOutputDevice = result:sub(1, -2)
-    -- if currentOutputDevice == "AirPods Max" then
-    --   icon = "􀺹"
-    -- elseif currentOutputDevice == "AirPods von Longdong Silver" or currentOutputDevice == "AirPods von Anna" then
-    --   icon = "􀟥"
-    -- elseif currentOutputDevice == "Arctis Nova Pro Wireless" then
-    --   icon = "􀑈"
-    -- elseif currentOutputDevice == "Ear (2)" then
-    --   icon = "􀪷"
-    -- elseif currentOutputDevice == "iD4" then
-    --   icon = "􀝎"
-    -- else
     if volume > 60 then
       icon = settings.icons.text.volume._100
     elseif volume > 30 then
@@ -48,7 +36,6 @@ volumeValue:subscribe("volume_change", function(env)
     elseif volume > 0 then
       icon = settings.icons.text.volume._10
     end
-    -- end
 
     local lead = ""
     if volume < 10 then

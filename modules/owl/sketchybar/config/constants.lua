@@ -16,6 +16,7 @@ local items <const> = {
   MENU_TOGGLE = "menu_toggle",
   FRONT_APPS = "front_apps",
   MESSAGE = "message",
+  MEDIA = "media",
   VOLUME = "widgets.volume",
   WIFI = "widgets.wifi",
   BATTERY = "widgets.battery",

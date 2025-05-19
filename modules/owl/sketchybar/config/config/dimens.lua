@@ -6,7 +6,7 @@ local padding <const> = {
     item = 8,
     popup = 8,
   }
-  
+
   local graphics <const> = {
     bar = {
       height = 32,
@@ -25,12 +25,12 @@ local padding <const> = {
     },
     blur_radius = 30,
   }
-  
+
   local text <const> = {
     icon = 14.0,
     label = 12.0,
   }
-  
+
   return {
     padding = padding,
     graphics = graphics,

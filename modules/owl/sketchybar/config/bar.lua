@@ -1,5 +1,5 @@
 local settings = require("config.settings")
-																		
+
 sbar.bar({ 																-- Create the bar
 	topmost = "window", 												-- "window" or "screen"
 	height = settings.dimens.graphics.bar.height,						-- Height of the bar
