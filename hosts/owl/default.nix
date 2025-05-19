@@ -125,7 +125,8 @@ let user = "nrew"; in
             "sketchybar"
             "spicetify-cli"
             "gowall"
-	    "switchaudio-osx"
+	        "switchaudio-osx"
+            "nowplaying-cli"
         ];                                
         casks = [                                   # Install GUI apps via Homebrew
             # `brew install --cask`
@@ -136,7 +137,7 @@ let user = "nrew"; in
             "raycast"             
             "visual-studio-code"  
             "ghostty"
-	    "zen-browser"
+	        "zen-browser"
         ]; 
         taps = [                                    # Add additional Homebrew taps
             "nikitabobko/tap"                       # Aerospace tap
