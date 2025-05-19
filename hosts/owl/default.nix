@@ -113,6 +113,8 @@ let user = "nrew"; in
     #        1. right click on the running app's icon in Dock, select "Options" -> "Show in Finder" and delete it
     #    4. hold down the Option key, a `x` button will appear on the icon, click it to remove the icon
     # ────────────────────────────────────────────────────────────────
+    
+    services.sketchybar.enable = true;
 
     homebrew = {
         enable = true;
@@ -134,6 +136,7 @@ let user = "nrew"; in
             "raycast"             
             "visual-studio-code"  
             "ghostty"
+	    "zen-browser"
         ]; 
         taps = [                                    # Add additional Homebrew taps
             "nikitabobko/tap"                       # Aerospace tap

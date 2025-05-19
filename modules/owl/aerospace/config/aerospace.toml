@@ -66,10 +66,10 @@ on-focus-changed = ['move-mouse window-lazy-center']
 [gaps]
   inner.horizontal = 10
   inner.vertical   = 10
-  outer.left       = 18
-  outer.bottom     = 18
-  outer.top        = 18
-  outer.right      = 18
+  outer.left       = 14
+  outer.bottom     = 14
+  outer.top        = [{ monitor."built-in.*" = 14 }, 14]
+  outer.right      = 14
   # padding = [top, right, bottom, left] # Padding inside borders, outside gaps
 
 # ─────────────────────────────────────────────────────────────────────

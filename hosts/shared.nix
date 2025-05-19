@@ -21,9 +21,10 @@ let user = "nrew"; in
         docker      # Requires system-level daemon
         wget        # Command-line file downloader
         curl        # Command-line URL transfer tool
-        
+        cmake
         jq          # A lightweight and flexible command-line JSON processor
-        texinfo     # Needed for compiling tools like Emacs
+        cargo
+	texinfo     # Needed for compiling tools like Emacs
         btop        # System-wide resource monitor
         neovim      # Modern text editor
         git         # Version control system

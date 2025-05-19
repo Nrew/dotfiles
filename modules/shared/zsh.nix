@@ -95,7 +95,6 @@
       vim = "nvim";
       
       # System
-      cat = "bat";
       grep = "rg";
       rm = "rm -i";
       cp = "cp -i";
