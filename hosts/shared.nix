@@ -72,7 +72,7 @@ let user = "nrew"; in
     nix = {
         # Set the Nix package as the default to ensure Nix commands are available system-wide
         package = pkgs.nix;
-        settings = {
+	settings = {
             trusted-users = [ "@admin" "${user}" ];
             substituters = [ "https://nix-community.cachix.org" "https://cache.nixos.org" ];
             trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];

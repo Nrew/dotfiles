@@ -24,7 +24,7 @@ let user = "nrew"; in
 
     # User configuration
     users.users.${user} = {
-        name = "${user}";
+        name = user;
         home = "/Users/${user}";
         isHidden = false;
         shell = pkgs.zsh;
@@ -44,6 +44,7 @@ let user = "nrew"; in
     system.defaults = {
         ".GlobalPreferences" = { };
         NSGlobalDomain = {
+	    _HIHideMenuBar = true;
             AppleInterfaceStyle = "Dark";           # Use dark mode by default
             AppleShowAllExtensions = true;          # Show all file extensions
             AppleICUForce24HourTime = true;         # Use 24-hour time format
@@ -121,11 +122,11 @@ let user = "nrew"; in
         brews = [                                   # Install CLI tools via Homebrew
             # `brew install`
             "mas"
-            "lua"
+	    "lua"
             "sketchybar"
             "spicetify-cli"
             "gowall"
-	        "switchaudio-osx"
+	    "switchaudio-osx"
             "nowplaying-cli"
         ];                                
         casks = [                                   # Install GUI apps via Homebrew
@@ -137,7 +138,6 @@ let user = "nrew"; in
             "raycast"             
             "visual-studio-code"  
             "ghostty"
-	        "zen-browser"
         ]; 
         taps = [                                    # Add additional Homebrew taps
             "nikitabobko/tap"                       # Aerospace tap

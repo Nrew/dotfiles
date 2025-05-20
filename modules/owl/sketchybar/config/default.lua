@@ -8,19 +8,20 @@ sbar.default({
   icon = {
     font = {
       family = settings.fonts.text,
-      style = settings.fonts.styles.regular,
+      style = settings.fonts.styles.bold,
       size = settings.dimens.text.icon,
     },
     color = settings.colors.white,
     padding_left = settings.dimens.padding.icon,
     padding_right = settings.dimens.padding.icon,
+    background = { image = { corner_radius = 9 } },
   },
 
   -- Label configuration
   label = {
     font = {
       family = settings.fonts.text,
-      style = settings.fonts.styles.regular,
+      style = settings.fonts.styles.semibold,
       size = settings.dimens.text.label,
     },
     color = settings.colors.white,
@@ -32,24 +33,23 @@ sbar.default({
   background = {
     height = settings.dimens.graphics.background.height,
     corner_radius = settings.dimens.graphics.background.corner_radius,
-    border_width = 0,
+    border_width = 1,
+    border_color = settings.colors.with_alpha(settings.colors.bg2, 0.7),
     image = {
-      corner_radius = settings.dimens.graphics.background.corner_radius
+      corner_radius = settings.dimens.graphics.background.corner_radius,
+      border_color = settings.colors.with_alpha(settings.colors.grey, 0.6),
+      border_width = 1
     }
   },
 
   -- Popup configuration
   popup = {
-    y_offset = settings.dimens.padding.popup,
-    align = "center",
     blur_radius = settings.dimens.graphics.blur_radius,
     background = {
       border_width = 0,
       corner_radius = settings.dimens.graphics.background.corner_radius,
       color = settings.colors.popup.bg,
       shadow = { drawing = true },
-      padding_left = settings.dimens.padding.icon,
-      padding_right = settings.dimens.padding.icon,
     },
   },
 
@@ -59,6 +59,7 @@ sbar.default({
     background = {
       height = settings.dimens.graphics.slider.height,
       corner_radius = settings.dimens.graphics.background.corner_radius,
+      border_color = settings.colors.popup.border,
       color = settings.colors.slider.bg,
       border_color = settings.colors.slider.border,
       border_width = 1,

@@ -1,5 +1,3 @@
-require("install.sbar")         -- Load the Sketchybar installation
-
 sbar = require("sketchybar")    -- Load the Sketchybar module
 
 sbar.begin_config()             -- Begin the configuration

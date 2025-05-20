@@ -12,5 +12,4 @@ sbar.bar({ 																-- Create the bar
 	corner_radius = 15, 	-- Corner radius of the bar
 	y_offset = 0,						-- Offset of the bar
 	-- blur_radius = settings.dimens.graphics.blur_radius, 				-- Blur radius of the bar
-	background_color = settings.olors.with_alpha(settings.colors.bar.bg, 0.40),
 })
