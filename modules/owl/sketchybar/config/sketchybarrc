@@ -1,8 +1,6 @@
 #!/usr/bin/env lua
 
 -- SbarLua setup
-local sbarpath = "/Users/" .. os.getenv("USER") .. "/.local/share/sketchybar_lua/"
-
 local function exists(file)
   local ok, err, code = os.rename(file, file)
   if not ok then
@@ -18,6 +16,7 @@ local function isdir(path)
 end
 
 -- Install SbarLua if needed
+local sbarpath = "/Users/" .. os.getenv("USER") .. "/.local/share/sketchybar_lua/"
 if not isdir(sbarpath) then
   os.execute(
     "git clone https://github.com/FelixKratz/SbarLua.git /tmp/SbarLua && cd /tmp/SbarLua && make install && rm -rf /tmp/SbarLua/"
