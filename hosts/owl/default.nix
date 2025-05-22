@@ -101,14 +101,15 @@ let user = "nrew"; in
     # ────────────────────────────────────────────────────────────────
 
     environment.systemPackages = with pkgs; [
-        sketchybar
     ];
 
     fonts = {
-        fonts = with pkgs; [
+        packages = with pkgs; [
             sketchybar-app-font
         ];
     };
+
+    services.sketchybar.enable = true;
 
     # ────────────────────────────────────────────────────────────────
     # Homebrew-Specific Settings
@@ -138,6 +139,7 @@ let user = "nrew"; in
             "gowall"
 	        "switchaudio-osx"
             "nowplaying-cli"
+	    "sketchybar"
         ];                                
         casks = [                                   # Install GUI apps via Homebrew
             # `brew install --cask`
