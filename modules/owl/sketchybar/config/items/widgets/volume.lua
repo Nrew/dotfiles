@@ -1,3 +1,6 @@
+-- Volume control widget for SketchyBar
+-- Enhanced with improved error handling and audio device management
+
 local constants = require("constants")
 local settings = require("settings")
 local colors = require("colors")
@@ -109,21 +112,19 @@ local function toggleVolumeDetails(env)
 
         for device in string.gmatch(available, '[^\r\n]+') do
           if device and device ~= "" then
-            local color = colors.grey
+            local itemColor = colors.grey
             if current == device then
-              color = colors.white
+              itemColor = colors.white
             end
 
             sbar.add("item", constants.items.VOLUME .. ".device." .. counter, {
               position = "popup." .. volumeBracket.name,
               align = "center",
-              label = { string = device, color = color },
+              label = { string = device, color = itemColor },
               click_script = string.format(
-                'SwitchAudioSource -s "%s" && sketchybar --set /%s.device\\.*/ label.color=%s --set $NAME label.color=%s',
+                'SwitchAudioSource -s "%s" && sketchybar --set /%s.device\\.*/ label.color=0xff6e6a86 --set $NAME label.color=0xffe0def4',
                 device,
-                constants.items.VOLUME,
-                colors.grey,
-                colors.white
+                constants.items.VOLUME
               )
             })
             counter = counter + 1

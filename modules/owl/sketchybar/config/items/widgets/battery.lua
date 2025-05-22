@@ -1,11 +1,11 @@
+-- Battery widget for SketchyBar
+-- Fixed constant references and improved logic
+
 local constants = require("constants")
 local settings = require("settings")
 local colors = require("colors")
 
 local isCharging = false
-
-local dimens = settings.dimens
-
 
 local battery = sbar.add("item", constants.items.BATTERY, {
   position = "right",
@@ -16,8 +16,8 @@ local batteryPopup = sbar.add("item", {
   position = "popup." .. battery.name,
   width = "dynamic",
   label = {
-    padding_right = dimens.padding.label,
-    padding_left = dimens.padding.label,
+    padding_right = settings.dimens.padding.label,
+    padding_left = settings.dimens.padding.label,
   },
   icon = {
     padding_left = 0,

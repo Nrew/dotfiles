@@ -1,4 +1,37 @@
 #!/usr/bin/env lua
 
-require("bridge")
+-- SbarLua setup
+local sbarpath = "/Users/" .. os.getenv("USER") .. "/.local/share/sketchybar_lua/"
+
+local function exists(file)
+  local ok, err, code = os.rename(file, file)
+  if not ok then
+    if code == 13 then
+      return true
+    end
+  end
+  return ok, err
+end
+
+local function isdir(path)
+  return exists(path .. "/")
+end
+
+-- Install SbarLua if needed
+if not isdir(sbarpath) then
+  os.execute(
+    "git clone https://github.com/FelixKratz/SbarLua.git /tmp/SbarLua && cd /tmp/SbarLua && make install && rm -rf /tmp/SbarLua/"
+  )
+end
+
+-- Add SbarLua to package path
+package.cpath = package.cpath .. ";" .. sbarpath .. "?.so"
+
+-- Build bridge components
+local config_dir = os.getenv("CONFIG_DIR")
+if config_dir then
+  os.execute("(cd " .. config_dir .. "/bridge && make)")
+end
+
+-- Load main configuration
 require("init")
