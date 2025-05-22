@@ -105,6 +105,15 @@ let user = "nrew"; in
         sketchybar
     ];
 
+    fonts = {
+        fonts = with pkgs; [
+            "SF Pro Display"
+            "SF Pro Text"
+            "SF Mono"
+            "sketchybar-app-font"
+        ];
+    };
+
     # ────────────────────────────────────────────────────────────────
     # Homebrew-Specific Settings
     # ────────────────────────────────────────────────────────────────
