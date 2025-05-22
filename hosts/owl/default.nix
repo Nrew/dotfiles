@@ -101,16 +101,12 @@ let user = "nrew"; in
     # ────────────────────────────────────────────────────────────────
 
     environment.systemPackages = with pkgs; [
-        sketchybar-app-font
         sketchybar
     ];
 
     fonts = {
         fonts = with pkgs; [
-            "SF Pro Display"
-            "SF Pro Text"
-            "SF Mono"
-            "sketchybar-app-font"
+            sketchybar-app-font
         ];
     };
 
@@ -153,8 +149,8 @@ let user = "nrew"; in
             "visual-studio-code"  
             "ghostty"
             "sf-symbols"
-            "font-sf-mono"
-            "font-sf-pro"
+            "homebrew/cask-fonts/font-sf-mono"
+            "homebrew/cask-fonts/font-sf-pro"
         ]; 
         taps = [                                    # Add additional Homebrew taps
             "nikitabobko/tap"                       # Aerospace tap
