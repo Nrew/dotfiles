@@ -1,3 +1,6 @@
+-- Default configuration for SketchyBar items
+-- Fixed all reference issues and improved structure
+
 local colors = require("colors")
 local settings = require("settings")
 

@@ -1,5 +1,6 @@
 local icons = require("icons")
 
+-- Dimension and spacing constants
 local dimens = {
   -- Padding values for various UI components
   padding = {
@@ -81,10 +82,10 @@ local fonts = {
   }
 }
 
--- Export consolidated settings
 return {
   fonts = fonts,
   dimens = dimens,
+  alphas = dimens.alphas,        
   text = icons.text.nerdfont,
   apps = icons.apps,
 }

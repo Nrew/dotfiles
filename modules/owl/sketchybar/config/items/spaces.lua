@@ -1,11 +1,17 @@
+-- Workspace/Spaces display for SketchyBar
+-- Fixed variable references and improved consistency
+
 local constants = require("constants")
 local settings = require("settings")
 local colors = require("colors")
 
-local spaces = {}
+-- Extract commonly used settings
 local apps = settings.apps
 local dimens = settings.dimens
 
+local spaces = {}
+
+-- Hidden watchers for events
 local swapWatcher = sbar.add("item", {
   drawing = false,
   updates = true,
@@ -16,7 +22,8 @@ local currentWorkspaceWatcher = sbar.add("item", {
   updates = true,
 })
 
-local spaceConfigs <const> = {
+-- Configuration for different workspace types
+local spaceConfigs = {
   ["B"] = { icon = "󰖟", name = "Browsing" },
   ["C"] = { icon = "", name = "Coding" },
   ["E"] = { icon = "", name = "Mail" },
@@ -25,9 +32,14 @@ local spaceConfigs <const> = {
   ["X"] = { icon = "", name = "Misc" },
 }
 
+-- Highlight the currently focused workspace
 local function selectCurrentWorkspace(focusedWorkspaceName)
+  if not focusedWorkspaceName or focusedWorkspaceName == "" then
+    return
+  end
+
   for sid, item in pairs(spaces) do
-    if item ~= nil then
+    if item then
       local isSelected = sid == constants.items.SPACES .. "." .. focusedWorkspaceName
       item:set({
         icon = { color = isSelected and colors.bg1 or colors.white },
@@ -40,16 +52,27 @@ local function selectCurrentWorkspace(focusedWorkspaceName)
   sbar.trigger(constants.events.UPDATE_WINDOWS)
 end
 
+-- Find and select the current workspace
 local function findAndSelectCurrentWorkspace()
   sbar.exec(constants.aerospace.GET_CURRENT_WORKSPACE, function(focusedWorkspaceOutput)
-    local focusedWorkspaceName = focusedWorkspaceOutput:match("[^\r\n]+")
-    selectCurrentWorkspace(focusedWorkspaceName)
+    if focusedWorkspaceOutput then
+      local focusedWorkspaceName = focusedWorkspaceOutput:match("[^\r\n]+")
+      selectCurrentWorkspace(focusedWorkspaceName)
+    end
   end)
 end
 
+-- Add a workspace item to the bar
 local function addWorkspaceItem(workspaceName)
+  if not workspaceName or workspaceName == "" then
+    return
+  end
+
   local spaceName = constants.items.SPACES .. "." .. workspaceName
-  local spaceConfig = spaceConfigs[workspaceName] or { icon = apps["default"], name = workspaceName }
+  local spaceConfig = spaceConfigs[workspaceName] or { 
+    icon = apps["default"] or ":default:", 
+    name = workspaceName 
+  }
 
   spaces[spaceName] = sbar.add("item", spaceName, {
     label = {
@@ -58,7 +81,7 @@ local function addWorkspaceItem(workspaceName)
       string = spaceConfig.name,
     },
     icon = {
-      string = spaceConfig.icon or apps["default"],
+      string = spaceConfig.icon,
       color = colors.white,
     },
     background = {
@@ -67,6 +90,7 @@ local function addWorkspaceItem(workspaceName)
     click_script = "aerospace workspace " .. workspaceName,
   })
 
+  -- Add hover animations
   spaces[spaceName]:subscribe("mouse.entered", function(env)
     sbar.animate("tanh", 30, function()
       spaces[spaceName]:set({ label = { width = "dynamic" } })
@@ -79,29 +103,44 @@ local function addWorkspaceItem(workspaceName)
     end)
   end)
 
+  -- Add padding after each workspace
   sbar.add("item", spaceName .. ".padding", {
     width = dimens.padding.label
   })
 end
 
+-- Create all workspace items
 local function createWorkspaces()
   sbar.exec(constants.aerospace.LIST_ALL_WORKSPACES, function(workspacesOutput)
+    if not workspacesOutput or workspacesOutput == "" then
+      return
+    end
+
     for workspaceName in workspacesOutput:gmatch("[^\r\n]+") do
-      addWorkspaceItem(workspaceName)
+      if workspaceName and workspaceName ~= "" then
+        addWorkspaceItem(workspaceName)
+      end
     end
 
     findAndSelectCurrentWorkspace()
   end)
 end
 
+-- Subscribe to menu/spaces toggle events
 swapWatcher:subscribe(constants.events.SWAP_MENU_AND_SPACES, function(env)
-  local isShowingSpaces = env.isShowingMenu == "off" and true or false
+  local isShowingSpaces = env.isShowingMenu == "off"
   sbar.set("/" .. constants.items.SPACES .. "\\..*/", { drawing = isShowingSpaces })
 end)
 
+-- Subscribe to workspace change events
 currentWorkspaceWatcher:subscribe(constants.events.AEROSPACE_WORKSPACE_CHANGED, function(env)
-  selectCurrentWorkspace(env.FOCUSED_WORKSPACE)
-  sbar.trigger(constants.events.UPDATE_WINDOWS)
+  if env.FOCUSED_WORKSPACE then
+    selectCurrentWorkspace(env.FOCUSED_WORKSPACE)
+    sbar.trigger(constants.events.UPDATE_WINDOWS)
+  end
 end)
 
+-- Initialize workspaces
 createWorkspaces()
+
+return spaces
