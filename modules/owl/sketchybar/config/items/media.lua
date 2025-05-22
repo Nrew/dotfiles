@@ -1,10 +1,16 @@
-local colors = require("config.colors")
-local settings = require("config.settings")
+local colors = require("colors")
+local settings = require("settings")
 
+-- Whitelist of supported media applications
 local whitelist = {
   ["Psst"] = true,
-};
+  ["Spotify"] = true,
+  ["Music"] = true,
+  ["TIDAL"] = true,
+  ["Podcasts"] = true,
+}
 
+-- Media cover art display
 local media_cover = sbar.add("item", {
   position = "left",
   background = {
@@ -24,6 +30,7 @@ local media_cover = sbar.add("item", {
   }
 })
 
+-- Media artist display
 local media_artist = sbar.add("item", {
   position = "left",
   drawing = false,
@@ -40,6 +47,7 @@ local media_artist = sbar.add("item", {
   },
 })
 
+-- Media title display
 local media_title = sbar.add("item", {
   position = "left",
   drawing = false,
@@ -54,46 +62,78 @@ local media_title = sbar.add("item", {
   },
 })
 
-sbar.add("item", {
+-- Media control buttons in popup
+local media_previous = sbar.add("item", {
   position = "popup." .. media_cover.name,
-  icon = { string = settings.icons.text.media.back },
+  icon = { string = settings.text.media.back },
   label = { drawing = false },
   click_script = "nowplaying-cli previous",
 })
-sbar.add("item", {
+
+local media_play_pause = sbar.add("item", {
   position = "popup." .. media_cover.name,
-  icon = { string = settings.icons.text.media.play_pause },
+  icon = { string = settings.text.media.play_pause },
   label = { drawing = false },
   click_script = "nowplaying-cli togglePlayPause",
 })
-sbar.add("item", {
+
+local media_next = sbar.add("item", {
   position = "popup." .. media_cover.name,
-  icon = { string = settings.icons.text.media.forward },
+  icon = { string = settings.text.media.forward },
   label = { drawing = false },
   click_script = "nowplaying-cli next",
 })
 
+-- Animation control variables
 local interrupt = 0
+
+-- Animate media details visibility
 local function animate_detail(detail)
-  if (not detail) then interrupt = interrupt - 1 end
-  if interrupt > 0 and (not detail) then return end
+  if not detail then
+    interrupt = interrupt - 1
+  end
+
+  if interrupt > 0 and not detail then
+    return
+  end
 
   sbar.animate("tanh", 30, function()
-    media_artist:set({ label = { width = detail and "dynamic" or 0 } })
-    media_title:set({ label = { width = detail and "dynamic" or 0 } })
+    media_artist:set({
+      label = { width = detail and "dynamic" or 0 }
+    })
+    media_title:set({
+      label = { width = detail and "dynamic" or 0 }
+    })
   end)
 end
 
+-- Handle media state changes
 media_cover:subscribe("media_change", function(env)
+  if not env.INFO or not env.INFO.app then
+    return
+  end
+
+  -- Check if the app is in our whitelist
   if whitelist[env.INFO.app] then
     local drawing = (env.INFO.state == "playing")
-    media_artist:set({ drawing = drawing, label = env.INFO.artist, })
-    media_title:set({ drawing = drawing, label = env.INFO.title, })
+
+    -- Update media information
+    media_artist:set({
+      drawing = drawing,
+      label = env.INFO.artist or "Unknown Artist"
+    })
+
+    media_title:set({
+      drawing = drawing,
+      label = env.INFO.title or "Unknown Title"
+    })
+
     media_cover:set({ drawing = drawing })
 
     if drawing then
       animate_detail(true)
       interrupt = interrupt + 1
+      -- Auto-hide details after 5 seconds
       sbar.delay(5, animate_detail)
     else
       media_cover:set({ popup = { drawing = false } })
@@ -101,19 +141,32 @@ media_cover:subscribe("media_change", function(env)
   end
 end)
 
+-- Show details on mouse enter
 media_cover:subscribe("mouse.entered", function(env)
   interrupt = interrupt + 1
   animate_detail(true)
 end)
 
+-- Hide details on mouse exit
 media_cover:subscribe("mouse.exited", function(env)
   animate_detail(false)
 end)
 
+-- Toggle media controls popup
 media_cover:subscribe("mouse.clicked", function(env)
   media_cover:set({ popup = { drawing = "toggle" } })
 end)
 
+-- Hide popup when mouse leaves the title area
 media_title:subscribe("mouse.exited.global", function(env)
   media_cover:set({ popup = { drawing = false } })
 end)
+
+return {
+  media_cover,
+  media_artist,
+  media_title,
+  media_previous,
+  media_play_pause,
+  media_next
+}

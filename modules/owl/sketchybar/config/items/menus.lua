@@ -1,10 +1,12 @@
 local constants = require("constants")
-local settings = require("config.settings")
+local settings = require("settings")
+local colors = require("colors")
 
-local maxItems <const> = 15
+local maxItems = 15
 local menuItems = {}
 local isShowingMenu = false
 
+-- Hidden watchers for events
 local frontAppWatcher = sbar.add("item", {
   drawing = false,
   updates = true,
@@ -15,6 +17,7 @@ local swapWatcher = sbar.add("item", {
   updates = true,
 })
 
+-- Create placeholder menu items
 local function createPlaceholders()
   for index = 1, maxItems, 1 do
     local menu = sbar.add("item", constants.items.MENU .. "." .. index, {
@@ -31,48 +34,61 @@ local function createPlaceholders()
     menuItems[index] = menu
   end
 
+  -- Add padding item
   sbar.add("item", constants.items.MENU .. ".padding", {
     width = settings.dimens.padding.label
   })
 
+  -- Create bracket for visual grouping
   sbar.add("bracket", { "/" .. constants.items.MENU .. "\\..*/" }, {
     background = {
-      color = settings.colors.bg1,
+      color = colors.bg1,
       padding_left = settings.dimens.padding.item,
       padding_right = settings.dimens.padding.item,
     },
   })
 end
 
+-- Update menu items based on current application
 local function updateMenus()
+  -- Hide all menu items first
   sbar.set("/" .. constants.items.MENU .. "\\..*/", { drawing = false })
 
+  -- Get menu items from the bridge binary
   sbar.exec("$CONFIG_DIR/bridge/menus/bin/menus -l", function(menus)
+    if not menus or menus == "" then
+      return
+    end
+
     local index = 1
     for menu in string.gmatch(menus, '[^\r\n]+') do
-      if index < maxItems then
-        menuItems[index]:set(
-          {
-            width = "dynamic",
-            label = menu,
-            drawing = isShowingMenu
-          }
-        )
+      if index < maxItems and menu ~= "" then
+        menuItems[index]:set({
+          width = "dynamic",
+          label = menu,
+          drawing = isShowingMenu
+        })
+        index = index + 1
       else
         break
       end
-      index = index + 1
     end
   end)
 
+  -- Show/hide padding based on menu visibility
   sbar.set(constants.items.MENU .. ".padding", { drawing = isShowingMenu })
 end
 
+-- Subscribe to front app changes
 frontAppWatcher:subscribe(constants.events.FRONT_APP_SWITCHED, updateMenus)
 
+-- Subscribe to menu/spaces toggle
 swapWatcher:subscribe(constants.events.SWAP_MENU_AND_SPACES, function(env)
   isShowingMenu = env.isShowingMenu == "on"
   updateMenus()
 end)
 
+-- Initialize the menu system
 createPlaceholders()
+
+return menuItems

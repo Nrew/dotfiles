@@ -1,6 +1,8 @@
 local constants = require("constants")
-local settings = require("config.settings")
+local settings = require("settings")
+local colors = require("colors")
 
+-- Main message item (invisible, used for positioning)
 local message = sbar.add("item", constants.items.MESSAGE, {
   width = 0,
   position = "center",
@@ -15,6 +17,7 @@ local message = sbar.add("item", constants.items.MESSAGE, {
   }
 })
 
+-- Popup content for displaying the actual message
 local messagePopup = sbar.add("item", {
   position = "popup." .. message.name,
   width = "dynamic",
@@ -28,28 +31,40 @@ local messagePopup = sbar.add("item", {
   },
 })
 
+-- Hide the message popup
 local function hideMessage()
   message:set({ popup = { drawing = false } })
 end
 
+-- Show a message with optional auto-hide
 local function showMessage(content, hold)
+  if not content or content == "" then
+    return
+  end
+
+  -- Hide any existing message first
   hideMessage()
 
+  -- Show the new message
   message:set({ popup = { drawing = true } })
   messagePopup:set({ label = { string = content } })
 
-  if hold == false then
+  -- Auto-hide after 5 seconds unless hold is true
+  if not hold then
     sbar.delay(5, function()
-      if hold then return end
       hideMessage()
     end)
   end
 end
 
+-- Subscribe to message display events
 message:subscribe(constants.events.SEND_MESSAGE, function(env)
   local content = env.MESSAGE
-  local hold = env.HOLD ~= nil and env.HOLD == "true" or false
+  local hold = env.HOLD and env.HOLD == "true"
   showMessage(content, hold)
 end)
 
+-- Subscribe to message hide events
 message:subscribe(constants.events.HIDE_MESSAGE, hideMessage)
+
+return { message, messagePopup }

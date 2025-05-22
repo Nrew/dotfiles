@@ -1,7 +1,10 @@
 local constants = require("constants")
-local settings = require("config.settings")
+local settings = require("settings")
+local colors = require("colors")
 
 local spaces = {}
+local apps = settings.apps
+local dimens = settings.dimens
 
 local swapWatcher = sbar.add("item", {
   drawing = false,
@@ -27,9 +30,9 @@ local function selectCurrentWorkspace(focusedWorkspaceName)
     if item ~= nil then
       local isSelected = sid == constants.items.SPACES .. "." .. focusedWorkspaceName
       item:set({
-        icon = { color = isSelected and settings.colors.bg1 or settings.colors.white },
-        label = { color = isSelected and settings.colors.bg1 or settings.colors.white },
-        background = { color = isSelected and settings.colors.white or settings.colors.bg1 },
+        icon = { color = isSelected and colors.bg1 or colors.white },
+        label = { color = isSelected and colors.bg1 or colors.white },
+        background = { color = isSelected and colors.white or colors.bg1 },
       })
     end
   end
@@ -46,7 +49,7 @@ end
 
 local function addWorkspaceItem(workspaceName)
   local spaceName = constants.items.SPACES .. "." .. workspaceName
-  local spaceConfig = spaceConfigs[workspaceName] or { icon = settings.icons.apps["default"], name = workspaceName }
+  local spaceConfig = spaceConfigs[workspaceName] or { icon = apps["default"], name = workspaceName }
 
   spaces[spaceName] = sbar.add("item", spaceName, {
     label = {
@@ -55,11 +58,11 @@ local function addWorkspaceItem(workspaceName)
       string = spaceConfig.name,
     },
     icon = {
-      string = spaceConfig.icon or settings.icons.apps["default"],
-      color = settings.colors.white,
+      string = spaceConfig.icon or apps["default"],
+      color = colors.white,
     },
     background = {
-      color = settings.colors.bg1,
+      color = colors.bg1,
     },
     click_script = "aerospace workspace " .. workspaceName,
   })
@@ -77,7 +80,7 @@ local function addWorkspaceItem(workspaceName)
   end)
 
   sbar.add("item", spaceName .. ".padding", {
-    width = settings.dimens.padding.label
+    width = dimens.padding.label
   })
 end
 

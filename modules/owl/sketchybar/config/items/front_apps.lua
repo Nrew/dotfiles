@@ -1,70 +1,103 @@
 local constants = require("constants")
-local settings = require("config.settings")
+local settings = require("settings")
+local colors = require("colors")
 
 local frontApps = {}
 
+-- Create bracket for grouping front app items
 sbar.add("bracket", constants.items.FRONT_APPS, {}, { position = "left" })
 
+-- Hidden watcher for front app events
 local frontAppWatcher = sbar.add("item", {
-	drawing = false,
-	updates = true,
+  drawing = false,
+  updates = true,
 })
 
+-- Highlight the currently focused window
 local function selectFocusedWindow(frontAppName)
-	for appName, app in pairs(frontApps) do
-		local isSelected = appName == frontAppName
-		local color = isSelected and settings.colors.orange or settings.colors.white
-		app:set({
-			label = { color = color },
-			icon = { color = color },
-		})
-	end
+  if not frontAppName or frontAppName == "" then
+    return
+  end
+
+  for appName, app in pairs(frontApps) do
+    if app then
+      local isSelected = appName == frontAppName
+      local color = isSelected and colors.orange or colors.white
+
+      app:set({
+        label = { color = color },
+        icon = { color = color },
+      })
+    end
+  end
 end
 
+-- Update the list of visible windows
 local function updateWindows(windows)
-	sbar.remove("/" .. constants.items.FRONT_APPS .. "\\.*/")
+  if not windows or windows == "" then
+    return
+  end
 
-	frontApps = {}
-	local foundWindows = string.gmatch(windows, "[^\n]+")
-	for window in foundWindows do
-		local parsedWindow = {}
-		for key, value in string.gmatch(window, "(%w+)=([%w%s]+)") do
-			parsedWindow[key] = value
-		end
+  -- Remove existing front app items
+  sbar.remove("/" .. constants.items.FRONT_APPS .. "\\.*/")
+  frontApps = {}
 
-		local windowId = parsedWindow["id"]
-		local windowName = parsedWindow["name"]
-		local icon = settings.icons.apps[windowName] or settings.icons.apps["default"]
+  local foundWindows = string.gmatch(windows, "[^\n]+")
+  for window in foundWindows do
+    if window and window ~= "" then
+      local parsedWindow = {}
 
-		frontApps[windowName] = sbar.add("item", constants.items.FRONT_APPS .. "." .. windowName, {
-			label = {
-				padding_left = 0,
-        padding_right = 0,
-        -- string = windowName,
-			},
-			icon = {
-				string = icon,
-				font = settings.fonts.icons(),
-			},
-			click_script = "aerospace focus --window-id " .. windowId,
-		})
-	end
+      -- Parse window information (id=123, name=AppName)
+      for key, value in string.gmatch(window, "(%w+)=([%w%s%-_%.]+)") do
+        parsedWindow[key] = value
+      end
 
-	sbar.exec(constants.aerospace.GET_CURRENT_WINDOW, function(frontAppName)
-		selectFocusedWindow(frontAppName:gsub("[\n\r]", ""))
-	end)
+      local windowId = parsedWindow["id"]
+      local windowName = parsedWindow["name"]
+
+      if windowId and windowName then
+        -- Get app icon, fallback to default if not found
+        local icon = settings.apps[windowName] or settings.apps["default"] or ":default:"
+
+        frontApps[windowName] = sbar.add("item", constants.items.FRONT_APPS .. "." .. windowName, {
+          label = {
+            padding_left = 0,
+            padding_right = 0,
+            -- Uncomment to show app names: string = windowName,
+          },
+          icon = {
+            string = icon,
+            font = settings.fonts.icons(),
+            color = colors.white,
+          },
+          click_script = "aerospace focus --window-id " .. windowId,
+        })
+      end
+    end
+  end
+
+  -- Update focus state for current window
+  sbar.exec(constants.aerospace.GET_CURRENT_WINDOW, function(frontAppName)
+    if frontAppName then
+      selectFocusedWindow(frontAppName:gsub("[\n\r]", ""))
+    end
+  end)
 end
 
+-- Get current windows from aerospace
 local function getWindows()
-	sbar.exec(constants.aerospace.LIST_WINDOWS, updateWindows)
+  sbar.exec(constants.aerospace.LIST_WINDOWS, function(result)
+    updateWindows(result)
+  end)
 end
 
-frontAppWatcher:subscribe(constants.events.UPDATE_WINDOWS, function()
-	getWindows()
-end)
+-- Subscribe to window update events
+frontAppWatcher:subscribe(constants.events.UPDATE_WINDOWS, getWindows)
 
-frontAppWatcher:subscribe(constants.events.FRONT_APP_SWITCHED, function(env)
-	getWindows()
-end)
+-- Subscribe to front app switch events
+frontAppWatcher:subscribe(constants.events.FRONT_APP_SWITCHED, getWindows)
 
+-- Initialize windows on startup
 getWindows()
+
+return frontApps
