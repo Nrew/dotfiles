@@ -8,11 +8,11 @@ local battery = sbar.add("item", "widgets.battery", {
 		font = {
 			style = settings.font.style_map["Regular"],
 			size = 19.0,
-		},
+		}
 	},
 	label = { font = { family = settings.font.numbers } },
 	update_freq = 180,
-	popup = { align = "center" },
+	popup = { align = "center" }
 })
 
 local remaining_time = sbar.add("item", {
@@ -20,14 +20,15 @@ local remaining_time = sbar.add("item", {
 	icon = {
 		string = "Time remaining:",
 		width = 100,
-		align = "left",
+		align = "left"
 	},
 	label = {
 		string = "??:??h",
 		width = 100,
-		align = "right",
+		align = "right"
 	},
 })
+
 
 battery:subscribe({ "routine", "power_source_change", "system_woke" }, function()
 	sbar.exec("pmset -g batt", function(batt_info)
@@ -40,7 +41,7 @@ battery:subscribe({ "routine", "power_source_change", "system_woke" }, function(
 			label = charge .. "%"
 		end
 
-		local color = colors.blue
+		local color = colors.green
 		local charging, _, _ = batt_info:find("AC Power")
 
 		if charging then
@@ -52,6 +53,9 @@ battery:subscribe({ "routine", "power_source_change", "system_woke" }, function(
 				icon = icons.battery._75
 			elseif found and charge > 40 then
 				icon = icons.battery._50
+			elseif found and charge > 30 then
+				icon = icons.battery._50
+				color = colors.yellow
 			elseif found and charge > 20 then
 				icon = icons.battery._25
 				color = colors.orange
@@ -69,7 +73,7 @@ battery:subscribe({ "routine", "power_source_change", "system_woke" }, function(
 		battery:set({
 			icon = {
 				string = icon,
-				color = color,
+				color = color
 			},
 			label = { string = lead .. label },
 		})
@@ -89,15 +93,15 @@ battery:subscribe("mouse.clicked", function(env)
 	end
 end)
 
-battery:subscribe("mouse.exited.global", function()
-	battery:set({ popup = { drawing = "off" } })
-end)
-
 sbar.add("bracket", "widgets.battery.bracket", { battery.name }, {
-	background = { color = colors.bg1 },
+	background = {
+		color = colors.bg2,
+		border_color = colors.bg1,
+		border_width = 2,
+	},
 })
 
 sbar.add("item", "widgets.battery.padding", {
 	position = "right",
-	width = settings.group_paddings,
+	width = settings.group_paddings
 })
