@@ -43,8 +43,16 @@ struct mach_buffer {
 /*********************************
  * Global State
  *********************************/
-static mach_port_t g_mach_port = INITIAL_PORT_VALUE;
+static volatile mach_port_t g_mach_port = INITIAL_PORT_VALUE;
 static pthread_mutex_t g_port_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_once_t g_init_once = PTHREAD_ONCE_INIT;
+
+static void init_mach_port(void) {
+    g_mach_port = mach_get_bs_port();
+}
+
+// In sketchybar function:
+pthread_once(&g_init_once, init_mach_port);
 
 /*********************************
  * Function Declarations

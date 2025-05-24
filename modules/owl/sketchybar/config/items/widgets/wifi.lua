@@ -6,7 +6,7 @@ sbar.exec("killall network_load >/dev/null; $CONFIG_DIR/bridge/network_load/bin/
 local popup_width = settings.dimens.graphics.popup.width
 
 -- SSID label (positioned first, rightmost)
-local wifi_up = sbar.add("item", "widgetsW.wifi.ssid", {
+local wifi_up = sbar.add("item", "widgets.wifi.ssid", {
   position = "right",
   padding_left = 0,
   padding_right = settings.dimens.padding.small,
@@ -23,12 +23,17 @@ local wifi_up = sbar.add("item", "widgetsW.wifi.ssid", {
   y_offset = 0,
 })
 
+
 wifi_up:subscribe({"wifi_change", "system_woke"}, function(env)
   sbar.exec("ipconfig getsummary en0 | awk -F ' SSID : '  '/ SSID : / {print $2}'", function(result)
+    if not result or result == "" then
+      wifi_up:set({ label = { string = "Disconnected", color = colors.legacy.red }})
+      return
+    end
     local ssid = result:gsub("\n", "")
     wifi_up:set({
       label = {
-        string = ssid,
+        string = ssid ~= "" and ssid or "No SSID",
         color = colors.legacy.red
       }
     })
@@ -110,7 +115,7 @@ local router = sbar.add("item", {
 })
 
 -- Add spacing after wifi (before battery)
-sbar.add("item", { position = "right", width = settings.dimens.group_paddings })
+sbar.add("item", { position = "right", width = settings.dimens.padding.group })
 
 -- Update wifi status
 wifi:subscribe({"wifi_change", "system_woke"}, function(env)
