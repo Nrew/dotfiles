@@ -53,13 +53,13 @@ local hostname = sbar.add("item", {
   icon = {
     align = "left",
     string = "Hostname:",
-    width = popup_width / settings.dimens.wifi.popup_split,
+    width = popup_width / 2,
     color = colors.sections.widgets.wifi.icon,
   },
   label = {
     max_chars = 20,
     string = "????????????",
-    width = popup_width / settings.dimens.wifi.popup_split,
+    width = popup_width / 2,
     align = "right",
     color = colors.sections.widgets.wifi.icon,
   }
@@ -70,12 +70,12 @@ local ip = sbar.add("item", {
   icon = {
     align = "left",
     string = "IP:",
-    width = popup_width / settings.dimens.wifi.popup_split,
+    width = popup_width / 2,
     color = colors.sections.widgets.wifi.icon,
   },
   label = {
     string = "???.???.???.???",
-    width = popup_width / settings.dimens.wifi.popup_split,
+    width = popup_width / 2,
     align = "right",
     color = colors.sections.widgets.wifi.icon,
   }
@@ -86,12 +86,12 @@ local mask = sbar.add("item", {
   icon = {
     align = "left",
     string = "Subnet mask:",
-    width = popup_width / settings.dimens.wifi.popup_split,
+    width = popup_width / 2,
     color = colors.sections.widgets.wifi.icon,
   },
   label = {
     string = "???.???.???.???",
-    width = popup_width / settings.dimens.wifi.popup_split,
+    width = popup_width / 2,
     align = "right",
     color = colors.sections.widgets.wifi.icon,
   }
@@ -102,12 +102,12 @@ local router = sbar.add("item", {
   icon = {
     align = "left",
     string = "Router:",
-    width = popup_width / settings.dimens.wifi.popup_split,
+    width = popup_width / 2,
     color = colors.sections.widgets.wifi.icon,
   },
   label = {
     string = "???.???.???.???",
-    width = popup_width / settings.dimens.wifi.popup_split,
+    width = popup_width / 2,
     align = "right",
     color = colors.sections.widgets.wifi.icon,
   },

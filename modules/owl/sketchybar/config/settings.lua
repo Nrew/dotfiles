@@ -2,29 +2,16 @@ local icons = require("icons")
 
 local M = {}
 
--- Core constants
+-- Core constants - simplified and working values
 local FONT_FAMILY = "JetBrains Mono Nerd Font"
 local BASE_PADDING = 8
-local SMALL_PADDING = 1
 local GROUP_SPACING = 5
-local TINY_PADDING = 3
-local MICRO_PADDING = 4
-local FINAL_PADDING = 7
-local BRACKET_HEIGHT = 30
-local KNOB_SIZE = 32
-local ANIMATION_FAST = 8
-local ANIMATION_MEDIUM = 10
-local ANIMATION_SLOW = 30
-local ANIMATION_DELAY = 5
 
 M.dimens = {
   padding = {
     base = BASE_PADDING,
-    small = SMALL_PADDING,
+    small = 1,
     group = GROUP_SPACING,
-    tiny = TINY_PADDING,
-    micro = MICRO_PADDING,
-    final = FINAL_PADDING,
   },
   graphics = {
     bar = {
@@ -38,7 +25,7 @@ M.dimens = {
       corner_radius = 9,
     },
     bracket = {
-      height = BRACKET_HEIGHT,
+      height = 30,
     },
     slider = { height = 20 },
     popup = {
@@ -46,27 +33,22 @@ M.dimens = {
       large_width = 300,
     },
     border = { width = 1 },
-    knob = { size = KNOB_SIZE },
+    knob = { size = 32 },
   },
   text = {
     icon = 14.0,
     label = 12.0,
-    calendar_icon = 12.0,
     apple_icon = 16.0,
-    media_artist = 9,
-    media_title = 10,
-    spaces_font = 14.0,
-    calendar_width = 49,
     battery_icon = 19.0,
     volume_icon = 14.0,
     wifi_label = 10.0,
   },
   effects = { blur_radius = 35 },
   animation = {
-    fast = ANIMATION_FAST,
-    medium = ANIMATION_MEDIUM,
-    slow = ANIMATION_SLOW,
-    delay = ANIMATION_DELAY,
+    fast = 8,
+    medium = 10,
+    slow = 30,
+    delay = 5,
   },
   media = {
     cover_padding = 60,
@@ -99,7 +81,10 @@ M.dimens = {
     background_height = 2,
     background_offset = -20,
     label_width = 25,
-    device_label_padding = 6,
+  },
+  calendar = {
+    width = 49,
+    icon_size = 12.0,
   },
 }
 

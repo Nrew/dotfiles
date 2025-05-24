@@ -29,4 +29,4 @@ sbar.add("bracket", { apple.name }, {
   }
 })
 
-sbar.add("item", { width = settings.dimens.padding.final })
+sbar.add("item", { width = 7 })
