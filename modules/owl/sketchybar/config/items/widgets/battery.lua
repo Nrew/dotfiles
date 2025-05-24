@@ -9,7 +9,9 @@ local battery = sbar.add("item", "widgets.battery", {
     font = {
       style = settings.fonts.styles.regular,
       size = settings.dimens.text.battery_icon,
-    }
+    },
+    string = settings.icons.battery._100,
+    color = battery_colors.high,
   },
   label = { font = { family = settings.fonts.family } },
   update_freq = settings.timing.battery_update,

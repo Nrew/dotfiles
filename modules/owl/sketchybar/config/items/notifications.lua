@@ -48,9 +48,7 @@ local function show_notification(content, hold)
 
   if not hold then
     sbar.delay(5, function()
-      if not hold then 
         hide_notification()
-      end
     end)
   end
 end

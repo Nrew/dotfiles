@@ -6,7 +6,12 @@ local function add_windows(space, space_name)
     return
   end
 
-  sbar.exec("aerospace list-windows --format %{app-name} --workspace " .. space_name, function(windows)
+  sbar.exec("aerospace list-windows --format %{app-name} --workspace " .. space_name, function(windows, exit_code)
+    if exit_code ~= 0 or not windows then
+      space:set({ label = { string = "—" } })
+      return
+    end
+    
     local icon_line = ""
 
     for app in windows:gmatch("[^\r\n]+") do

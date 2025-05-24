@@ -50,34 +50,33 @@ local menu_padding = sbar.add("item", "menu.padding", {
 })
 
 local function update_menus(env)
-  -- Safety check for bridge binary
   local bridge_path = "$CONFIG_DIR/bridge/menus/bin/menus"
-  
-  sbar.exec("test -x " .. bridge_path, function(test_result)
-    if test_result ~= "" then
+
+  sbar.exec("test -x " .. bridge_path, function(test_result, exit_code)
+    if exit_code ~= 0 then
       print("Warning: Menu bridge binary not found or not executable")
       return
     end
-    
+
     sbar.exec(bridge_path .. " -l", function(menus)
       if not menus or menus == "" then
         return
       end
-      
+
       -- Hide all menu items first
       sbar.set('/menu\\..*/', { drawing = false })
       menu_padding:set({ drawing = true })
-      
+
       local id = 1
       for menu in string.gmatch(menus, '[^\r\n]+') do
         if id <= max_items and menu ~= "" then
-          menu_items[id]:set({ 
-            label = { string = menu }, 
-            drawing = true 
+          menu_items[id]:set({
+            label = { string = menu },
+            drawing = true
           })
           id = id + 1
-        else 
-          break 
+        else
+          break
         end
       end
     end)
@@ -92,7 +91,7 @@ space_menu_swap:subscribe("swap_menus_and_spaces", function(env)
     local query_result = menu_items[1]:query()
     drawing = query_result and query_result.geometry and query_result.geometry.drawing == "on"
   end
-  
+
   if drawing then
     -- Hide menus, show spaces
     menu_watcher:set({ updates = false })
