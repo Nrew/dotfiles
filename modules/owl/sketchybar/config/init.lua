@@ -1,12 +1,16 @@
-sbar = require("sketchybar")    -- Load the Sketchybar module
+-- Require the sketchybar module
+sbar = require("sketchybar")
 
-sbar.begin_config()             -- Begin the configuration
--- sbar.hotload(true)              -- Enable hotloading
+-- Set the bar name, if you are using another bar instance than sketchybar
+-- sbar.set_bar_name("bottom_bar")
 
-require("bar")                  -- Load the bar configuration
-require("default")              -- Load the default widgets
-require("items")                -- Load the items
+-- Bundle the entire initial configuration into a single message to sketchybar
+sbar.begin_config()
+require("bar")
+require("default")
+require("items")
+sbar.end_config()
 
-sbar.end_config()               -- End the configuration
-
-sbar.event_loop()               -- Start the event loop
+-- Run the event loop of the sketchybar module (without this there will be no
+-- callback functions executed in the lua module)
+sbar.event_loop()

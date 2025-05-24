@@ -1,44 +1,47 @@
 local settings = require("settings")
 local colors = require("colors")
 
-sbar.add("item", { position = "right", width = settings.dimens.padding.group })
+-- Padding item required because of bracket
+sbar.add("item", { position = "right", width = settings.group_paddings })
 
 local cal = sbar.add("item", {
   icon = {
-    color = colors.sections.calendar.label,
-    padding_left = settings.dimens.padding.base,
+    color = colors.white,
+    padding_left = 8,
     font = {
-      style = settings.fonts.styles.black,
-      size = settings.dimens.text.calendar_icon,
+      style = settings.font.style_map["Black"],
+      size = 12.0,
     },
   },
   label = {
-    color = colors.sections.calendar.label,
-    padding_right = settings.dimens.padding.base,
-    width = settings.dimens.spacing.calendar_width,
+    color = colors.white,
+    padding_right = 8,
+    width = 49,
     align = "right",
-    font = { family = settings.fonts.family },
+    font = { family = settings.font.numbers },
   },
   position = "right",
-  update_freq = settings.timing.calendar_update,
-  padding_left = settings.dimens.padding.small,
-  padding_right = settings.dimens.padding.small,
+  update_freq = 30,
+  padding_left = 1,
+  padding_right = 1,
   background = {
-    color = colors.sections.item.bg,
-    border_color = colors.sections.item.border,
-    border_width = settings.dimens.graphics.border.width
+    color = colors.bg2,
+    border_color = colors.black,
+    border_width = 1
   },
 })
 
+-- Double border for calendar using a single item bracket
 sbar.add("bracket", { cal.name }, {
   background = {
     color = colors.transparent,
-    height = settings.dimens.graphics.bracket.height,
-    border_color = colors.legacy.grey,
+    height = 30,
+    border_color = colors.grey,
   }
 })
 
-sbar.add("item", { position = "right", width = settings.dimens.padding.group })
+-- Padding item required because of bracket
+sbar.add("item", { position = "right", width = settings.group_paddings })
 
 cal:subscribe({ "forced", "routine", "system_woke" }, function(env)
   cal:set({ icon = os.date("%a. %d %b."), label = os.date("%H:%M") })

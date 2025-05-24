@@ -1,62 +1,57 @@
+local icons = require("icons")
 local colors = require("colors")
 local settings = require("settings")
 
-sbar.exec("killall network_load >/dev/null; $CONFIG_DIR/bridge/network_load/bin/network_load en0 network_update 2.0")
+-- Execute the event provider binary which provides the event "network_update"
+-- for the network interface "en0", which is fired every 2.0 seconds.
+sbar.exec("killall network_load >/dev/null; $CONFIG_DIR/helpers/event_providers/network_load/bin/network_load en0 network_update 2.0")
 
-local popup_width = settings.dimens.graphics.popup.width
+local popup_width = 250
 
--- SSID label (positioned first, rightmost)
-local wifi_up = sbar.add("item", "widgets.wifi.ssid", {
+local wifi_up = sbar.add("item", "widgets.wifi1", {
   position = "right",
   padding_left = 0,
-  padding_right = settings.dimens.padding.small,
+  padding_right = 25,
   width = 0,
   label = {
     font = {
-      family = settings.fonts.family,
-      style = settings.fonts.styles.bold,
-      size = settings.dimens.text.wifi_label,
+      family = settings.font.numbers,
+      style = settings.font.style_map["Bold"],
+      size = 10.0,
     },
-    color = colors.legacy.red,
+    color = colors.red,
     string = "Unknown SSID",
   },
   y_offset = 0,
 })
 
-
 wifi_up:subscribe({"wifi_change", "system_woke"}, function(env)
   sbar.exec("ipconfig getsummary en0 | awk -F ' SSID : '  '/ SSID : / {print $2}'", function(result)
-    if not result or result == "" then
-      wifi_up:set({ label = { string = "Disconnected", color = colors.legacy.red }})
-      return
-    end
-    local ssid = result:gsub("\n", "")
+    local ssid = result:gsub("\n", "") -- Remove newline characters
     wifi_up:set({
       label = {
-        string = ssid ~= "" and ssid or "No SSID",
-        color = colors.legacy.red
+        string = ssid,
+        color = colors.red
       }
     })
   end)
 end)
 
--- WiFi icon (positioned second, to the left of SSID)
 local wifi = sbar.add("item", "widgets.wifi.padding", {
   position = "right",
-  padding_right = settings.dimens.padding.small,
+  padding_right = 6,
   label = { drawing = false },
 })
 
--- Bracket around both wifi items
+-- Background around the item
 local wifi_bracket = sbar.add("bracket", "widgets.wifi.bracket", {
   wifi.name,
   wifi_up.name,
 }, {
-  background = { color = colors.legacy.bg1 },
-  popup = { align = "left", height = settings.dimens.graphics.bracket.height }
+  background = { color = colors.bg1 },
+  popup = { align = "left", height = 30 }
 })
 
--- Popup items for detailed network info
 local hostname = sbar.add("item", {
   position = "popup." .. wifi_bracket.name,
   icon = {
@@ -114,23 +109,39 @@ local router = sbar.add("item", {
   },
 })
 
--- Add spacing after wifi (before battery)
-sbar.add("item", { position = "right", width = settings.dimens.padding.group })
+sbar.add("item", { position = "right", width = settings.group_paddings })
 
--- Update wifi status
+-- wifi_up:subscribe("network_update", function(env)
+--   local up_color = (env.upload == "000 Bps") and colors.grey or colors.red
+--   local down_color = (env.download == "000 Bps") and colors.grey or colors.blue
+--   wifi_up:set({
+--     icon = { color = up_color },
+--     label = {
+--       string = env.upload,
+--       color = up_color
+--     }
+--   })
+--   wifi_down:set({
+--     icon = { color = down_color },
+--     label = {
+--       string = env.download,
+--       color = down_color
+--     }
+--   })
+-- end)
+
 wifi:subscribe({"wifi_change", "system_woke"}, function(env)
   sbar.exec("ipconfig getifaddr en0", function(ip)
     local connected = not (ip == "")
     wifi:set({
       icon = {
-        string = connected and settings.icons.wifi.connected or settings.icons.wifi.disconnected,
-        color = connected and colors.sections.widgets.wifi.icon or colors.legacy.red,
+        string = connected and icons.wifi.connected or icons.wifi.disconnected,
+        color = connected and colors.white or colors.red,
       },
     })
   end)
 end)
 
--- Popup handling functions
 local function hide_details()
   wifi_bracket:set({ popup = { drawing = false } })
 end
@@ -156,16 +167,14 @@ local function toggle_details()
   end
 end
 
--- Click handlers
 wifi_up:subscribe("mouse.clicked", toggle_details)
 wifi:subscribe("mouse.clicked", toggle_details)
 wifi:subscribe("mouse.exited.global", hide_details)
 
--- Clipboard copy functionality
 local function copy_label_to_clipboard(env)
   local label = sbar.query(env.NAME).label.value
   sbar.exec("echo \"" .. label .. "\" | pbcopy")
-  sbar.set(env.NAME, { label = { string = settings.icons.clipboard, align = "center" } })
+  sbar.set(env.NAME, { label = { string = icons.clipboard, align="center" } })
   sbar.delay(1, function()
     sbar.set(env.NAME, { label = { string = label, align = "right" } })
   end)
