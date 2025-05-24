@@ -123,10 +123,6 @@ M.fonts = {
     heavy = "Heavy",
     black = "Black",
   },
-  icons = function(size)
-    local font = "sketchybar-app-font:Regular:"
-    return size and (font .. size) or (font .. M.dimens.text.icon)
-  end,
 }
 
 M.timing = {
@@ -136,13 +132,5 @@ M.timing = {
 
 M.icons = icons.text.sf_symbols
 M.apps = icons.apps
-
--- Ensure switch icons are available for spaces indicator
-if not M.icons.switch then
-  M.icons.switch = {
-    on = "󱨥",
-    off = "󱨦",
-  }
-end
 
 return M

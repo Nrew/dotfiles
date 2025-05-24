@@ -401,6 +401,7 @@ local text <const> = {
     slider = {
       knob = ""
     },
+   },
 
     -- Icons for the sketchybar-app-font
     sf_symbols = {
@@ -445,7 +446,6 @@ local text <const> = {
       slider = {
         knob = "􀀁"
       },
-    }
   },
 }
 
