@@ -1,52 +1,45 @@
 local settings = require("settings")
 local colors = require("colors")
 
+sbar.add("item", { position = "right", width = settings.dimens.padding.group })
+
 local cal = sbar.add("item", {
-	icon = {
-		color = colors.dirty_white,
-		font = {
-			style = settings.font.style_map["Bold"],
-			size = 12.0,
-		},
-		y_offset = -1,
-		padding_right = -2,
-	},
-	label = {
-		color = colors.dirty_white,
-		width = 96,
-		align = "left",
-		font = {
-			style = settings.font.style_map["Black"],
-			size = 14.0,
-		},
-	},
-	position = "right",
-	update_freq = 1,
-	y_offset = 1,
-	padding_left = -2,
+  icon = {
+    color = colors.sections.calendar.label,
+    padding_left = settings.dimens.padding.base,
+    font = {
+      style = settings.fonts.styles.black,
+      size = settings.dimens.text.calendar_icon,
+    },
+  },
+  label = {
+    color = colors.sections.calendar.label,
+    padding_right = settings.dimens.padding.base,
+    width = settings.dimens.spacing.calendar_width,
+    align = "right",
+    font = { family = settings.fonts.family },
+  },
+  position = "right",
+  update_freq = settings.timing.calendar_update,
+  padding_left = settings.dimens.padding.small,
+  padding_right = settings.dimens.padding.small,
+  background = {
+    color = colors.sections.item.bg,
+    border_color = colors.sections.item.border,
+    border_width = settings.dimens.graphics.border.width
+  },
 })
 
--- german Date
+sbar.add("bracket", { cal.name }, {
+  background = {
+    color = colors.transparent,
+    height = settings.dimens.graphics.bracket.height,
+    border_color = colors.legacy.grey,
+  }
+})
+
+sbar.add("item", { position = "right", width = settings.dimens.padding.group })
+
 cal:subscribe({ "forced", "routine", "system_woke" }, function(env)
-	local weekdayNames = {
-		"So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."
-	}
-	local monthNames = {
-		"Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sep.", "Okt.", "Nov.", "Dez."
-	}
-
-	cal:set({
-		icon = weekdayNames[tonumber(os.date("%w")) + 1] ..
-			os.date("%d") .." ".. monthNames[tonumber(os.date("%m"))],
-		label = "｜" .. os.date("%H:%M:%S")
-	})
+  cal:set({ icon = os.date("%a. %d %b."), label = os.date("%H:%M") })
 end)
-
-cal:subscribe("mouse.clicked", function(env)
-	sbar.exec("open -a 'Dato'")
-end)
-
--- english date
--- cal:subscribe({ "forced", "routine", "system_woke" }, function(env)
---   cal:set({ icon = os.date("%a. %d %b."), label = os.date("%H:%M") })
--- end)

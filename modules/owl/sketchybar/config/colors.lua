@@ -1,38 +1,90 @@
--- Dracula Colors
+local M = {}
 
-return {
-	black = 0xff181819,
-	white = 0xfff8f8f2,
-	red = 0xffFF9580,
-	green = 0xff8AFF80,
-	blue = 0xff5199ba,
-	yellow = 0xffFFFF80,
-	orange = 0xffFFCA80,
-	pink = 0xffFF80BF,
-	purple = 0xff9580FF,
-	other_purple = 0xff302c45,
-	cyan = 0xff80FFEA,
-	grey = 0xff7f8490,
-	dirty_white = 0xc8cad3f5,
-	dark_grey = 0xff2b2736,
-	transparent = 0x00000000,
-	bar = {
-		bg = 0xf822212C,
-		border = 0xff2c2e34,
-	},
-	popup = {
-		bg = 0xd322212c,
-		border = 0xd322212c
-	},
-	spaces = {
-		active = 0xffFFFF80,
-		inactive = 0xc8cad3f5,
-	},
-	bg1 = 0x331e1d27,
-	bg2 = 0xff302c45,
+local function with_alpha(color, alpha)
+  if alpha > 1.0 or alpha < 0.0 then return color end
+  return (color & 0x00FFFFFF) | (math.floor(alpha * 255.0) << 24)
+end
 
-	with_alpha = function(color, alpha)
-		if alpha > 1.0 or alpha < 0.0 then return color end
-		return (color & 0x00ffffff) | (math.floor(alpha * 255.0) << 24)
-	end,
+local rosepine = {
+  base = 0xFF191724,
+  surface = 0xFF1F1D2E,
+  overlay = 0xFF26233A,
+  muted = 0xFF6E6A86,
+  subtle = 0xFF908CAA,
+  text = 0xFFE0DEF4,
+  love = 0xFFEB6F92,
+  gold = 0xFFF6C177,
+  rose = 0xFFEBBCBA,
+  pine = 0xFF31748F,
+  foam = 0xFF9CCFD8,
+  iris = 0xFFC4A7E7,
 }
+
+M.sections = {
+  bar = {
+    bg = with_alpha(rosepine.base, 0.94),
+    border = rosepine.overlay,
+  },
+  item = {
+    bg = rosepine.surface,
+    border = rosepine.overlay,
+    text = rosepine.text,
+  },
+  popup = {
+    bg = with_alpha(rosepine.surface, 0.94),
+    border = rosepine.overlay,
+  },
+  apple = rosepine.love,
+  media = { label = rosepine.text },
+  calendar = { label = rosepine.text },
+  spaces = {
+    icon = {
+      color = rosepine.muted,
+      highlight = rosepine.gold,
+    },
+    label = {
+      color = rosepine.muted,
+      highlight = rosepine.gold,
+    },
+    indicator = rosepine.iris,
+  },
+  widgets = {
+    battery = {
+      low = rosepine.love,
+      mid = rosepine.gold,
+      high = rosepine.foam,
+    },
+    wifi = { icon = rosepine.text },
+    volume = {
+      icon = rosepine.pine,
+      popup = {
+        item = rosepine.text,
+        highlight = rosepine.subtle,
+        bg = with_alpha(rosepine.surface, 0.94),
+      },
+      slider = {
+        highlight = rosepine.text,
+        bg = with_alpha(rosepine.surface, 0.94),
+        border = rosepine.overlay,
+      },
+    },
+    messages = { icon = rosepine.love },
+  },
+}
+
+M.legacy = {
+  white = rosepine.text,
+  red = rosepine.love,
+  green = rosepine.foam,
+  blue = rosepine.pine,
+  yellow = rosepine.gold,
+  orange = rosepine.rose,
+  grey = rosepine.muted,
+  bg1 = with_alpha(rosepine.base, 0.83),
+  bg2 = rosepine.surface,
+}
+
+M.with_alpha = with_alpha
+M.transparent = 0x00000000
+
+return M
