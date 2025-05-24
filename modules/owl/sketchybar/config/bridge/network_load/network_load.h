@@ -1,90 +1,139 @@
+#ifndef NETWORK_LOAD_H
+#define NETWORK_LOAD_H
+
 #include <math.h>
-#include <stdio.h>
-#include <string.h>
 #include <net/if.h>
 #include <net/if_mib.h>
-#include <sys/select.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/sysctl.h>
+#include <sys/time.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <dispatch/dispatch.h>
+#include <errno.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include "../sketchybar.h"
 
-static char unit_str[3][6] = { { " Bps" }, { "KBps" }, { "MBps" }, };
+/*********************************
+ * Constants and Types
+ *********************************/
+#define EVENT_MESSAGE_SIZE 512
+#define MAX_EVENT_NAME_LENGTH 256
+#define MIN_TIME_SCALE 1e-6 
+#define MAX_TIME_SCALE 1e2
+#define MAX_UPDATE_FREQ 60
+#define MAX_INTERFACES 1024
+#define MAX_DISPLAY_VALUE 999
+#define NETWORK_ERROR_THRESHOLD 5
+#define BYTES_PER_KILOBYTE 1000.0
+#define BYTES_PER_MEGABYTE 1000000.0
 
-enum unit {
-  UNIT_BPS,
+typedef enum {
+  UNIT_BPS = 0,
   UNIT_KBPS,
-  UNIT_MBPS
+  UNIT_MBPS,
+  UNIT_MAX  // Sentinel value for bounds checking
+} NetworkUnit;
+
+// Use const array for better performance and safety
+static const char* const unit_str[UNIT_MAX] = {
+  "Bps ",
+  "KBps",
+  "MBps",
 };
+
 struct network {
   uint32_t row;
   struct ifmibdata data;
   struct timeval tv_nm1, tv_n, tv_delta;
-
+  
   int up;
   int down;
-  enum unit up_unit, down_unit;
+  NetworkUnit up_unit, down_unit;
+  
+  // Error tracking
+  unsigned int error_count;
+  bool initialized;
 };
 
-static inline void ifdata(uint32_t net_row, struct ifmibdata* data) {
-	static size_t size = sizeof(struct ifmibdata);
-  static int32_t data_option[] = { CTL_NET, PF_LINK, NETLINK_GENERIC, IFMIB_IFDATA, 0, IFDATA_GENERAL };
-  data_option[4] = net_row;
-  sysctl(data_option, 6, data, &size, NULL, 0);
+/*********************************
+ * Core Network Functions
+ *********************************/
+
+/**
+ * Initialize the network struct for a given interface
+ * @param net The network struct to initialize (must not be NULL)
+ * @param ifname The name of the network interface (must not be NULL or empty)
+ * @return 0 on success, -1 on failure
+ */
+static inline int network_init(struct network *net, const char *ifname);
+
+/**
+ * Update the network struct with current data
+ * Includes error recovery and bounds checking
+ * @param net The network struct to update (must not be NULL)
+ */
+static inline void network_update(struct network *net);
+
+/**
+ * Calculate the network metrics from raw byte counts
+ * Includes overflow protection and unit scaling
+ * @param delta_bytes The number of bytes transferred
+ * @param unit Pointer to store the unit of the network data (must not be NULL)
+ * @param value Pointer to store the value of the network data (must not be NULL)
+ */
+static inline void calculate_network_metrics(double delta_bytes, NetworkUnit *unit, int *value);
+
+/**
+ * Get the network data for the given network row
+ * @param net_row The network row to get data for
+ * @param data Pointer to the network data structure to fill (must not be NULL)
+ * @return 0 on success, -1 on failure
+ */
+static inline int ifdata(uint32_t net_row, struct ifmibdata *data);
+
+/**
+ * Signal handler for clean shutdown
+ * @param signal The signal number
+ */
+static void cleanup_and_exit(int signal);
+
+/**
+ * Validate network parameters before processing
+ * @param net The network struct to validate
+ * @return true if valid, false otherwise
+ */
+static inline bool validate_network_state(const struct network *net) {
+    return net != NULL && 
+           net->initialized && 
+           net->error_count < NETWORK_ERROR_THRESHOLD &&
+           net->up_unit < UNIT_MAX &&
+           net->down_unit < UNIT_MAX;
 }
 
-static inline void network_init(struct network* net, char* ifname) {
-  memset(net, 0, sizeof(struct network));
-
-  static int count_option[] = { CTL_NET, PF_LINK, NETLINK_GENERIC, IFMIB_SYSTEM, IFMIB_IFCOUNT };
-  uint32_t interface_count = 0;
-  size_t size = sizeof(uint32_t);
-  sysctl(count_option, 5, &interface_count, &size, NULL, 0);
-
-  for (int i = 0; i < interface_count; i++) {
-    ifdata(i, &net->data);
-    if (strcmp(net->data.ifmd_name, ifname) == 0) {
-      net->row = i;
-      break;
+/**
+ * Reset network error state
+ * @param net The network struct to reset
+ */
+static inline void reset_network_errors(struct network *net) {
+    if (net) {
+        net->error_count = 0;
     }
-  }
 }
 
-static inline void network_update(struct network* net) {
-  gettimeofday(&net->tv_n, NULL);
-  timersub(&net->tv_n, &net->tv_nm1, &net->tv_delta);
-  net->tv_nm1 = net->tv_n;
-
-  uint64_t ibytes_nm1 = net->data.ifmd_data.ifi_ibytes;
-  uint64_t obytes_nm1 = net->data.ifmd_data.ifi_obytes;
-  ifdata(net->row, &net->data);
-
-  double time_scale = (net->tv_delta.tv_sec + 1e-6*net->tv_delta.tv_usec);
-  if (time_scale < 1e-6 || time_scale > 1e2) return;
-  double delta_ibytes = (double)(net->data.ifmd_data.ifi_ibytes - ibytes_nm1)
-                        / time_scale;
-  double delta_obytes = (double)(net->data.ifmd_data.ifi_obytes - obytes_nm1)
-                        / time_scale;
-
-  double exponent_ibytes = log10(delta_ibytes);
-  double exponent_obytes = log10(delta_obytes);
-
-  if (exponent_ibytes < 3) {
-    net->down_unit = UNIT_BPS;
-    net->down = delta_ibytes;
-  } else if (exponent_ibytes < 6) {
-    net->down_unit = UNIT_KBPS;
-    net->down = delta_ibytes / 1000.0;
-  } else if (exponent_ibytes < 9) {
-    net->down_unit = UNIT_MBPS;
-    net->down = delta_ibytes / 1000000.0;
-  }
-
-  if (exponent_obytes < 3) {
-    net->up_unit = UNIT_BPS;
-    net->up = delta_obytes;
-  } else if (exponent_obytes < 6) {
-    net->up_unit = UNIT_KBPS;
-    net->up = delta_obytes / 1000.0;
-  } else if (exponent_obytes < 9) {
-    net->up_unit = UNIT_MBPS;
-    net->up = delta_obytes / 1000000.0;
-  }
+/**
+ * Check if time delta is valid for calculations
+ * @param tv_delta The time delta to check
+ * @return true if valid, false otherwise
+ */
+static inline bool is_valid_time_delta(const struct timeval *tv_delta) {
+    if (!tv_delta) return false;
+    
+    double time_scale = tv_delta->tv_sec + MIN_TIME_SCALE * tv_delta->tv_usec;
+    return time_scale >= MIN_TIME_SCALE && time_scale <= MAX_TIME_SCALE;
 }
+
+#endif /* NETWORK_LOAD_H */
