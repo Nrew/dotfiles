@@ -1,148 +1,162 @@
-local colors = require("colors").sections.spaces
+local colors = require("colors")
+local icons = require("icons")
 local settings = require("settings")
+local app_icons = require("helpers.app_icons")
 
-local function add_windows(space, space_name)
-  if not space or not space_name then
-    return
-  end
+local spaces = {}
 
-  sbar.exec("aerospace list-windows --format %{app-name} --workspace " .. space_name, function(windows, exit_code)
-    if exit_code ~= 0 or not windows then
-      space:set({ label = { string = "—" } })
-      return
-    end
-    
-    local icon_line = ""
+for i = 1, 10, 1 do
+	local space = sbar.add("space", "space." .. i, {
+		space = i,
+		icon = {
+			font = { family = settings.font.numbers },
+			string = i,
+			padding_left = 15,
+			padding_right = 8,
+			color = colors.blue,
+			highlight_color = colors.magenta,
+		},
+		label = {
+			padding_right = 20,
+			color = colors.blue,
+			highlight_color = colors.magenta,
+			font = "sketchybar-app-font:Regular:16.0",
+			y_offset = -1,
+		},
+		padding_right = 1,
+		padding_left = 1,
+		background = {
+			color = colors.bg1,
+			height = 28,
+			border_width = 2,
+		},
+	})
 
-    for app in windows:gmatch("[^\r\n]+") do
-      local lookup = settings.apps[app]
-      local icon = lookup or settings.apps["default"] or settings.apps["Default"]
-      if icon then
-        icon_line = icon_line .. " " .. icon
-      end
-    end
+	spaces[i] = space
 
-    sbar.animate("tanh", settings.dimens.animation.medium, function()
-      space:set({
-        label = {
-          string = icon_line == "" and "—" or icon_line,
-          padding_right = icon_line == "" and settings.dimens.padding.base or settings.dimens.spacing.fallback_padding,
-        },
-      })
-    end)
-  end)
+	-- Padding space
+	sbar.add("space", "space.padding." .. i, {
+		space = i,
+		script = "",
+		width = settings.group_paddings,
+	})
+
+	local space_popup = sbar.add("item", {
+		position = "popup." .. space.name,
+		padding_left = 5,
+		padding_right = 0,
+		background = {
+			drawing = true,
+			image = {
+				corner_radius = 9,
+				scale = 0.2,
+			},
+		},
+	})
+
+	space:subscribe("space_change", function(env)
+		local selected = env.SELECTED == "true"
+		local color = selected and colors.grey or colors.bg2
+		space:set({
+			icon = { highlight = selected },
+			label = { highlight = selected },
+			background = { border_color = selected and colors.magenta or colors.bg2 },
+		})
+	end)
+
+	space:subscribe("mouse.clicked", function(env)
+		if env.BUTTON == "other" then
+			space_popup:set({ background = { image = "space." .. env.SID } })
+			space:set({ popup = { drawing = "toggle" } })
+		else
+			local op = (env.BUTTON == "right") and "--destroy" or "--focus"
+			sbar.exec((op == "--focus") and ("aerospace workspace " .. env.SID) or ("aerospace move-node-to-workspace " .. env.SID))
+		end
+	end)
+
+	space:subscribe("mouse.exited", function(_)
+		space:set({ popup = { drawing = false } })
+	end)
 end
 
-sbar.exec("aerospace list-workspaces --all", function(spaces)
-  for space_name in spaces:gmatch("[^\r\n]+") do
-    local space = sbar.add("item", "space." .. space_name, {
-      icon = {
-        string = space_name,
-        color = colors.icon.color,
-        highlight_color = colors.icon.highlight,
-        padding_left = settings.dimens.padding.base,
-      },
-      label = {
-        font = {
-          family = settings.fonts.family,
-          size = settings.dimens.text.icon,
-        },
-        string = "",
-        color = colors.label.color,
-        highlight_color = colors.label.highlight,
-        y_offset = settings.dimens.spaces.label_offset,
-      },
-      click_script = "aerospace workspace " .. space_name,
-      padding_left = space_name == "1" and 0 or settings.dimens.padding.space_micro,
-    })
-
-    add_windows(space, space_name)
-
-    space:subscribe("aerospace_workspace_change", function(env)
-      local selected = env.FOCUSED_WORKSPACE == space_name
-      space:set({
-        icon = { highlight = selected },
-        label = { highlight = selected },
-      })
-
-      if selected then
-        sbar.animate("tanh", settings.dimens.animation.fast, function()
-          space:set({
-            background = { shadow = { distance = 0 } },
-            y_offset = settings.dimens.spaces.animation_offset,
-            padding_left = settings.dimens.padding.base,
-            padding_right = 0,
-          })
-          space:set({
-            background = { shadow = { distance = settings.dimens.spaces.shadow_distance } },
-            y_offset = 0,
-            padding_left = settings.dimens.padding.space_micro,
-            padding_right = settings.dimens.padding.space_micro,
-          })
-        end)
-      end
-    end)
-
-    space:subscribe("space_windows_change", function()
-      add_windows(space, space_name)
-    end)
-
-    space:subscribe("mouse.clicked", function()
-      sbar.animate("tanh", settings.dimens.animation.fast, function()
-        space:set({
-          background = { shadow = { distance = 0 } },
-          y_offset = settings.dimens.spaces.animation_offset,
-          padding_left = settings.dimens.padding.base,
-          padding_right = 0,
-        })
-        space:set({
-          background = { shadow = { distance = settings.dimens.spaces.shadow_distance } },
-          y_offset = 0,
-          padding_left = settings.dimens.padding.space_micro,
-          padding_right = settings.dimens.padding.space_micro,
-        })
-      end)
-    end)
-  end
-end)
-
-local spaces_indicator = sbar.add("item", {
-  icon = {
-    padding_left = settings.dimens.padding.base,
-    padding_right = settings.dimens.padding.indicator,
-    string = settings.icons.switch.on,
-    color = colors.indicator,
-  },
-  label = {
-    width = 0,
-    padding_left = 0,
-    padding_right = settings.dimens.padding.base,
-  },
-  padding_right = settings.dimens.padding.base,
+local space_window_observer = sbar.add("item", {
+	drawing = false,
+	updates = true,
 })
 
-spaces_indicator:subscribe("swap_menus_and_spaces", function()
-  local currently_on = spaces_indicator:query().icon.value == settings.icons.switch.on
-  spaces_indicator:set({
-    icon = currently_on and settings.icons.switch.off or settings.icons.switch.on,
-  })
+local spaces_indicator = sbar.add("item", {
+	padding_left = -3,
+	padding_right = 0,
+	icon = {
+		padding_left = 8,
+		padding_right = 9,
+		color = colors.blue,
+		string = icons.switch.on,
+	},
+	label = {
+		width = 0,
+		padding_left = 0,
+		padding_right = 8,
+		string = "spaces",
+		color = colors.blue,
+	},
+	background = {
+		color = colors.with_alpha(colors.bg1, 0.0),
+		border_color = colors.with_alpha(colors.bg2, 0.0),
+	},
+})
+
+space_window_observer:subscribe("space_windows_change", function(env)
+	local icon_line = ""
+	local no_app = true
+	for app, count in pairs(env.INFO.apps) do
+		no_app = false
+		local lookup = app_icons[app]
+		local icon = ((lookup == nil) and app_icons["Default"] or lookup)
+		icon_line = icon_line .. icon
+	end
+
+	if no_app then
+		icon_line = " —"
+	end
+	sbar.animate("tanh", 10, function()
+		spaces[env.INFO.space]:set({ label = icon_line })
+	end)
 end)
 
-spaces_indicator:subscribe("mouse.clicked", function()
-  sbar.animate("tanh", settings.dimens.animation.fast, function()
-    spaces_indicator:set({
-      background = { shadow = { distance = 0 } },
-      y_offset = settings.dimens.spaces.animation_offset,
-      padding_left = settings.dimens.padding.base,
-      padding_right = settings.dimens.padding.space_micro,
-    })
-    spaces_indicator:set({
-      background = { shadow = { distance = settings.dimens.spaces.shadow_distance } },
-      y_offset = 0,
-      padding_left = settings.dimens.padding.space_micro,
-      padding_right = settings.dimens.padding.base,
-    })
-  end)
+spaces_indicator:subscribe("swap_menus_and_spaces", function(env)
+	local currently_on = spaces_indicator:query().icon.value == icons.switch.on
+	spaces_indicator:set({
+		icon = currently_on and icons.switch.off or icons.switch.on,
+	})
+end)
 
-  sbar.trigger("swap_menus_and_spaces")
+spaces_indicator:subscribe("mouse.entered", function(env)
+	sbar.animate("tanh", 10, function()
+		spaces_indicator:set({
+			background = {
+				color = { alpha = 1.0 },
+				border_color = { alpha = 1.0 },
+			},
+			icon = { color = colors.blue },
+			label = { width = "dynamic" },
+		})
+	end)
+end)
+
+spaces_indicator:subscribe("mouse.exited", function(env)
+	sbar.animate("tanh", 10, function()
+		spaces_indicator:set({
+			background = {
+				color = { alpha = 0.0 },
+				border_color = { alpha = 0.0 },
+			},
+			icon = { color = colors.blue },
+			label = { width = 0 },
+		})
+	end)
+end)
+
+spaces_indicator:subscribe("mouse.clicked", function(env)
+	sbar.trigger("swap_menus_and_spaces")
 end)
