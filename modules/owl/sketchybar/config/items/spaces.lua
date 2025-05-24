@@ -1,146 +1,133 @@
--- Workspace/Spaces display for SketchyBar
--- Fixed variable references and improved consistency
-
-local constants = require("constants")
+local colors = require("colors").sections.spaces
 local settings = require("settings")
-local colors = require("colors")
 
--- Extract commonly used settings
-local apps = settings.apps
-local dimens = settings.dimens
-
-local spaces = {}
-
--- Hidden watchers for events
-local swapWatcher = sbar.add("item", {
-  drawing = false,
-  updates = true,
-})
-
-local currentWorkspaceWatcher = sbar.add("item", {
-  drawing = false,
-  updates = true,
-})
-
--- Configuration for different workspace types
-local spaceConfigs = {
-  ["B"] = { icon = "󰖟", name = "Browsing" },
-  ["C"] = { icon = "", name = "Coding" },
-  ["E"] = { icon = "", name = "Mail" },
-  ["F"] = { icon = "", name = "Files" },
-  ["T"] = { icon = "", name = "Terminal" },
-  ["X"] = { icon = "", name = "Misc" },
-}
-
--- Highlight the currently focused workspace
-local function selectCurrentWorkspace(focusedWorkspaceName)
-  if not focusedWorkspaceName or focusedWorkspaceName == "" then
-    return
-  end
-
-  for sid, item in pairs(spaces) do
-    if item then
-      local isSelected = sid == constants.items.SPACES .. "." .. focusedWorkspaceName
-      item:set({
-        icon = { color = isSelected and colors.bg1 or colors.white },
-        label = { color = isSelected and colors.bg1 or colors.white },
-        background = { color = isSelected and colors.white or colors.bg1 },
-      })
+local function add_windows(space, space_name)
+  sbar.exec("aerospace list-windows --format %{app-name} --workspace " .. space_name, function(windows)
+    local icon_line = ""
+    for app in windows:gmatch "[^\r\n]+" do
+      local lookup = settings.apps[app]
+      local icon = ((lookup == nil) and settings.apps["Default"] or lookup)
+      icon_line = icon_line .. " " .. icon
     end
-  end
 
-  sbar.trigger(constants.events.UPDATE_WINDOWS)
-end
-
--- Find and select the current workspace
-local function findAndSelectCurrentWorkspace()
-  sbar.exec(constants.aerospace.GET_CURRENT_WORKSPACE, function(focusedWorkspaceOutput)
-    if focusedWorkspaceOutput then
-      local focusedWorkspaceName = focusedWorkspaceOutput:match("[^\r\n]+")
-      selectCurrentWorkspace(focusedWorkspaceName)
-    end
-  end)
-end
-
--- Add a workspace item to the bar
-local function addWorkspaceItem(workspaceName)
-  if not workspaceName or workspaceName == "" then
-    return
-  end
-
-  local spaceName = constants.items.SPACES .. "." .. workspaceName
-  local spaceConfig = spaceConfigs[workspaceName] or { 
-    icon = apps["default"] or ":default:", 
-    name = workspaceName 
-  }
-
-  spaces[spaceName] = sbar.add("item", spaceName, {
-    label = {
-      width = 0,
-      padding_left = 0,
-      string = spaceConfig.name,
-    },
-    icon = {
-      string = spaceConfig.icon,
-      color = colors.white,
-    },
-    background = {
-      color = colors.bg1,
-    },
-    click_script = "aerospace workspace " .. workspaceName,
-  })
-
-  -- Add hover animations
-  spaces[spaceName]:subscribe("mouse.entered", function(env)
-    sbar.animate("tanh", 30, function()
-      spaces[spaceName]:set({ label = { width = "dynamic" } })
+    sbar.animate("tanh", settings.dimens.animation.medium, function()
+      space:set {
+        label = {
+          string = icon_line == "" and "—" or icon_line,
+          padding_right = icon_line == "" and settings.dimens.padding.base or settings.dimens.spaces.fallback_padding,
+        },
+      }
     end)
   end)
-
-  spaces[spaceName]:subscribe("mouse.exited", function(env)
-    sbar.animate("tanh", 30, function()
-      spaces[spaceName]:set({ label = { width = 0 } })
-    end)
-  end)
-
-  -- Add padding after each workspace
-  sbar.add("item", spaceName .. ".padding", {
-    width = dimens.padding.label
-  })
 end
 
--- Create all workspace items
-local function createWorkspaces()
-  sbar.exec(constants.aerospace.LIST_ALL_WORKSPACES, function(workspacesOutput)
-    if not workspacesOutput or workspacesOutput == "" then
-      return
-    end
+sbar.exec("aerospace list-workspaces --all", function(spaces)
+  for space_name in spaces:gmatch "[^\r\n]+" do
+    local space = sbar.add("item", "space." .. space_name, {
+      icon = {
+        string = space_name,
+        color = colors.icon.color,
+        highlight_color = colors.icon.highlight,
+        padding_left = settings.dimens.padding.base,
+      },
+      label = {
+        font = settings.fonts.icons(settings.dimens.text.spaces_font),
+        string = "",
+        color = colors.label.color,
+        highlight_color = colors.label.highlight,
+        y_offset = settings.dimens.spaces.label_offset,
+      },
+      click_script = "aerospace workspace " .. space_name,
+      padding_left = space_name == "1" and 0 or settings.dimens.padding.micro,
+    })
 
-    for workspaceName in workspacesOutput:gmatch("[^\r\n]+") do
-      if workspaceName and workspaceName ~= "" then
-        addWorkspaceItem(workspaceName)
+    add_windows(space, space_name)
+
+    space:subscribe("aerospace_workspace_change", function(env)
+      local selected = env.FOCUSED_WORKSPACE == space_name
+      space:set {
+        icon = { highlight = selected },
+        label = { highlight = selected },
+      }
+
+      if selected then
+        sbar.animate("tanh", settings.dimens.animation.fast, function()
+          space:set {
+            background = { shadow = { distance = 0 } },
+            y_offset = settings.dimens.spaces.animation_offset,
+            padding_left = settings.dimens.padding.base,
+            padding_right = 0,
+          }
+          space:set {
+            background = { shadow = { distance = settings.dimens.spaces.shadow_distance } },
+            y_offset = 0,
+            padding_left = settings.dimens.padding.micro,
+            padding_right = settings.dimens.padding.micro,
+          }
+        end)
       end
-    end
+    end)
 
-    findAndSelectCurrentWorkspace()
-  end)
-end
+    space:subscribe("space_windows_change", function()
+      add_windows(space, space_name)
+    end)
 
--- Subscribe to menu/spaces toggle events
-swapWatcher:subscribe(constants.events.SWAP_MENU_AND_SPACES, function(env)
-  local isShowingSpaces = env.isShowingMenu == "off"
-  sbar.set("/" .. constants.items.SPACES .. "\\..*/", { drawing = isShowingSpaces })
-end)
-
--- Subscribe to workspace change events
-currentWorkspaceWatcher:subscribe(constants.events.AEROSPACE_WORKSPACE_CHANGED, function(env)
-  if env.FOCUSED_WORKSPACE then
-    selectCurrentWorkspace(env.FOCUSED_WORKSPACE)
-    sbar.trigger(constants.events.UPDATE_WINDOWS)
+    space:subscribe("mouse.clicked", function()
+      sbar.animate("tanh", settings.dimens.animation.fast, function()
+        space:set {
+          background = { shadow = { distance = 0 } },
+          y_offset = settings.dimens.spaces.animation_offset,
+          padding_left = settings.dimens.padding.base,
+          padding_right = 0,
+        }
+        space:set {
+          background = { shadow = { distance = settings.dimens.spaces.shadow_distance } },
+          y_offset = 0,
+          padding_left = settings.dimens.padding.micro,
+          padding_right = settings.dimens.padding.micro,
+        }
+      end)
+    end)
   end
 end)
 
--- Initialize workspaces
-createWorkspaces()
+local spaces_indicator = sbar.add("item", {
+  icon = {
+    padding_left = settings.dimens.padding.base,
+    padding_right = settings.dimens.spaces.indicator_padding,
+    string = settings.icons.switch.on,
+    color = colors.indicator,
+  },
+  label = {
+    width = 0,
+    padding_left = 0,
+    padding_right = settings.dimens.padding.base,
+  },
+  padding_right = settings.dimens.padding.base,
+})
 
-return spaces
+spaces_indicator:subscribe("swap_menus_and_spaces", function()
+  local currently_on = spaces_indicator:query().icon.value == settings.icons.switch.on
+  spaces_indicator:set {
+    icon = currently_on and settings.icons.switch.off or settings.icons.switch.on,
+  }
+end)
+
+spaces_indicator:subscribe("mouse.clicked", function()
+  sbar.animate("tanh", settings.dimens.animation.fast, function()
+    spaces_indicator:set {
+      background = { shadow = { distance = 0 } },
+      y_offset = settings.dimens.spaces.animation_offset,
+      padding_left = settings.dimens.padding.base,
+      padding_right = settings.dimens.padding.micro,
+    }
+    spaces_indicator:set {
+      background = { shadow = { distance = settings.dimens.spaces.shadow_distance } },
+      y_offset = 0,
+      padding_left = settings.dimens.padding.micro,
+      padding_right = settings.dimens.padding.base,
+    }
+  end)
+
+  sbar.trigger("swap_menus_and_spaces")
+end)

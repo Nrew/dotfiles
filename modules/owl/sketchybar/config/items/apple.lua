@@ -1,22 +1,32 @@
-local settings = require("settings")
 local colors = require("colors")
+local settings = require("settings")
 
-local dimens = settings.dimens
-local icon = settings.text
+sbar.add("item", { width = settings.dimens.padding.group })
 
-local apple = sbar.add("item", "apple", {
+local apple = sbar.add("item", {
   icon = {
-    padding_left = dimens.padding.icon,
-    padding_right = dimens.padding.icon,
-    string = icon.apple,
-    color = colors.white,
+    font = { size = settings.dimens.text.apple_icon },
+    string = settings.icons.apple,
+    padding_right = settings.dimens.padding.base,
+    padding_left = settings.dimens.padding.base,
   },
-  label = {
-    drawing = false
+  label = { drawing = false },
+  background = {
+    color = colors.sections.item.bg,
+    border_color = colors.sections.item.border,
+    border_width = settings.dimens.graphics.border.width
   },
-  padding_left = dimens.padding.label,
-  padding_right = dimens.padding.label,
-  click_script = "$CONFIG_DIR/bridge/menus/bin/menus -s 0"
+  padding_left = settings.dimens.padding.small,
+  padding_right = settings.dimens.padding.small,
+  click_script = "$CONFIG_DIR/helpers/menus/bin/menus -s 0"
 })
 
-return apple
+sbar.add("bracket", { apple.name }, {
+  background = {
+    color = colors.transparent,
+    height = settings.dimens.graphics.bracket.height,
+    border_color = colors.legacy.grey,
+  }
+})
+
+sbar.add("item", { width = settings.dimens.padding.final })
