@@ -2,24 +2,39 @@ local icons = require("icons")
 
 local M = {}
 
--- ALL constants defined here - no magic numbers anywhere
-local FONT_FAMILY = "JetBrains Mono Nerd Font"
-local BASE_PADDING = 8
-local SMALL_PADDING = 1
-local GROUP_SPACING = 5
-local MENU_LABEL_PADDING = 6
-local FINAL_SPACING = 7
-local MEDIA_SMALL_PADDING = 3
-local SPACE_MICRO_PADDING = 4
-local INDICATOR_PADDING = 9
-local BRACKET_HEIGHT = 30
-local POPUP_WIDTH = 200
-local VOLUME_LABEL_WIDTH = 25
-local WIFI_PADDING_RIGHT = 25
-local WIFI_PADDING_MAIN = 6
-local MEDIA_COVER_PADDING = 60
-local CALENDAR_WIDTH = 49
-local BATTERY_POPUP_WIDTH = 100
+-- Constants 
+local FONT_FAMILY <const> = "JetBrains Mono Nerd Font"
+
+-- Padding constants
+local BASE_PADDING <const> = 8
+local SMALL_PADDING <const> = 1
+local GROUP_SPACING <const> = 5
+local MENU_LABEL_PADDING <const> = 6
+local FINAL_SPACING <const> = 7
+local MEDIA_SMALL_PADDING <const> = 3
+local SPACE_MICRO_PADDING <const> = 4
+local INDICATOR_PADDING <const> = 9
+
+-- Graphics constants
+local BRACKET_HEIGHT <const> = 30
+local POPUP_WIDTH <const> = 200
+local LARGE_POPUP_WIDTH <const> = 300
+local BATTERY_POPUP_WIDTH <const> = 100
+local VOLUME_LABEL_WIDTH <const> = 25
+local WIFI_PADDING_RIGHT <const> = 25
+local WIFI_PADDING_MAIN <const> = 6
+local MEDIA_COVER_PADDING <const> = 60
+local CALENDAR_WIDTH <const> = 49
+
+-- Animation constants
+local ANIMATION_FAST <const> = 8
+local ANIMATION_MEDIUM <const> = 10
+local ANIMATION_SLOW <const> = 30
+local ANIMATION_DELAY <const> = 5
+
+-- Timing constants
+local CALENDAR_UPDATE_FREQ <const> = 30
+local BATTERY_UPDATE_FREQ <const> = 180
 
 M.dimens = {
   padding = {
@@ -46,13 +61,19 @@ M.dimens = {
     bracket = {
       height = BRACKET_HEIGHT,
     },
-    slider = { height = 20 },
+    slider = { 
+      height = 20 
+    },
     popup = {
       width = POPUP_WIDTH,
-      large_width = 300,
+      large_width = LARGE_POPUP_WIDTH,
     },
-    border = { width = 1 },
-    knob = { size = 32 },
+    border = { 
+      width = 1 
+    },
+    knob = { 
+      size = 32 
+    },
   },
   text = {
     icon = 14.0,
@@ -74,12 +95,14 @@ M.dimens = {
     battery_popup_width = BATTERY_POPUP_WIDTH,
     fallback_padding = 12,
   },
-  effects = { blur_radius = 35 },
+  effects = { 
+    blur_radius = 35 
+  },
   animation = {
-    fast = 8,
-    medium = 10,
-    slow = 30,
-    delay = 5,
+    fast = ANIMATION_FAST,
+    medium = ANIMATION_MEDIUM,
+    slow = ANIMATION_SLOW,
+    delay = ANIMATION_DELAY,
   },
   media = {
     artist_offset = -8,
@@ -126,11 +149,34 @@ M.fonts = {
 }
 
 M.timing = {
-  calendar_update = 30,
-  battery_update = 180,
+  calendar_update = CALENDAR_UPDATE_FREQ,
+  battery_update = BATTERY_UPDATE_FREQ,
 }
 
+-- Icon and app references
 M.icons = icons.text.sf_symbols
 M.apps = icons.apps
+
+-- Utility functions for settings
+function M.get_font_config(style, size)
+  style = style or M.fonts.styles.regular
+  size = size or M.dimens.text.label
+  
+  return {
+    family = M.fonts.family,
+    style = style,
+    size = size,
+  }
+end
+
+function M.get_padding_config(left, right)
+  left = left or M.dimens.padding.base
+  right = right or left
+  
+  return {
+    padding_left = left,
+    padding_right = right,
+  }
+end
 
 return M

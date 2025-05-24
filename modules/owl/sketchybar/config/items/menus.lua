@@ -13,10 +13,11 @@ local space_menu_swap = sbar.add("item", {
 
 sbar.add("event", "swap_menus_and_spaces")
 
-local max_items = 15
+local max_items <const> = 15
 local menu_items = {}
 
-for i = 1, max_items, 1 do
+-- Create menu items with proper error handling
+for i = 1, max_items do
   local menu = sbar.add("item", "menu." .. i, {
     padding_left = settings.dimens.padding.base,
     padding_right = settings.dimens.padding.base,
@@ -24,7 +25,9 @@ for i = 1, max_items, 1 do
     icon = { drawing = false },
     label = {
       font = {
-        style = i == 1 and settings.fonts.styles.heavy or settings.fonts.styles.semibold
+        family = settings.fonts.family,
+        style = i == 1 and settings.fonts.styles.heavy or settings.fonts.styles.semibold,
+        size = settings.dimens.text.label,
       },
       padding_left = settings.dimens.padding.menu_label,
       padding_right = settings.dimens.padding.menu_label,
@@ -36,6 +39,7 @@ for i = 1, max_items, 1 do
   menu_items[i] = menu
 end
 
+-- Add bracket around all menu items
 sbar.add("bracket", { '/menu\\..*/' }, {
   background = { color = colors.legacy.bg1 }
 })
@@ -46,25 +50,49 @@ local menu_padding = sbar.add("item", "menu.padding", {
 })
 
 local function update_menus(env)
-  sbar.exec("$CONFIG_DIR/bridge/menus/bin/menus -l", function(menus)
-    sbar.set('/menu\\..*/', { drawing = false })
-    menu_padding:set({ drawing = true })
-    local id = 1
-    for menu in string.gmatch(menus, '[^\r\n]+') do
-      if id <= max_items then
-        menu_items[id]:set({ label = menu, drawing = true })
-      else 
-        break 
-      end
-      id = id + 1
+  -- Safety check for bridge binary
+  local bridge_path = "$CONFIG_DIR/bridge/menus/bin/menus"
+  
+  sbar.exec("test -x " .. bridge_path, function(test_result)
+    if test_result ~= "" then
+      print("Warning: Menu bridge binary not found or not executable")
+      return
     end
+    
+    sbar.exec(bridge_path .. " -l", function(menus)
+      if not menus or menus == "" then
+        return
+      end
+      
+      -- Hide all menu items first
+      sbar.set('/menu\\..*/', { drawing = false })
+      menu_padding:set({ drawing = true })
+      
+      local id = 1
+      for menu in string.gmatch(menus, '[^\r\n]+') do
+        if id <= max_items and menu ~= "" then
+          menu_items[id]:set({ 
+            label = { string = menu }, 
+            drawing = true 
+          })
+          id = id + 1
+        else 
+          break 
+        end
+      end
+    end)
   end)
 end
 
 menu_watcher:subscribe("front_app_switched", update_menus)
 
 space_menu_swap:subscribe("swap_menus_and_spaces", function(env)
-  local drawing = menu_items[1]:query().geometry.drawing == "on"
+  local drawing = false
+  if menu_items[1] then
+    local query_result = menu_items[1]:query()
+    drawing = query_result and query_result.geometry and query_result.geometry.drawing == "on"
+  end
+  
   if drawing then
     -- Hide menus, show spaces
     menu_watcher:set({ updates = false })

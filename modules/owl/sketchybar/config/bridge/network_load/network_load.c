@@ -59,7 +59,11 @@ static inline int network_init(struct network *net, const char *ifname) {
         
         if (strcmp(net->data.ifmd_name, ifname) == 0) {
             net->row = i;
+            net->initialized = true;
+            net->error_count = 0;
+            
             if (gettimeofday(&net->tv_nm1, NULL) != 0) {
+                net->initialized = false;
                 return -1;
             }
             return 0;
@@ -77,16 +81,15 @@ static inline void calculate_network_metrics(double delta_bytes, NetworkUnit *un
     double double_value = 0;
     
     if (delta_bytes > 0 && isfinite(delta_bytes)) {
-        double exponent = log10(delta_bytes);
-        if (exponent < 3) {
+        if (delta_bytes < BYTES_PER_KILOBYTE) {
             *unit = UNIT_BPS;
             double_value = delta_bytes;
-        } else if (exponent < 6) {
+        } else if (delta_bytes < BYTES_PER_MEGABYTE) {
             *unit = UNIT_KBPS;
-            double_value = delta_bytes / 1000.0;
+            double_value = delta_bytes / BYTES_PER_KILOBYTE;
         } else {
             *unit = UNIT_MBPS;
-            double_value = delta_bytes / 1000000.0;
+            double_value = delta_bytes / BYTES_PER_MEGABYTE;
         }
     } else {
         *unit = UNIT_BPS;
@@ -98,39 +101,47 @@ static inline void calculate_network_metrics(double delta_bytes, NetworkUnit *un
         double_value = MAX_DISPLAY_VALUE;
     }
     
+    // Ensure unit is within bounds
+    if (*unit >= UNIT_MAX) {
+        *unit = UNIT_BPS;
+    }
+    
     *value = (int)round(double_value);
 }
 
 static inline void network_update(struct network *net) {
-    if (!net) {
+    if (!validate_network_state(net)) {
         return;
     }
 
     if (gettimeofday(&net->tv_n, NULL) != 0) {
+        net->error_count++;
         return;
     }
     
     timersub(&net->tv_n, &net->tv_nm1, &net->tv_delta);
+    
+    if (!is_valid_time_delta(&net->tv_delta)) {
+        net->error_count++;
+        return;
+    }
+    
     net->tv_nm1 = net->tv_n;
 
     uint64_t ibytes_nm1 = net->data.ifmd_data.ifi_ibytes;
     uint64_t obytes_nm1 = net->data.ifmd_data.ifi_obytes;
 
     if (ifdata(net->row, &net->data) != 0) {
+        net->error_count++;
         return;
     }
 
     double time_scale = (net->tv_delta.tv_sec + MIN_TIME_SCALE * net->tv_delta.tv_usec);
-    
-    // Validate time scale to prevent division by zero or unrealistic values
-    if (time_scale < MIN_TIME_SCALE || time_scale > MAX_TIME_SCALE) {
-        return;
-    }
 
     // Check for counter wraparound or invalid data
     if (net->data.ifmd_data.ifi_ibytes < ibytes_nm1 || 
         net->data.ifmd_data.ifi_obytes < obytes_nm1) {
-        // Counter wrapped around, skip this update
+        // Counter wrapped around, skip this update but don't count as error
         return;
     }
 
@@ -139,6 +150,11 @@ static inline void network_update(struct network *net) {
 
     calculate_network_metrics(delta_ibytes, &net->down_unit, &net->down);
     calculate_network_metrics(delta_obytes, &net->up_unit, &net->up);
+    
+    // Reset error count on successful update
+    if (net->error_count > 0) {
+        reset_network_errors(net);
+    }
 }
 
 static void cleanup_and_exit(int signal) {
@@ -149,12 +165,16 @@ static void cleanup_and_exit(int signal) {
 int main(int argc, char **argv) {
     if (argc < 4) {
         fprintf(stderr, "Usage: %s \"<interface>\" \"<event-name>\" \"<event_freq>\"\n", argv[0]);
+        fprintf(stderr, "  interface:  Network interface name (e.g., en0)\n");
+        fprintf(stderr, "  event-name: SketchyBar event name\n");
+        fprintf(stderr, "  event_freq: Update frequency in seconds (0-60)\n");
         return EXIT_FAILURE;
     }
 
     // Validate interface name length
     if (strlen(argv[1]) >= IFNAMSIZ) {
-        fprintf(stderr, "Interface name too long: %s\n", argv[1]);
+        fprintf(stderr, "Error: Interface name too long: %s (max %d chars)\n", 
+                argv[1], IFNAMSIZ - 1);
         return EXIT_FAILURE;
     }
 
@@ -164,20 +184,23 @@ int main(int argc, char **argv) {
     float update_freq = strtof(argv[3], &endptr);
 
     if (errno != 0 || *endptr != '\0' || update_freq <= 0 || update_freq > MAX_UPDATE_FREQ) {
-        fprintf(stderr, "Invalid update frequency: %s (must be between 0 and %d)\n", 
+        fprintf(stderr, "Error: Invalid update frequency: %s (must be between 0 and %d)\n", 
                 argv[3], MAX_UPDATE_FREQ);
         return EXIT_FAILURE;
     }
 
     // Validate event name length
     if (strlen(argv[2]) >= MAX_EVENT_NAME_LENGTH) {
-        fprintf(stderr, "Event name too long: %s\n", argv[2]);
+        fprintf(stderr, "Error: Event name too long: %s (max %d chars)\n", 
+                argv[2], MAX_EVENT_NAME_LENGTH - 1);
         return EXIT_FAILURE;
     }
 
     // Set up signal handlers for clean exit
-    signal(SIGTERM, cleanup_and_exit);
-    signal(SIGINT, cleanup_and_exit);
+    if (signal(SIGTERM, cleanup_and_exit) == SIG_ERR ||
+        signal(SIGINT, cleanup_and_exit) == SIG_ERR) {
+        fprintf(stderr, "Warning: Could not set up signal handlers\n");
+    }
     
     // Clear any existing alarms
     alarm(0);
@@ -187,7 +210,7 @@ int main(int argc, char **argv) {
     int written = snprintf(event_message, EVENT_MESSAGE_SIZE, "--add event '%s'", argv[2]);
     
     if (written >= EVENT_MESSAGE_SIZE || written < 0) {
-        fprintf(stderr, "Event name too long: %s\n", argv[2]);
+        fprintf(stderr, "Error: Event name too long for message buffer\n");
         return EXIT_FAILURE;
     }
 
@@ -196,7 +219,8 @@ int main(int argc, char **argv) {
     // Initialize network monitoring
     __block struct network network;
     if (network_init(&network, argv[1]) != 0) {
-        fprintf(stderr, "Failed to initialize network monitoring for interface: %s\n", argv[1]);
+        fprintf(stderr, "Error: Failed to initialize network monitoring for interface: %s\n", argv[1]);
+        fprintf(stderr, "Check that the interface exists and is accessible.\n");
         return EXIT_FAILURE;
     }
     
@@ -207,7 +231,7 @@ int main(int argc, char **argv) {
     dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
 
     if (!timer) {
-        fprintf(stderr, "Failed to create timer\n");
+        fprintf(stderr, "Error: Failed to create timer\n");
         return EXIT_FAILURE;
     }
 
@@ -219,15 +243,18 @@ int main(int argc, char **argv) {
     dispatch_source_set_event_handler(timer, ^{
         network_update(&network);
         
-        char trigger_message[EVENT_MESSAGE_SIZE];
-        int msg_written = snprintf(trigger_message, EVENT_MESSAGE_SIZE,
-                    "--trigger '%s' upload='%03d%s' download='%03d%s'",
-                    event_name, 
-                    network.up, unit_str[network.up_unit],
-                    network.down, unit_str[network.down_unit]);
-                    
-        if (msg_written > 0 && msg_written < EVENT_MESSAGE_SIZE) {
-            sketchybar(trigger_message);
+        // Only send update if network state is valid
+        if (validate_network_state(&network)) {
+            char trigger_message[EVENT_MESSAGE_SIZE];
+            int msg_written = snprintf(trigger_message, EVENT_MESSAGE_SIZE,
+                        "--trigger '%s' upload='%03d%s' download='%03d%s'",
+                        event_name, 
+                        network.up, unit_str[network.up_unit],
+                        network.down, unit_str[network.down_unit]);
+                        
+            if (msg_written > 0 && msg_written < EVENT_MESSAGE_SIZE) {
+                sketchybar(trigger_message);
+            }
         }
     });
 
@@ -237,6 +264,8 @@ int main(int argc, char **argv) {
     });
 
     dispatch_resume(timer);
+    
+    // Run the main dispatch loop
     dispatch_main();
     
     return EXIT_SUCCESS;

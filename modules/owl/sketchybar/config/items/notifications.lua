@@ -19,7 +19,7 @@ local notification_popup = sbar.add("item", {
   label = {
     color = colors.sections.item.text,
     font = {
-      family = settings.fonts.text,
+      family = settings.fonts.family,
       style = settings.fonts.styles.semibold,
       size = settings.dimens.text.label,
     },
@@ -27,32 +27,37 @@ local notification_popup = sbar.add("item", {
 })
 
 local function hide_notification()
-  sbar.animate("sin", 30, function()
+  sbar.animate("sin", settings.dimens.animation.slow, function()
     notification:set({ popup = { y_offset = 2 } })
     notification:set({ popup = { y_offset = -80 } })
   end)
 end
 
 local function show_notification(content, hold)
+  if not content or content == "" then
+    return
+  end
+  
   hide_notification()
   notification_popup:set({ label = { string = content } })
 
-  sbar.animate("sin", 30, function()
+  sbar.animate("sin", settings.dimens.animation.slow, function()
     notification:set({ popup = { y_offset = -80 } })
     notification:set({ popup = { y_offset = 2 } })
   end)
 
-  if hold == false then
+  if not hold then
     sbar.delay(5, function()
-      if hold then return end
-      hide_notification()
+      if not hold then 
+        hide_notification()
+      end
     end)
   end
 end
 
 notification:subscribe("send_message", function(env)
   local content = env.MESSAGE
-  local hold = env.HOLD ~= nil and env.HOLD == "true" or false
+  local hold = env.HOLD and env.HOLD == "true"
   show_notification(content, hold)
 end)
 

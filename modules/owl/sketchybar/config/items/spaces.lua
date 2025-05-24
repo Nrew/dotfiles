@@ -2,27 +2,34 @@ local colors = require("colors").sections.spaces
 local settings = require("settings")
 
 local function add_windows(space, space_name)
+  if not space or not space_name then
+    return
+  end
+  
   sbar.exec("aerospace list-windows --format %{app-name} --workspace " .. space_name, function(windows)
     local icon_line = ""
-    for app in windows:gmatch "[^\r\n]+" do
+    
+    for app in windows:gmatch("[^\r\n]+") do
       local lookup = settings.apps[app]
-      local icon = ((lookup == nil) and settings.apps["Default"] or lookup)
-      icon_line = icon_line .. " " .. icon
+      local icon = lookup or settings.apps["default"] or settings.apps["Default"]
+      if icon then
+        icon_line = icon_line .. " " .. icon
+      end
     end
 
     sbar.animate("tanh", settings.dimens.animation.medium, function()
-      space:set {
+      space:set({
         label = {
           string = icon_line == "" and "—" or icon_line,
           padding_right = icon_line == "" and settings.dimens.padding.base or settings.dimens.spacing.fallback_padding,
         },
-      }
+      })
     end)
   end)
 end
 
 sbar.exec("aerospace list-workspaces --all", function(spaces)
-  for space_name in spaces:gmatch "[^\r\n]+" do
+  for space_name in spaces:gmatch("[^\r\n]+") do
     local space = sbar.add("item", "space." .. space_name, {
       icon = {
         string = space_name,
@@ -31,7 +38,10 @@ sbar.exec("aerospace list-workspaces --all", function(spaces)
         padding_left = settings.dimens.padding.base,
       },
       label = {
-        font = settings.fonts.icons(settings.dimens.text.icon),
+        font = {
+          family = settings.fonts.family,
+          size = settings.dimens.text.icon,
+        },
         string = "",
         color = colors.label.color,
         highlight_color = colors.label.highlight,
@@ -45,25 +55,25 @@ sbar.exec("aerospace list-workspaces --all", function(spaces)
 
     space:subscribe("aerospace_workspace_change", function(env)
       local selected = env.FOCUSED_WORKSPACE == space_name
-      space:set {
+      space:set({
         icon = { highlight = selected },
         label = { highlight = selected },
-      }
+      })
 
       if selected then
         sbar.animate("tanh", settings.dimens.animation.fast, function()
-          space:set {
+          space:set({
             background = { shadow = { distance = 0 } },
             y_offset = settings.dimens.spaces.animation_offset,
             padding_left = settings.dimens.padding.base,
             padding_right = 0,
-          }
-          space:set {
+          })
+          space:set({
             background = { shadow = { distance = settings.dimens.spaces.shadow_distance } },
             y_offset = 0,
             padding_left = settings.dimens.padding.space_micro,
             padding_right = settings.dimens.padding.space_micro,
-          }
+          })
         end)
       end
     end)
@@ -74,18 +84,18 @@ sbar.exec("aerospace list-workspaces --all", function(spaces)
 
     space:subscribe("mouse.clicked", function()
       sbar.animate("tanh", settings.dimens.animation.fast, function()
-        space:set {
+        space:set({
           background = { shadow = { distance = 0 } },
           y_offset = settings.dimens.spaces.animation_offset,
           padding_left = settings.dimens.padding.base,
           padding_right = 0,
-        }
-        space:set {
+        })
+        space:set({
           background = { shadow = { distance = settings.dimens.spaces.shadow_distance } },
           y_offset = 0,
           padding_left = settings.dimens.padding.space_micro,
           padding_right = settings.dimens.padding.space_micro,
-        }
+        })
       end)
     end)
   end
@@ -108,25 +118,25 @@ local spaces_indicator = sbar.add("item", {
 
 spaces_indicator:subscribe("swap_menus_and_spaces", function()
   local currently_on = spaces_indicator:query().icon.value == settings.icons.switch.on
-  spaces_indicator:set {
+  spaces_indicator:set({
     icon = currently_on and settings.icons.switch.off or settings.icons.switch.on,
-  }
+  })
 end)
 
 spaces_indicator:subscribe("mouse.clicked", function()
   sbar.animate("tanh", settings.dimens.animation.fast, function()
-    spaces_indicator:set {
+    spaces_indicator:set({
       background = { shadow = { distance = 0 } },
       y_offset = settings.dimens.spaces.animation_offset,
       padding_left = settings.dimens.padding.base,
       padding_right = settings.dimens.padding.space_micro,
-    }
-    spaces_indicator:set {
+    })
+    spaces_indicator:set({
       background = { shadow = { distance = settings.dimens.spaces.shadow_distance } },
       y_offset = 0,
       padding_left = settings.dimens.padding.space_micro,
       padding_right = settings.dimens.padding.base,
-    }
+    })
   end)
 
   sbar.trigger("swap_menus_and_spaces")
