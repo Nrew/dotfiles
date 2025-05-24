@@ -137,4 +137,12 @@ M.timing = {
 M.icons = icons.text.nerdfont
 M.apps = icons.apps
 
+-- Ensure switch icons are available for spaces indicator
+if not M.icons.switch then
+  M.icons.switch = {
+    on = "󱨥",
+    off = "󱨦",
+  }
+end
+
 return M

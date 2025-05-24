@@ -106,6 +106,7 @@ let user = "nrew"; in
     fonts = {
         packages = with pkgs; [
             sketchybar-app-font
+            source-code-pro
         ];
     };
 
@@ -139,8 +140,12 @@ let user = "nrew"; in
             "gowall"
 	        "switchaudio-osx"
             "nowplaying-cli"
-	    "sketchybar"
-        ];                                
+	        "sketchybar"
+        ];
+        extraConfig = ''
+            export HOMEBREW_NO_ANALYTICS=1
+            brew analytics off 2>/dev/null || true
+        '';                            
         casks = [                                   # Install GUI apps via Homebrew
             # `brew install --cask`
             "aerospace"           
