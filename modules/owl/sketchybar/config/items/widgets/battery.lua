@@ -23,13 +23,13 @@ local remaining_time = sbar.add("item", {
   position = "popup." .. battery.name,
   icon = {
     string = "Time remaining:",
-    width = settings.dimens.battery.popup_width,
+    width = settings.dimens.spacing.battery_popup_width,
     align = "left",
     color = battery_colors.high,
   },
   label = {
     string = "??:??h",
-    width = settings.dimens.battery.popup_width,
+    width = settings.dimens.spacing.battery_popup_width,
     align = "right",
     color = battery_colors.high,
   },

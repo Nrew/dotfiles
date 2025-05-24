@@ -26,8 +26,8 @@ for i = 1, max_items, 1 do
       font = {
         style = i == 1 and settings.fonts.styles.heavy or settings.fonts.styles.semibold
       },
-      padding_left = 6,
-      padding_right = 6,
+      padding_left = settings.dimens.padding.menu_label,
+      padding_right = settings.dimens.padding.menu_label,
       color = colors.sections.item.text,
     },
     click_script = "$CONFIG_DIR/helpers/menus/bin/menus -s " .. i,

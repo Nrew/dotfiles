@@ -2,16 +2,35 @@ local icons = require("icons")
 
 local M = {}
 
--- Core constants - simplified and working values
+-- ALL constants defined here - no magic numbers anywhere
 local FONT_FAMILY = "JetBrains Mono Nerd Font"
 local BASE_PADDING = 8
+local SMALL_PADDING = 1
 local GROUP_SPACING = 5
+local MENU_LABEL_PADDING = 6
+local FINAL_SPACING = 7
+local MEDIA_SMALL_PADDING = 3
+local SPACE_MICRO_PADDING = 4
+local INDICATOR_PADDING = 9
+local BRACKET_HEIGHT = 30
+local POPUP_WIDTH = 200
+local VOLUME_LABEL_WIDTH = 25
+local WIFI_PADDING_RIGHT = 25
+local WIFI_PADDING_MAIN = 6
+local MEDIA_COVER_PADDING = 60
+local CALENDAR_WIDTH = 49
+local BATTERY_POPUP_WIDTH = 100
 
 M.dimens = {
   padding = {
     base = BASE_PADDING,
-    small = 1,
+    small = SMALL_PADDING,
     group = GROUP_SPACING,
+    menu_label = MENU_LABEL_PADDING,
+    final = FINAL_SPACING,
+    media_small = MEDIA_SMALL_PADDING,
+    space_micro = SPACE_MICRO_PADDING,
+    indicator = INDICATOR_PADDING,
   },
   graphics = {
     bar = {
@@ -25,11 +44,11 @@ M.dimens = {
       corner_radius = 9,
     },
     bracket = {
-      height = 30,
+      height = BRACKET_HEIGHT,
     },
     slider = { height = 20 },
     popup = {
-      width = 200,
+      width = POPUP_WIDTH,
       large_width = 300,
     },
     border = { width = 1 },
@@ -42,6 +61,18 @@ M.dimens = {
     battery_icon = 19.0,
     volume_icon = 14.0,
     wifi_label = 10.0,
+    media_artist = 9,
+    media_title = 10,
+    calendar_icon = 12.0,
+  },
+  spacing = {
+    calendar_width = CALENDAR_WIDTH,
+    media_cover_padding = MEDIA_COVER_PADDING,
+    wifi_padding_right = WIFI_PADDING_RIGHT,
+    wifi_padding_main = WIFI_PADDING_MAIN,
+    volume_label_width = VOLUME_LABEL_WIDTH,
+    battery_popup_width = BATTERY_POPUP_WIDTH,
+    fallback_padding = 12,
   },
   effects = { blur_radius = 35 },
   animation = {
@@ -51,7 +82,6 @@ M.dimens = {
     delay = 5,
   },
   media = {
-    cover_padding = 60,
     artist_offset = -8,
     title_offset = 6,
     artist_chars = 25,
@@ -60,19 +90,9 @@ M.dimens = {
     artist_alpha = 0.6,
   },
   spaces = {
-    indicator_padding = 9,
     label_offset = -1,
     animation_offset = -4,
     shadow_distance = 4,
-    fallback_padding = 12,
-  },
-  wifi = {
-    padding_right = 25,
-    padding_main = 6,
-    popup_split = 2,
-  },
-  battery = {
-    popup_width = 100,
   },
   volume = {
     padding_negative = -1,
@@ -80,11 +100,6 @@ M.dimens = {
     slider_radius = 3,
     background_height = 2,
     background_offset = -20,
-    label_width = 25,
-  },
-  calendar = {
-    width = 49,
-    icon_size = 12.0,
   },
 }
 

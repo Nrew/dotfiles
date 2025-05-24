@@ -8,7 +8,7 @@ local whitelist = {
 
 local media_cover = sbar.add("item", {
   position = "right",
-  padding_right = settings.dimens.media.cover_padding,
+  padding_right = settings.dimens.spacing.media_cover_padding,
   background = {
     image = {
       string = "media.artwork",
@@ -29,13 +29,13 @@ local media_cover = sbar.add("item", {
 local media_artist = sbar.add("item", {
   position = "right",
   drawing = false,
-  padding_left = 3,
+  padding_left = settings.dimens.padding.media_small,
   padding_right = 0,
   width = 0,
   icon = { drawing = false },
   label = {
     width = 0,
-    font = { size = 9 },
+    font = { size = settings.dimens.text.media_artist },
     color = colors.with_alpha(colors.sections.media.label, settings.dimens.media.artist_alpha),
     max_chars = settings.dimens.media.artist_chars,
     y_offset = settings.dimens.media.artist_offset,
@@ -45,11 +45,11 @@ local media_artist = sbar.add("item", {
 local media_title = sbar.add("item", {
   position = "right",
   drawing = false,
-  padding_left = 3,
+  padding_left = settings.dimens.padding.media_small,
   padding_right = 0,
   icon = { drawing = false },
   label = {
-    font = { size = 10 },
+    font = { size = settings.dimens.text.media_title },
     color = colors.sections.media.label,
     width = 0,
     max_chars = settings.dimens.media.title_chars,

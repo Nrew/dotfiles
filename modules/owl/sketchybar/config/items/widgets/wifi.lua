@@ -8,7 +8,7 @@ local popup_width = settings.dimens.graphics.popup.width
 local wifi_up = sbar.add("item", "widgets.wifi1", {
   position = "right",
   padding_left = 0,
-  padding_right = settings.dimens.wifi.padding_right,
+  padding_right = settings.dimens.spacing.wifi_padding_right,
   width = 0,
   label = {
     font = {
@@ -36,7 +36,7 @@ end)
 
 local wifi = sbar.add("item", "widgets.wifi.padding", {
   position = "right",
-  padding_right = settings.dimens.wifi.padding_main,
+  padding_right = settings.dimens.spacing.wifi_padding_main,
   label = { drawing = false },
 })
 

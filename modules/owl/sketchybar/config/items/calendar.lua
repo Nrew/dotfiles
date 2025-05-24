@@ -9,13 +9,13 @@ local cal = sbar.add("item", {
     padding_left = settings.dimens.padding.base,
     font = {
       style = settings.fonts.styles.black,
-      size = settings.dimens.calendar.icon_size,
+      size = settings.dimens.text.calendar_icon,
     },
   },
   label = {
     color = colors.sections.calendar.label,
     padding_right = settings.dimens.padding.base,
-    width = settings.dimens.calendar.width,
+    width = settings.dimens.spacing.calendar_width,
     align = "right",
     font = { family = settings.fonts.family },
   },

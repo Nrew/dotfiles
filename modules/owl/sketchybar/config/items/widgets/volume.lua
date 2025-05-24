@@ -29,7 +29,7 @@ local volume_icon = sbar.add("item", "widgets.volume2", {
     },
   },
   label = {
-    width = settings.dimens.volume.label_width,
+    width = settings.dimens.spacing.volume_label_width,
     align = "left",
     font = {
       style = settings.fonts.styles.regular,

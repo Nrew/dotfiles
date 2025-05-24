@@ -14,7 +14,7 @@ local function add_windows(space, space_name)
       space:set {
         label = {
           string = icon_line == "" and "—" or icon_line,
-          padding_right = icon_line == "" and settings.dimens.padding.base or settings.dimens.spaces.fallback_padding,
+          padding_right = icon_line == "" and settings.dimens.padding.base or settings.dimens.spacing.fallback_padding,
         },
       }
     end)
@@ -31,14 +31,14 @@ sbar.exec("aerospace list-workspaces --all", function(spaces)
         padding_left = settings.dimens.padding.base,
       },
       label = {
-        font = settings.fonts.icons(14.0),
+        font = settings.fonts.icons(settings.dimens.text.icon),
         string = "",
         color = colors.label.color,
         highlight_color = colors.label.highlight,
         y_offset = settings.dimens.spaces.label_offset,
       },
       click_script = "aerospace workspace " .. space_name,
-      padding_left = space_name == "1" and 0 or 4,
+      padding_left = space_name == "1" and 0 or settings.dimens.padding.space_micro,
     })
 
     add_windows(space, space_name)
@@ -61,8 +61,8 @@ sbar.exec("aerospace list-workspaces --all", function(spaces)
           space:set {
             background = { shadow = { distance = settings.dimens.spaces.shadow_distance } },
             y_offset = 0,
-            padding_left = 4,
-            padding_right = 4,
+            padding_left = settings.dimens.padding.space_micro,
+            padding_right = settings.dimens.padding.space_micro,
           }
         end)
       end
@@ -83,8 +83,8 @@ sbar.exec("aerospace list-workspaces --all", function(spaces)
         space:set {
           background = { shadow = { distance = settings.dimens.spaces.shadow_distance } },
           y_offset = 0,
-          padding_left = 4,
-          padding_right = 4,
+          padding_left = settings.dimens.padding.space_micro,
+          padding_right = settings.dimens.padding.space_micro,
         }
       end)
     end)
@@ -94,7 +94,7 @@ end)
 local spaces_indicator = sbar.add("item", {
   icon = {
     padding_left = settings.dimens.padding.base,
-    padding_right = settings.dimens.spaces.indicator_padding,
+    padding_right = settings.dimens.padding.indicator,
     string = settings.icons.switch.on,
     color = colors.indicator,
   },
@@ -119,12 +119,12 @@ spaces_indicator:subscribe("mouse.clicked", function()
       background = { shadow = { distance = 0 } },
       y_offset = settings.dimens.spaces.animation_offset,
       padding_left = settings.dimens.padding.base,
-      padding_right = 4,
+      padding_right = settings.dimens.padding.space_micro,
     }
     spaces_indicator:set {
       background = { shadow = { distance = settings.dimens.spaces.shadow_distance } },
       y_offset = 0,
-      padding_left = 4,
+      padding_left = settings.dimens.padding.space_micro,
       padding_right = settings.dimens.padding.base,
     }
   end)
