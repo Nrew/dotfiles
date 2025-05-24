@@ -6,7 +6,7 @@
 extern int SLSMainConnectionID(void);
 extern void SLSSetMenuBarVisibilityOverrideOnDisplay(int cid, int did, bool enabled);
 extern void SLSSetMenuBarInsetAndAlpha(int cid, double u1, double u2, float alpha);
-extern void _SLPSGetFrontProcess(ProcessSerialNumber *psn);
+extern OSErr _SLPSGetFrontProcess(ProcessSerialNumber *psn);
 extern void SLSGetConnectionIDForPSN(int cid, ProcessSerialNumber *psn, int *cid_out);
 extern void SLSConnectionGetPID(int cid, pid_t *pid_out);
 
@@ -19,17 +19,16 @@ typedef void (^ClickCompletionHandler)(void);
 /**
  * Safely release CoreFoundation objects
  * @param ref The reference to release
- * @return void
  */
 static void safe_release(CFTypeRef ref) {
-  if (ref) CFRelease(ref);
+    if (ref) CFRelease(ref);
 }
 
 /**
  * Get the value of the given attribute
  * @param element The element to get the attribute from
  * @param attribute The attribute to get
- * @param value The value of the attribute
+ * @param value The value of the attribute (output parameter)
  * @return AXError code
  */
 static AXError ax_get_attribute(AXUIElementRef element, CFStringRef attribute, CFTypeRef *value) {
@@ -43,7 +42,7 @@ static AXError ax_get_attribute(AXUIElementRef element, CFStringRef attribute, C
 /**
  * Get the children of the menubar
  * @param app The application to get the menubar children from
- * @param children The children of the menubar
+ * @param children The children of the menubar (output parameter)
  * @return AXError code
  */
 static AXError ax_get_menubar_children(AXUIElementRef app, CFArrayRef *children) {
@@ -56,12 +55,12 @@ static AXError ax_get_menubar_children(AXUIElementRef app, CFArrayRef *children)
     AXError error = ax_get_attribute(app, kAXMenuBarAttribute, &menubar);
     
     if (error != kAXErrorSuccess || !menubar) {
-        if (menubar) CFRelease(menubar);
+        safe_release(menubar);
         return error != kAXErrorSuccess ? error : kAXErrorNoValue;
     }
     
     error = ax_get_attribute(menubar, kAXVisibleChildrenAttribute, (CFTypeRef*)children);
-    CFRelease(menubar);
+    safe_release(menubar);
     
     return error;
 }
@@ -69,7 +68,7 @@ static AXError ax_get_menubar_children(AXUIElementRef app, CFArrayRef *children)
 /**
  * Get the title of the given element
  * @param element The element to get the title of
- * @return CFStringRef of the title, or NULL on failure
+ * @return CFStringRef of the title, or NULL on failure. Caller must release.
  */
 static CFStringRef ax_get_title(AXUIElementRef element) {
     if (!element) return NULL;
@@ -85,8 +84,7 @@ static CFStringRef ax_get_title(AXUIElementRef element) {
  * Uses a dispatch queue to simulate a click with a delay
  *
  * @param element The element to click
- * @param completion The completion handler
- * @return void
+ * @param completion The completion handler (can be NULL)
  */
 static void ax_perform_click(AXUIElementRef element, ClickCompletionHandler completion) {
     if (!element) {
@@ -94,6 +92,7 @@ static void ax_perform_click(AXUIElementRef element, ClickCompletionHandler comp
         return;
     }
     
+    // Cancel any existing action first
     AXUIElementPerformAction(element, kAXCancelAction);
     
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -109,170 +108,16 @@ static void ax_perform_click(AXUIElementRef element, ClickCompletionHandler comp
     });
 }
 
-/*********************************
- * Core Implementation
- *********************************/
-
-MenuError ax_init(void) {
-    // First check if we already have permissions
-    if (AXIsProcessTrusted()) {
-        return MENU_SUCCESS;
-    }
-    
-    // Create options dictionary for permission prompt
-    const void *keys[] = { kAXTrustedCheckOptionPrompt };
-    const void *values[] = { kCFBooleanTrue };
-
-    CFDictionaryRef options = CFDictionaryCreate(
-        kCFAllocatorDefault,
-        keys,
-        values,
-        sizeof(keys) / sizeof(*keys),
-        &kCFCopyStringDictionaryKeyCallBacks,
-        &kCFTypeDictionaryValueCallBacks
-    );
-
-    if (!options) {
-        fprintf(stderr, "Error: Failed to create accessibility options dictionary\n");
-        return MENU_ERROR_MEMORY;
-    }
-
-    bool trusted = AXIsProcessTrustedWithOptions(options);
-    CFRelease(options);                       // Release the dictionary
-
-    return trusted ? MENU_SUCCESS : MENU_ERROR_ACCESSIBILITY;
-    }
-
-AXUIElementRef ax_get_front_app(void) {
-    ProcessSerialNumber psn;
-    
-    // Get the front process with error checking
-    OSErr err = _SLPSGetFrontProcess(&psn);
-    if (err != noErr) {
-        fprintf(stderr, "Error: Failed to get front process (error %d)\n", err);
-        return NULL;
-    }
-
-    int target_cid = 0;
-    SLSGetConnectionIDForPSN(SLSMainConnectionID(), &psn, &target_cid);
-    
-    if (target_cid == 0) {
-        fprintf(stderr, "Error: Failed to get connection ID for front process\n");
-        return NULL;
-    }
-
-    pid_t pid = 0;
-    SLSConnectionGetPID(target_cid, &pid);
-    
-    if (pid == 0) {
-        fprintf(stderr, "Error: Failed to get PID for front process\n");
-        return NULL;
-    }
-
-    AXUIElementRef app = AXUIElementCreateApplication(pid);
-    if (!app) {
-        fprintf(stderr, "Error: Failed to create accessibility element for PID %d\n", pid);
-    }
-    
-    return app;
-}
-
-/*********************************
- * Menu Bar Operations
- *********************************/
-
-MenuError ax_print_menu_options(AXUIElementRef app) {
-    if (!app) return MENU_ERROR_INVALID_PARAM;
-    
-
-    CFArrayRef children = NULL;
-    AXError error = ax_get_menubar_children(app, &children);
-    
-    if (error != kAXErrorSuccess) {
-        if (error == kAXErrorNoValue) {
-            fprintf(stderr, "Error: No menu bar found for application\n");
-        } else {
-            fprintf(stderr, "Error: Failed to get menu bar children (error %d)\n", error);
-        }
-        return MENU_ERROR_ACCESSIBILITY;
-    }
-    
-    if (!children) {
-        fprintf(stderr, "Error: Menu bar children array is NULL\n");
-        return MENU_ERROR_ACCESSIBILITY;
-    }
-
-    CFIndex count = CFArrayGetCount(children);
-    
-    // Start from index 1 to skip the app menu (index 0)
-    for (CFIndex i = 1; i < count; i++) {
-        AXUIElementRef item = (AXUIElementRef)CFArrayGetValueAtIndex(children, i);
-        if (!item) continue;
-        
-        CFStringRef title = ax_get_title(item);
-        if (title) {
-            CFIndex length = CFStringGetLength(title);
-            if (length > 0) {
-                // Calculate buffer size
-                CFIndex maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8) + 1;
-                char* buffer = (char*)malloc(maxSize);
-                
-                if (buffer) {
-                    if (CFStringGetCString(title, buffer, maxSize, kCFStringEncodingUTF8)) {
-                        printf("%s\n", buffer);
-                    }
-                    free(buffer);
-                }
-            }
-            CFRelease(title);
-        }
-    }
-    
-    CFRelease(children);
-    return MENU_SUCCESS;
-}
-
-MenuError ax_select_menu_option(AXUIElementRef app, int id) {
-    if (!app || id < 0) return MENU_ERROR_INVALID_PARAM;
-
-    CFArrayRef children = NULL;
-    AXError error = ax_get_menubar_children(app, &children);
-    if (error != kAXErrorSuccess) return MENU_ERROR_ACCESSIBILITY;
-    
-    if (!children) {
-        return MENU_ERROR_ACCESSIBILITY;
-    }
-
-    CFIndex count = CFArrayGetCount(children);
-    MenuError result = MENU_SUCCESS;
-
-    if (id < count) {
-        AXUIElementRef item = (AXUIElementRef)CFArrayGetValueAtIndex(children, id);
-        if (!item) {
-            result = MENU_ERROR_NOT_FOUND;
-        } else {
-            dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-            
-            ax_perform_click(item, ^{
-                dispatch_semaphore_signal(semaphore);
-            });
-            
-        // Wait for click to complete with timeout
-        if (dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)) != 0) {
-                result = MENU_ERROR_ACCESSIBILITY;
-            }
-            dispatch_release(semaphore);
-        }
-    else {
-        result = MENU_ERROR_NOT_FOUND;
-    }
-
-    CFRelease(children);
-    return result;
-}
-
+/**
+ * Find a menu extra item by alias
+ * @param alias The alias string to search for (format: "OwnerName,WindowName")
+ * @return AXUIElementRef of the menu extra item, or NULL if not found. Caller must release.
+ */
 static AXUIElementRef ax_get_extra_menu_item(const char* alias) {
-    if (!alias || strlen(alias) == 0) return NULL;
+    if (!alias || strlen(alias) == 0) {
+        fprintf(stderr, "Error: Menu extra alias cannot be NULL or empty\n");
+        return NULL;
+    }
 
     pid_t target_pid = 0;
     CGRect target_bounds = CGRectNull;
@@ -282,7 +127,10 @@ static AXUIElementRef ax_get_extra_menu_item(const char* alias) {
         kCGNullWindowID
     );
 
-    if (!window_list) return NULL;
+    if (!window_list) {
+        fprintf(stderr, "Error: Failed to get window list\n");
+        return NULL;
+    }
 
     char owner_buffer[MAX_BUFFER_SIZE] = {0};
     char name_buffer[MAX_BUFFER_SIZE] = {0};
@@ -322,13 +170,13 @@ static AXUIElementRef ax_get_extra_menu_item(const char* alias) {
             continue;
         }
 
-        // Get strings
+        // Get strings with buffer overflow protection
         if (!CFStringGetCString(owner_ref, owner_buffer, sizeof(owner_buffer), kCFStringEncodingUTF8) ||
             !CFStringGetCString(name_ref, name_buffer, sizeof(name_buffer), kCFStringEncodingUTF8)) {
             continue;
         }
 
-        // Create combined string
+        // Create combined string with overflow protection
         int written = snprintf(combined_buffer, sizeof(combined_buffer), "%s,%s", owner_buffer, name_buffer);
         if (written >= sizeof(combined_buffer)) {
             continue; // Buffer overflow protection
@@ -345,8 +193,7 @@ static AXUIElementRef ax_get_extra_menu_item(const char* alias) {
     CFRelease(window_list);
     
     if (!target_pid) {
-        fprintf(stderr, "Error: Menu extra with alias '%s' not found\n", alias);
-        return NULL;
+        return NULL; // Not found, but not an error - caller will handle
     }
 
     // Create app element and find the matching menu extra
@@ -364,14 +211,12 @@ static AXUIElementRef ax_get_extra_menu_item(const char* alias) {
         // Get extras menu bar
         AXError error = ax_get_attribute(app, kAXExtrasMenuBarAttribute, &extras);
         if (error != kAXErrorSuccess || !extras) {
-            fprintf(stderr, "Error: Failed to get extras menu bar (error %d)\n", error);
             break;
         }
 
         // Get visible children
         error = ax_get_attribute(extras, kAXVisibleChildrenAttribute, (CFTypeRef*)&children);
         if (error != kAXErrorSuccess || !children) {
-            fprintf(stderr, "Error: Failed to get extras children (error %d)\n", error);
             break;
         }
 
@@ -415,6 +260,170 @@ static AXUIElementRef ax_get_extra_menu_item(const char* alias) {
     return result;
 }
 
+/*********************************
+ * Core Implementation
+ *********************************/
+
+MenuError ax_init(void) {
+    // First check if we already have permissions
+    if (AXIsProcessTrusted()) {
+        return MENU_SUCCESS;
+    }
+    
+    // Create options dictionary for permission prompt
+    const void *keys[] = { kAXTrustedCheckOptionPrompt };
+    const void *values[] = { kCFBooleanTrue };
+
+    CFDictionaryRef options = CFDictionaryCreate(
+        kCFAllocatorDefault,
+        keys,
+        values,
+        sizeof(keys) / sizeof(*keys),
+        &kCFCopyStringDictionaryKeyCallBacks,
+        &kCFTypeDictionaryValueCallBacks
+    );
+
+    if (!options) {
+        fprintf(stderr, "Error: Failed to create accessibility options dictionary\n");
+        return MENU_ERROR_MEMORY;
+    }
+
+    bool trusted = AXIsProcessTrustedWithOptions(options);
+    CFRelease(options);
+
+    return trusted ? MENU_SUCCESS : MENU_ERROR_ACCESSIBILITY;
+}
+
+AXUIElementRef ax_get_front_app(void) {
+    ProcessSerialNumber psn;
+    
+    // Get the front process with error checking
+    OSErr err = _SLPSGetFrontProcess(&psn);
+    if (err != noErr) {
+        fprintf(stderr, "Error: Failed to get front process (error %d)\n", err);
+        return NULL;
+    }
+
+    int target_cid = 0;
+    SLSGetConnectionIDForPSN(SLSMainConnectionID(), &psn, &target_cid);
+    
+    if (target_cid == 0) {
+        fprintf(stderr, "Error: Failed to get connection ID for front process\n");
+        return NULL;
+    }
+
+    pid_t pid = 0;
+    SLSConnectionGetPID(target_cid, &pid);
+    
+    if (pid == 0) {
+        fprintf(stderr, "Error: Failed to get PID for front process\n");
+        return NULL;
+    }
+
+    AXUIElementRef app = AXUIElementCreateApplication(pid);
+    if (!app) {
+        fprintf(stderr, "Error: Failed to create accessibility element for PID %d\n", pid);
+    }
+    
+    return app;
+}
+
+/*********************************
+ * Menu Bar Operations
+ *********************************/
+
+MenuError ax_print_menu_options(AXUIElementRef app) {
+    if (!app) return MENU_ERROR_INVALID_PARAM;
+
+    CFArrayRef children = NULL;
+    AXError error = ax_get_menubar_children(app, &children);
+    
+    if (error != kAXErrorSuccess) {
+        if (error == kAXErrorNoValue) {
+            fprintf(stderr, "Error: No menu bar found for application\n");
+        } else {
+            fprintf(stderr, "Error: Failed to get menu bar children (error %d)\n", error);
+        }
+        return MENU_ERROR_ACCESSIBILITY;
+    }
+    
+    if (!children) {
+        fprintf(stderr, "Error: Menu bar children array is NULL\n");
+        return MENU_ERROR_ACCESSIBILITY;
+    }
+
+    CFIndex count = CFArrayGetCount(children);
+    
+    // Start from index 1 to skip the app menu (index 0)
+    for (CFIndex i = 1; i < count; i++) {
+        AXUIElementRef item = (AXUIElementRef)CFArrayGetValueAtIndex(children, i);
+        if (!item) continue;
+        
+        CFStringRef title = ax_get_title(item);
+        if (title) {
+            CFIndex length = CFStringGetLength(title);
+            if (length > 0) {
+                // Calculate buffer size safely
+                CFIndex maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8) + 1;
+                char* buffer = (char*)malloc(maxSize);
+                
+                if (buffer) {
+                    if (CFStringGetCString(title, buffer, maxSize, kCFStringEncodingUTF8)) {
+                        printf("%s\n", buffer);
+                    }
+                    free(buffer);
+                } else {
+                    fprintf(stderr, "Error: Failed to allocate memory for menu title\n");
+                }
+            }
+            CFRelease(title);
+        }
+    }
+    
+    CFRelease(children);
+    return MENU_SUCCESS;
+}
+
+MenuError ax_select_menu_option(AXUIElementRef app, int id) {
+    if (!app || id < 0) return MENU_ERROR_INVALID_PARAM;
+
+    CFArrayRef children = NULL;
+    AXError error = ax_get_menubar_children(app, &children);
+    if (error != kAXErrorSuccess) return MENU_ERROR_ACCESSIBILITY;
+    
+    if (!children) {
+        return MENU_ERROR_ACCESSIBILITY;
+    }
+
+    CFIndex count = CFArrayGetCount(children);
+    MenuError result = MENU_SUCCESS;
+
+    if (id < count) {
+        AXUIElementRef item = (AXUIElementRef)CFArrayGetValueAtIndex(children, id);
+        if (!item) {
+            result = MENU_ERROR_NOT_FOUND;
+        } else {
+            dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+            
+            ax_perform_click(item, ^{
+                dispatch_semaphore_signal(semaphore);
+            });
+            
+            // Wait for click to complete with timeout
+            dispatch_time_t timeout = dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC);
+            if (dispatch_semaphore_wait(semaphore, timeout) != 0) {
+                result = MENU_ERROR_TIMEOUT;
+            }
+            dispatch_release(semaphore);
+        }
+    } else {
+        result = MENU_ERROR_NOT_FOUND;
+    }
+
+    CFRelease(children);
+    return result;
+}
+
 MenuError ax_select_menu_extra(const char* alias) {
     if (!alias) return MENU_ERROR_INVALID_PARAM;
 
@@ -435,8 +444,9 @@ MenuError ax_select_menu_extra(const char* alias) {
         dispatch_semaphore_signal(semaphore);
     });
 
-    if (dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)) != 0) {
-        result = MENU_ERROR_ACCESSIBILITY;
+    dispatch_time_t timeout = dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC);
+    if (dispatch_semaphore_wait(semaphore, timeout) != 0) {
+        result = MENU_ERROR_TIMEOUT;
     }
     dispatch_release(semaphore);
 
@@ -462,6 +472,8 @@ const char* menu_error_to_string(MenuError error) {
             return "Memory allocation failed";
         case MENU_ERROR_ACCESSIBILITY: 
             return "Accessibility API error - check permissions and try again";
+        case MENU_ERROR_TIMEOUT:
+            return "Operation timed out";
         default: 
             return "Unknown error";
     }
@@ -473,10 +485,13 @@ const char* menu_error_to_string(MenuError error) {
 int main(int argc, char **argv) {
     if (argc == 1) {
         printf("Usage: %s [-l | -s id/alias ]\n", argv[0]);
+        printf("  -l              List menu options for the front application\n");
+        printf("  -s id           Select menu option by numeric index\n");
+        printf("  -s alias        Select menu extra by alias (format: 'OwnerName,WindowName')\n");
         return 0;
     }
 
-  MenuError error = ax_init(); // Will exit if not trusted
+    MenuError error = ax_init();
     if (error != MENU_SUCCESS) {
         fprintf(stderr, "Initialization failed: %s\n", menu_error_to_string(error));
         return 1;
@@ -484,7 +499,6 @@ int main(int argc, char **argv) {
 
     if (strcmp(argv[1], "-l") == 0) {
         AXUIElementRef app = ax_get_front_app();
-
         if (!app) {
             fprintf(stderr, "Error: Failed to get front application\n");
             return 1;
@@ -506,7 +520,6 @@ int main(int argc, char **argv) {
         if (errno == 0 && *endptr == '\0' && id >= 0 && id <= INT_MAX) {
             // Numeric ID provided - select menu option
             AXUIElementRef app = ax_get_front_app();
-
             if (!app) {
                 fprintf(stderr, "Error: Could not get front application\n");
                 return 1;
@@ -531,6 +544,9 @@ int main(int argc, char **argv) {
     }
     else {
         printf("Usage: %s [-l | -s id/alias ]\n", argv[0]);
+        printf("  -l              List menu options for the front application\n");
+        printf("  -s id           Select menu option by numeric index\n");
+        printf("  -s alias        Select menu extra by alias (format: 'OwnerName,WindowName')\n");
         return 1;
     }
     

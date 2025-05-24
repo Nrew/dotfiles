@@ -1,14 +1,15 @@
 local colors = require("colors")
 local settings = require("settings")
 
-sbar.exec("killall network_load >/dev/null; $CONFIG_DIR/helpers/event_providers/network_load/bin/network_load en0 network_update 2.0")
+sbar.exec("killall network_load >/dev/null; $CONFIG_DIR/bridge/network_load/bin/network_load en0 network_update 2.0")
 
 local popup_width = settings.dimens.graphics.popup.width
 
-local wifi_up = sbar.add("item", "widgets.wifi1", {
+-- SSID label (positioned first, rightmost)
+local wifi_up = sbar.add("item", "widgets.wifi.ssid", {
   position = "right",
   padding_left = 0,
-  padding_right = settings.dimens.spacing.wifi_padding_right,
+  padding_right = settings.dimens.padding.small,
   width = 0,
   label = {
     font = {
@@ -34,12 +35,20 @@ wifi_up:subscribe({"wifi_change", "system_woke"}, function(env)
   end)
 end)
 
-local wifi = sbar.add("item", "widgets.wifi.padding", {
+-- WiFi icon (positioned second, to the left of SSID)
+local wifi = sbar.add("item", "widgets.wifi", {
   position = "right",
-  padding_right = settings.dimens.spacing.wifi_padding_main,
+  padding_right = settings.dimens.padding.small,
+  padding_left = settings.dimens.padding.small,
   label = { drawing = false },
+  icon = {
+    font = { size = settings.dimens.text.icon },
+    string = settings.icons.wifi.disconnected,
+    color = colors.legacy.red,
+  },
 })
 
+-- Bracket around both wifi items
 local wifi_bracket = sbar.add("bracket", "widgets.wifi.bracket", {
   wifi.name,
   wifi_up.name,
@@ -48,6 +57,7 @@ local wifi_bracket = sbar.add("bracket", "widgets.wifi.bracket", {
   popup = { align = "left", height = settings.dimens.graphics.bracket.height }
 })
 
+-- Popup items for detailed network info
 local hostname = sbar.add("item", {
   position = "popup." .. wifi_bracket.name,
   icon = {
@@ -113,8 +123,13 @@ local router = sbar.add("item", {
   },
 })
 
-sbar.add("item", { position = "right", width = settings.dimens.padding.group })
+-- Add spacing after wifi (before battery)
+sbar.add("item", "widgets.wifi.spacing", { 
+  position = "right", 
+  width = settings.dimens.padding.group 
+})
 
+-- Update wifi status
 wifi:subscribe({"wifi_change", "system_woke"}, function(env)
   sbar.exec("ipconfig getifaddr en0", function(ip)
     local connected = not (ip == "")
@@ -127,6 +142,7 @@ wifi:subscribe({"wifi_change", "system_woke"}, function(env)
   end)
 end)
 
+-- Popup handling functions
 local function hide_details()
   wifi_bracket:set({ popup = { drawing = false } })
 end
@@ -152,10 +168,12 @@ local function toggle_details()
   end
 end
 
+-- Click handlers
 wifi_up:subscribe("mouse.clicked", toggle_details)
 wifi:subscribe("mouse.clicked", toggle_details)
 wifi:subscribe("mouse.exited.global", hide_details)
 
+-- Clipboard copy functionality
 local function copy_label_to_clipboard(env)
   local label = sbar.query(env.NAME).label.value
   sbar.exec("echo \"" .. label .. "\" | pbcopy")

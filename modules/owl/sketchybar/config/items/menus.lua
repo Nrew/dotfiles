@@ -30,7 +30,7 @@ for i = 1, max_items, 1 do
       padding_right = settings.dimens.padding.menu_label,
       color = colors.sections.item.text,
     },
-    click_script = "$CONFIG_DIR/helpers/menus/bin/menus -s " .. i,
+    click_script = "$CONFIG_DIR/bridge/menus/bin/menus -s " .. i,
   })
 
   menu_items[i] = menu
@@ -46,12 +46,12 @@ local menu_padding = sbar.add("item", "menu.padding", {
 })
 
 local function update_menus(env)
-  sbar.exec("$CONFIG_DIR/helpers/menus/bin/menus -l", function(menus)
+  sbar.exec("$CONFIG_DIR/bridge/menus/bin/menus -l", function(menus)
     sbar.set('/menu\\..*/', { drawing = false })
     menu_padding:set({ drawing = true })
     local id = 1
     for menu in string.gmatch(menus, '[^\r\n]+') do
-      if id < max_items then
+      if id <= max_items then
         menu_items[id]:set({ label = menu, drawing = true })
       else 
         break 
@@ -66,11 +66,14 @@ menu_watcher:subscribe("front_app_switched", update_menus)
 space_menu_swap:subscribe("swap_menus_and_spaces", function(env)
   local drawing = menu_items[1]:query().geometry.drawing == "on"
   if drawing then
+    -- Hide menus, show spaces
     menu_watcher:set({ updates = false })
     sbar.set("/menu\\..*/", { drawing = false })
+    menu_padding:set({ drawing = false })
     sbar.set("/space\\..*/", { drawing = true })
     sbar.set("front_app", { drawing = true })
   else
+    -- Show menus, hide spaces
     menu_watcher:set({ updates = true })
     sbar.set("/space\\..*/", { drawing = false })
     sbar.set("front_app", { drawing = false })

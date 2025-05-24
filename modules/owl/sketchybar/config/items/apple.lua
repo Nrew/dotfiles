@@ -18,8 +18,18 @@ local apple = sbar.add("item", {
   },
   padding_left = settings.dimens.padding.small,
   padding_right = settings.dimens.padding.small,
-  click_script = "$CONFIG_DIR/helpers/menus/bin/menus -s 0"
 })
+
+-- Subscribe to mouse clicks to trigger the menu swap
+apple:subscribe("mouse.clicked", function(env)
+  -- First trigger the menu/spaces swap to show menus
+  sbar.trigger("swap_menus_and_spaces")
+  
+  -- Small delay to ensure menus are visible before clicking
+  sbar.delay(0.1, function()
+    sbar.exec("$CONFIG_DIR/bridge/menus/bin/menus -s 0")
+  end)
+end)
 
 sbar.add("bracket", { apple.name }, {
   background = {

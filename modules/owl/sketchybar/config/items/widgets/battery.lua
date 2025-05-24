@@ -5,6 +5,8 @@ local battery_colors = colors.sections.widgets.battery
 
 local battery = sbar.add("item", "widgets.battery", {
   position = "right",
+  padding_left = settings.dimens.padding.small,
+  padding_right = settings.dimens.padding.small,
   icon = {
     font = {
       style = settings.fonts.styles.regular,
@@ -19,7 +21,7 @@ local battery = sbar.add("item", "widgets.battery", {
   popup = { align = "center" }
 })
 
-local remaining_time = sbar.add("item", {
+local remaining_time = sbar.add("item", "widgets.battery.time", {
   position = "popup." .. battery.name,
   icon = {
     string = "Time remaining:",
@@ -95,10 +97,12 @@ battery:subscribe("mouse.clicked", function(env)
   end
 end)
 
+-- Bracket around battery
 sbar.add("bracket", "widgets.battery.bracket", { battery.name }, {
   background = { color = colors.legacy.bg1 }
 })
 
+-- Final spacing (rightmost)
 sbar.add("item", "widgets.battery.padding", {
   position = "right",
   width = settings.dimens.padding.group

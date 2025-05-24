@@ -22,7 +22,8 @@ typedef enum {
     MENU_ERROR_NOT_FOUND,
     MENU_ERROR_INVALID_PARAM,
     MENU_ERROR_MEMORY,
-    MENU_ERROR_ACCESSIBILITY
+    MENU_ERROR_ACCESSIBILITY,
+    MENU_ERROR_TIMEOUT
 } MenuError;
 
 /*********************************
@@ -62,7 +63,7 @@ MenuError ax_select_menu_option(AXUIElementRef app, int id);
 
 /**
  * Select a menu extra by its alias
- * @param alias The alias of the menu extra
+ * @param alias The alias of the menu extra (must not be NULL)
  * @return MENU_SUCCESS if successful, error code otherwise
  */
 MenuError ax_select_menu_extra(const char* alias);
@@ -77,24 +78,5 @@ MenuError ax_select_menu_extra(const char* alias);
  * @return String description of the error
  */
 const char* menu_error_to_string(MenuError error);
-
-/*********************************
- * Private Helper Functions
- *********************************/
-/**
- * Perform a click action on the given element
- * @param element The element to click
- * @param completion The completion block to call after the click
- * @return void
- */
-static AXError ax_get_attribute(AXUIElementRef element, CFStringRef attribute, CFTypeRef *value);
-
-/**
- * Perform a click action on the given element
- * @param element The element to click
- * @param completion The completion block to call after the click
- * @return void
- */
-static AXError ax_get_menubar_children(AXUIElementRef app, CFArrayRef *children);
 
 #endif /* MENUS_H */
