@@ -134,7 +134,7 @@ M.timing = {
   battery_update = 180,
 }
 
-M.icons = icons.text.nerdfont
+M.icons = icons.text.sf_symbols
 M.apps = icons.apps
 
 -- Ensure switch icons are available for spaces indicator
