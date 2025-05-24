@@ -61,18 +61,18 @@ M.dimens = {
     bracket = {
       height = BRACKET_HEIGHT,
     },
-    slider = { 
-      height = 20 
+    slider = {
+      height = 20
     },
     popup = {
       width = POPUP_WIDTH,
       large_width = LARGE_POPUP_WIDTH,
     },
-    border = { 
-      width = 1 
+    border = {
+      width = 1
     },
-    knob = { 
-      size = 32 
+    knob = {
+      size = 32
     },
   },
   text = {
@@ -95,8 +95,8 @@ M.dimens = {
     battery_popup_width = BATTERY_POPUP_WIDTH,
     fallback_padding = 12,
   },
-  effects = { 
-    blur_radius = 35 
+  effects = {
+    blur_radius = 35
   },
   animation = {
     fast = ANIMATION_FAST,
@@ -161,7 +161,7 @@ M.apps = icons.apps
 function M.get_font_config(style, size)
   style = style or M.fonts.styles.regular
   size = size or M.dimens.text.label
-  
+
   return {
     family = M.fonts.family,
     style = style,
@@ -172,7 +172,7 @@ end
 function M.get_padding_config(left, right)
   left = left or M.dimens.padding.base
   right = right or left
-  
+
   return {
     padding_left = left,
     padding_right = right,

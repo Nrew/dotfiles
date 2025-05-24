@@ -5,40 +5,28 @@ local battery_colors = colors.sections.widgets.battery
 
 local battery = sbar.add("item", "widgets.battery", {
   position = "right",
-  padding_left = settings.dimens.padding.small,
-  padding_right = settings.dimens.padding.small,
   icon = {
     font = {
-      family = settings.fonts.family,
       style = settings.fonts.styles.regular,
       size = settings.dimens.text.battery_icon,
     }
   },
-  label = { 
-    font = { 
-      family = settings.fonts.family,
-      style = settings.fonts.styles.regular,
-      size = settings.dimens.text.label,
-    },
-    color = battery_colors.high,
-  },
+  label = { font = { family = settings.fonts.family } },
   update_freq = settings.timing.battery_update,
   popup = { align = "center" }
 })
 
-local remaining_time = sbar.add("item", "widgets.battery.time", {
+local remaining_time = sbar.add("item", {
   position = "popup." .. battery.name,
   icon = {
     string = "Time remaining:",
     width = settings.dimens.spacing.battery_popup_width,
     align = "left",
-    color = battery_colors.high,
   },
   label = {
     string = "??:??h",
     width = settings.dimens.spacing.battery_popup_width,
     align = "right",
-    color = battery_colors.high,
   },
 })
 
@@ -47,22 +35,22 @@ local function parse_battery_info(batt_info)
   if not batt_info or batt_info == "" then
     return nil, nil, nil
   end
-  
+
   local charge_match = batt_info:match("(%d+)%%")
   local charge = charge_match and tonumber(charge_match) or nil
-  
+
   local is_charging = batt_info:find("AC Power") ~= nil
-  
+
   local remaining_match = batt_info:match("(%d+:%d+) remaining")
   local remaining = remaining_match or "No estimate"
-  
+
   return charge, is_charging, remaining
 end
 
 local function get_battery_icon_and_color(charge, is_charging)
   local icon = settings.icons.battery._100
   local color = battery_colors.high
-  
+
   if is_charging then
     icon = settings.icons.battery.charging
     color = battery_colors.high
@@ -87,7 +75,7 @@ local function get_battery_icon_and_color(charge, is_charging)
     icon = "!"
     color = battery_colors.low
   end
-  
+
   return icon, color
 end
 
@@ -95,7 +83,7 @@ battery:subscribe({"routine", "power_source_change", "system_woke"}, function()
   sbar.exec("pmset -g batt", function(batt_info)
     local charge, is_charging, remaining = parse_battery_info(batt_info)
     local icon, color = get_battery_icon_and_color(charge, is_charging)
-    
+
     local label = charge and charge .. "%" or "?"
     local lead = (charge and charge < 10) and "0" or ""
 
@@ -104,8 +92,8 @@ battery:subscribe({"routine", "power_source_change", "system_woke"}, function()
         string = icon,
         color = color
       },
-      label = { 
-        string = lead .. label 
+      label = {
+        string = lead .. label
       },
     })
   end)

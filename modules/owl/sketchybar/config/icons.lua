@@ -1,5 +1,5 @@
 local apps <const> = {
-  ["Live"] = ":ableton:",
+  	["Live"] = ":ableton:",
 	["Activity Monitor"] = ":activity_monitor:",
 	["Adobe Bridge"] = ":adobe_bridge:",
 	["Affinity Designer"] = ":affinity_designer:",
@@ -356,7 +356,7 @@ local apps <const> = {
 	["zoom.us"] = ":zoom:",
 	["Zotero"] = ":zotero:",
 	["Zulip"] = ":zulip:",
-  ["default"] = ":default:",
+  	["default"] = ":default:",
 }
 
 local text <const> = {

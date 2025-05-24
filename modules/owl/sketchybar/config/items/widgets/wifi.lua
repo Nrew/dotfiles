@@ -6,7 +6,7 @@ sbar.exec("killall network_load >/dev/null; $CONFIG_DIR/bridge/network_load/bin/
 local popup_width = settings.dimens.graphics.popup.width
 
 -- SSID label (positioned first, rightmost)
-local wifi_up = sbar.add("item", "widgets.wifi.ssid", {
+local wifi_up = sbar.add("item", "widgetsW.wifi.ssid", {
   position = "right",
   padding_left = 0,
   padding_right = settings.dimens.padding.small,
@@ -36,16 +36,10 @@ wifi_up:subscribe({"wifi_change", "system_woke"}, function(env)
 end)
 
 -- WiFi icon (positioned second, to the left of SSID)
-local wifi = sbar.add("item", "widgets.wifi", {
+local wifi = sbar.add("item", "widgets.wifi.padding", {
   position = "right",
   padding_right = settings.dimens.padding.small,
-  padding_left = settings.dimens.padding.small,
   label = { drawing = false },
-  icon = {
-    font = { size = settings.dimens.text.icon },
-    string = settings.icons.wifi.disconnected,
-    color = colors.legacy.red,
-  },
 })
 
 -- Bracket around both wifi items
@@ -64,14 +58,12 @@ local hostname = sbar.add("item", {
     align = "left",
     string = "Hostname:",
     width = popup_width / 2,
-    color = colors.sections.widgets.wifi.icon,
   },
   label = {
     max_chars = 20,
     string = "????????????",
     width = popup_width / 2,
     align = "right",
-    color = colors.sections.widgets.wifi.icon,
   }
 })
 
@@ -81,13 +73,11 @@ local ip = sbar.add("item", {
     align = "left",
     string = "IP:",
     width = popup_width / 2,
-    color = colors.sections.widgets.wifi.icon,
   },
   label = {
     string = "???.???.???.???",
     width = popup_width / 2,
     align = "right",
-    color = colors.sections.widgets.wifi.icon,
   }
 })
 
@@ -97,13 +87,11 @@ local mask = sbar.add("item", {
     align = "left",
     string = "Subnet mask:",
     width = popup_width / 2,
-    color = colors.sections.widgets.wifi.icon,
   },
   label = {
     string = "???.???.???.???",
     width = popup_width / 2,
     align = "right",
-    color = colors.sections.widgets.wifi.icon,
   }
 })
 
@@ -113,21 +101,16 @@ local router = sbar.add("item", {
     align = "left",
     string = "Router:",
     width = popup_width / 2,
-    color = colors.sections.widgets.wifi.icon,
   },
   label = {
     string = "???.???.???.???",
     width = popup_width / 2,
     align = "right",
-    color = colors.sections.widgets.wifi.icon,
   },
 })
 
 -- Add spacing after wifi (before battery)
-sbar.add("item", "widgets.wifi.spacing", { 
-  position = "right", 
-  width = settings.dimens.padding.group 
-})
+sbar.add("item", { position = "right", width = settings.dimens.group_paddings })
 
 -- Update wifi status
 wifi:subscribe({"wifi_change", "system_woke"}, function(env)

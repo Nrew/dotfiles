@@ -5,10 +5,10 @@ local function add_windows(space, space_name)
   if not space or not space_name then
     return
   end
-  
+
   sbar.exec("aerospace list-windows --format %{app-name} --workspace " .. space_name, function(windows)
     local icon_line = ""
-    
+
     for app in windows:gmatch("[^\r\n]+") do
       local lookup = settings.apps[app]
       local icon = lookup or settings.apps["default"] or settings.apps["Default"]
