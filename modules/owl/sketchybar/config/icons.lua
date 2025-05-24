@@ -442,6 +442,9 @@ local text <const> = {
         forward = "􀊌",
         play_pause = "􀊈",
       },
+      slider = {
+        knob = "􀀁"
+      },
     }
   },
 }
