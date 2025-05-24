@@ -142,10 +142,6 @@ let user = "nrew"; in
             "nowplaying-cli"
 	        "sketchybar"
         ];
-        extraConfig = ''
-            export HOMEBREW_NO_ANALYTICS=1
-            brew analytics off 2>/dev/null || true
-        '';                            
         casks = [                                   # Install GUI apps via Homebrew
             # `brew install --cask`
             "aerospace"           
