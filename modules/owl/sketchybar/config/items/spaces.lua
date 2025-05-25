@@ -8,89 +8,89 @@ local item_order = ""
 sbar.exec("aerospace list-workspaces --all", function(spaces)
   for space_name in spaces:gmatch("[^\r\n]+") do
     local space = sbar.add("item", "space." .. space_name, {
-    space = i,
-    icon = {
-      font = { family = settings.font.space_numbers },
-      string = i,
-      padding_left = 11,
-      padding_right = 4,
-      color = colors.white,
-      highlight_color = colors.blue,
-      y_offset = "1"
-    },
-    label = {
-      padding_left = 4,
-      padding_right = 12,
-      color = colors.grey,
-      highlight_color = colors.white,
-      font = "sketchybar-app-font:Regular:16.0",
-    },
-    padding_right = 1,
-    padding_left = 1,
-    background = {
-      color = colors.bg1,
-      border_width = 1,
-      height = 26,
-      border_color = colors.black,
-    },
-    popup = { background = { border_width = 5, border_color = colors.black } }
-  })
-
-  -- Single item bracket for space items to achieve double border on highlight
-  local space_bracket = sbar.add("bracket", { space.name }, {
-    background = {
-      color = colors.transparent,
-      border_color = colors.bg2,
-      height = 28,
-      border_width = 2
-    }
-  })
-
-  -- Padding space
-  local space_padding = sbar.add("item", "space.padding." .. space_name, {
-      script = "",
-      width = settings.group_paddings,
+      icon = {
+        font = { family = settings.font.space_numbers },
+        string = i,
+        padding_left = 11,
+        padding_right = 4,
+        color = colors.white,
+        highlight_color = colors.blue,
+        y_offset = "1"
+      },
+      label = {
+        padding_left = 4,
+        padding_right = 12,
+        color = colors.grey,
+        highlight_color = colors.white,
+        font = "sketchybar-app-font:Regular:16.0",
+      },
+      padding_right = 1,
+      padding_left = 1,
+      background = {
+        color = colors.bg1,
+        border_width = 1,
+        height = 26,
+        border_color = colors.black,
+      },
+      popup = { background = { border_width = 5, border_color = colors.black } }
     })
 
-  local space_popup = sbar.add("item", {
-    position = "popup." .. space.name,
-    padding_left= 5,
-    padding_right= 0,
-    background = {
-      drawing = true,
-      image = {
-        corner_radius = 9,
-        scale = 0.2
+    -- Single item bracket for space items to achieve double border on highlight
+    local space_bracket = sbar.add("bracket", { space.name }, {
+      background = {
+        color = colors.transparent,
+        border_color = colors.bg2,
+        height = 28,
+        border_width = 2
       }
-    }
-  })
-
-  space:subscribe("aerospace_workspace_change", function(env)
-    local selected = env.FOCUSED_WORKSPACE == space_name
-    local color = selected and colors.grey or colors.bg2
-    space:set({
-      icon = { highlight = selected, },
-      label = { highlight = selected },
-      background = { border_color = selected and colors.black or colors.bg2 }
     })
-    space_bracket:set({
-      background = { border_color = selected and colors.grey or colors.bg2 }
+
+    -- Padding space
+    local space_padding = sbar.add("item", "space.padding." .. space_name, {
+        script = "",
+        width = settings.group_paddings,
+      })
+
+    local space_popup = sbar.add("item", {
+      position = "popup." .. space.name,
+      padding_left= 5,
+      padding_right= 0,
+      background = {
+        drawing = true,
+        image = {
+          corner_radius = 9,
+          scale = 0.2
+        }
+      }
     })
-  end)
 
-  space:subscribe("mouse.clicked", function(env)
-    if env.BUTTON == "other" then
-      space_popup:set({ background = { image = "space." .. env.SID } })
-      space:set({ popup = { drawing = "toggle" } })
-    else
-      sbar.exec("aerospace workspace " .. space_name)
-    end
-  end)
+    space:subscribe("aerospace_workspace_change", function(env)
+      local selected = env.FOCUSED_WORKSPACE == space_name
+      local color = selected and colors.grey or colors.bg2
+      space:set({
+        icon = { highlight = selected, },
+        label = { highlight = selected },
+        background = { border_color = selected and colors.black or colors.bg2 }
+      })
+      space_bracket:set({
+        background = { border_color = selected and colors.grey or colors.bg2 }
+      })
+    end)
 
-  space:subscribe("mouse.exited", function(_)
-    space:set({ popup = { drawing = false } })
-  end)
-end
+    space:subscribe("mouse.clicked", function(env)
+      if env.BUTTON == "other" then
+        space_popup:set({ background = { image = "space." .. env.SID } })
+        space:set({ popup = { drawing = "toggle" } })
+      else
+        sbar.exec("aerospace workspace " .. space_name)
+      end
+    end)
+
+    space:subscribe("mouse.exited", function(_)
+      space:set({ popup = { drawing = false } })
+    end)
+  end
+end)
 
 local space_window_observer = sbar.add("item", {
   drawing = false,
