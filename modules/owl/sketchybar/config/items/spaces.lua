@@ -3,10 +3,11 @@ local icons = require("icons")
 local settings = require("settings")
 local app_icons = require("helpers.app_icons")
 
-local spaces = {}
+local item_order = ""
 
-for i = 1, 10, 1 do
-  local space = sbar.add("space", "space." .. i, {
+sbar.exec("aerospace list-workspaces --all", function(spaces)
+  for space_name in spaces:gmatch("[^\r\n]+") do
+    local space = sbar.add("item", "space." .. space_name, {
     space = i,
     icon = {
       font = { family = settings.font.space_numbers },
@@ -35,8 +36,6 @@ for i = 1, 10, 1 do
     popup = { background = { border_width = 5, border_color = colors.black } }
   })
 
-  spaces[i] = space
-
   -- Single item bracket for space items to achieve double border on highlight
   local space_bracket = sbar.add("bracket", { space.name }, {
     background = {
@@ -48,11 +47,10 @@ for i = 1, 10, 1 do
   })
 
   -- Padding space
-  sbar.add("space", "space.padding." .. i, {
-    space = i,
-    script = "",
-    width = settings.group_paddings,
-  })
+  local space_padding = sbar.add("item", "space.padding." .. space_name, {
+      script = "",
+      width = settings.group_paddings,
+    })
 
   local space_popup = sbar.add("item", {
     position = "popup." .. space.name,
@@ -67,8 +65,8 @@ for i = 1, 10, 1 do
     }
   })
 
-  space:subscribe("space_change", function(env)
-    local selected = env.SELECTED == "true"
+  space:subscribe("aerospace_workspace_change", function(env)
+    local selected = env.FOCUSED_WORKSPACE == space_name
     local color = selected and colors.grey or colors.bg2
     space:set({
       icon = { highlight = selected, },
@@ -85,10 +83,7 @@ for i = 1, 10, 1 do
       space_popup:set({ background = { image = "space." .. env.SID } })
       space:set({ popup = { drawing = "toggle" } })
     else
-      -- For Aerospace, left, middle, and right clicks will focus the workspace.
-      -- Yabai's "--destroy" functionality for right-click doesn't have a direct,
-      -- simple equivalent command in Aerospace for a numbered workspace.
-      sbar.exec("aerospace workspace " .. env.SID)
+      sbar.exec("aerospace workspace " .. space_name)
     end
   end)
 

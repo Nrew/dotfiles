@@ -7,10 +7,9 @@ return {
   -- This is a font configuration for SF Pro and SF Mono (installed manually)
   -- font = require("helpers.default_font"),
 
-  -- Alternatively, this is a font config for JetBrainsMono Nerd Font
   font = {
-    text = "Monaspace Neon Var", -- Used for text
-    numbers = "Monaspace Neon Var", -- Used for numbers
+    text = "Maple Mono NF",    -- Used for text
+    numbers = "Maple Mono NF", -- Used for numbers
     space_numbers = "Maple Mono NF",
     style_map = {
       ["Regular"] = "Regular",
