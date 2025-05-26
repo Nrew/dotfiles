@@ -68,12 +68,11 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       }
     })
 
-    -- Fixed workspace change handling - reverted to original logic
+    -- Enhanced workspace change with animation (like spaces_indicator)
     space:subscribe("aerospace_workspace_change", function(env)
       local selected = env.SELECTED == "true"
       
-      -- Added smooth animation while keeping original logic
-      sbar.animate("tanh", 20, function()
+      sbar.animate("tanh", 30, function()
         space:set({
           icon = { highlight = selected },
           label = { highlight = selected },
@@ -85,21 +84,44 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       end)
     end)
 
-    space:subscribe("mouse.entered", function()
-      sbar.animate("tanh", 15, function()
+    -- Add hover animations (like spaces_indicator pattern)
+    space:subscribe("mouse.entered", function(env)
+      sbar.animate("tanh", 30, function()
         space:set({
           background = {
+            color = colors.with_alpha(colors.blue, 0.3),
             border_color = colors.blue,
           },
-          icon = {
-            color = colors.blue,
+          icon = { color = colors.blue },
+        })
+        space_bracket:set({
+          background = {
+            color = colors.with_alpha(colors.blue, 0.1),
+            border_color = colors.blue,
           }
         })
       end)
     end)
 
-    space:subscribe("mouse.exited", function()
-      space:set({ popup = { drawing = false } })
+    space:subscribe("mouse.exited", function(env)
+      local selected = env.SELECTED == "true" -- Check current state
+      
+      sbar.animate("tanh", 30, function()
+        space:set({
+          background = {
+            color = colors.bg1,
+            border_color = selected and colors.black or colors.bg2,
+          },
+          icon = { color = colors.white },
+          popup = { drawing = false }
+        })
+        space_bracket:set({
+          background = {
+            color = colors.transparent,
+            border_color = selected and colors.grey or colors.bg2,
+          }
+        })
+      end)
     end)
 
     space:subscribe("mouse.clicked", function(env)
@@ -113,12 +135,13 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
   end
 end)
 
--- Simplified window observer - removed problematic debouncing
+-- Efficient global space window observer
 local space_window_observer = sbar.add("item", {
   drawing = false,
   updates = true,
 })
 
+-- Batch update function for better performance
 local function update_space_windows()
   sbar.exec("aerospace list-windows --format '%{workspace}|%{app-name}' --all", function(windows_output)
     local workspace_apps = {}
@@ -126,7 +149,7 @@ local function update_space_windows()
     -- Parse all windows in one go
     for line in windows_output:gmatch("[^\r\n]+") do
       local workspace, app = line:match("([^|]+)|(.+)")
-      if workspace and app and workspace ~= "" and app ~= "" then
+      if workspace and app then
         if not workspace_apps[workspace] then
           workspace_apps[workspace] = {}
         end
@@ -165,7 +188,6 @@ end)
 -- Initial window state update
 update_space_windows()
 
--- Simplified spaces indicator - removed problematic features
 local spaces_indicator = sbar.add("item", {
   padding_left = -3,
   padding_right = -5,
