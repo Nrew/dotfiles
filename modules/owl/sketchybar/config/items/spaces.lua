@@ -16,7 +16,7 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
         padding_right = 4,
         color = colors.white,
         highlight_color = colors.blue,
-        y_offset = 1
+        y_offset = "1"
       },
       label = {
         padding_left = 4,
@@ -33,12 +33,7 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
         height = 26,
         border_color = colors.black,
       },
-      popup = { 
-        background = { 
-          border_width = 5, 
-          border_color = colors.black,
-        } 
-      }
+      popup = { background = { border_width = 5, border_color = colors.black } }
     })
 
     -- Store space reference for global updates
@@ -49,7 +44,7 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
         color = colors.transparent,
         border_color = colors.bg2,
         height = 28,
-        border_width = 2,
+        border_width = 2
       }
     })
 
@@ -73,30 +68,19 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       }
     })
 
+    -- Fixed workspace change handling - reverted to original logic
     space:subscribe("aerospace_workspace_change", function(env)
-      local selected = env.FOCUSED_WORKSPACE == space_name
+      local selected = env.SELECTED == "true"
       
+      -- Added smooth animation while keeping original logic
       sbar.animate("tanh", 20, function()
         space:set({
-          icon = { 
-            highlight = selected,
-            color = selected and colors.blue or colors.white,
-            font = { size = selected and 16 or 14 }
-          },
-          label = { 
-            highlight = selected,
-            color = selected and colors.white or colors.grey
-          },
-          background = { 
-            border_color = selected and colors.blue or colors.bg2,
-            color = selected and colors.with_alpha(colors.blue, 0.2) or colors.bg1,
-          }
+          icon = { highlight = selected },
+          label = { highlight = selected },
+          background = { border_color = selected and colors.black or colors.bg2 }
         })
         space_bracket:set({
-          background = { 
-            border_color = selected and colors.blue or colors.bg2,
-            color = selected and colors.with_alpha(colors.blue, 0.1) or colors.transparent
-          }
+          background = { border_color = selected and colors.grey or colors.bg2 }
         })
       end)
     end)
@@ -105,45 +89,16 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       sbar.animate("tanh", 15, function()
         space:set({
           background = {
-            color = colors.with_alpha(colors.blue, 0.1),
             border_color = colors.blue,
           },
           icon = {
             color = colors.blue,
           }
         })
-        space_bracket:set({
-          background = {
-            border_color = colors.blue,
-            color = colors.with_alpha(colors.blue, 0.05)
-          }
-        })
       end)
     end)
 
     space:subscribe("mouse.exited", function()
-      local current_workspace = sbar.exec("aerospace list-workspaces --focused"):match("^%s*(.-)%s*$")
-      local is_current = current_workspace == space_name
-      
-      sbar.animate("tanh", 15, function()
-        space:set({
-          background = {
-            color = is_current and colors.with_alpha(colors.blue, 0.2) or colors.bg1,
-            border_color = is_current and colors.blue or colors.bg2,
-          },
-          icon = {
-            color = is_current and colors.blue or colors.white,
-          }
-        })
-        space_bracket:set({
-          background = {
-            border_color = is_current and colors.blue or colors.bg2,
-            color = is_current and colors.with_alpha(colors.blue, 0.1) or colors.transparent
-          }
-        })
-      end)
-      
-      -- Hide popup
       space:set({ popup = { drawing = false } })
     end)
 
@@ -152,82 +107,66 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
         space_popup:set({ background = { image = "space." .. env.SID } })
         space:set({ popup = { drawing = "toggle" } })
       else
-        -- Animate click feedback
-        sbar.animate("tanh", 8, function()
-          space:set({
-            background = { color = colors.with_alpha(colors.blue, 0.4) }
-          })
-        end)
-        
-        -- Switch workspace with small delay for visual feedback
-        sbar.delay(0.1, function()
-          sbar.exec("aerospace workspace " .. space_name)
-        end)
+        sbar.exec("aerospace workspace " .. env.SID)
       end
     end)
   end
 end)
 
--- Enhanced space window observer
+-- Simplified window observer - removed problematic debouncing
 local space_window_observer = sbar.add("item", {
   drawing = false,
   updates = true,
 })
 
-local update_timer = nil
-local function debounced_update()
-  if update_timer then
-    sbar.cancel(update_timer)
-  end
-  
-  update_timer = sbar.delay(0.1, function()
-    sbar.exec("aerospace list-windows --format '%{workspace}|%{app-name}' --all", function(windows_output)
-      local workspace_apps = {}
+local function update_space_windows()
+  sbar.exec("aerospace list-windows --format '%{workspace}|%{app-name}' --all", function(windows_output)
+    local workspace_apps = {}
 
-      -- Parse all windows in one go
-      for line in windows_output:gmatch("[^\r\n]+") do
-        local workspace, app = line:match("([^|]+)|(.+)")
-        if workspace and app and workspace ~= "" and app ~= "" then
-          if not workspace_apps[workspace] then
-            workspace_apps[workspace] = {}
-          end
-          workspace_apps[workspace][app] = true
+    -- Parse all windows in one go
+    for line in windows_output:gmatch("[^\r\n]+") do
+      local workspace, app = line:match("([^|]+)|(.+)")
+      if workspace and app and workspace ~= "" and app ~= "" then
+        if not workspace_apps[workspace] then
+          workspace_apps[workspace] = {}
         end
+        workspace_apps[workspace][app] = true
+      end
+    end
+
+    -- Update all spaces
+    for space_name, space in pairs(spaces) do
+      local apps = workspace_apps[space_name] or {}
+      local icon_line = ""
+      local no_app = true
+
+      for app, _ in pairs(apps) do
+        no_app = false
+        local lookup = app_icons[app]
+        local icon = (lookup == nil) and app_icons["default"] or lookup
+        icon_line = icon_line .. " " .. icon
       end
 
-      -- Update all spaces
-      for space_name, space in pairs(spaces) do
-        local apps = workspace_apps[space_name] or {}
-        local icon_line = ""
-        local no_app = true
-
-        for app, _ in pairs(apps) do
-          no_app = false
-          local lookup = app_icons[app]
-          local icon = (lookup == nil) and app_icons["default"] or lookup
-          icon_line = icon_line .. " " .. icon
-        end
-
-        if no_app then
-          icon_line = " —"
-        end
-
-        sbar.animate("tanh", 10, function()
-          space:set({ label = icon_line })
-        end)
+      if no_app then
+        icon_line = " —"
       end
-    end)
-    update_timer = nil
+
+      sbar.animate("tanh", 10, function()
+        space:set({ label = icon_line })
+      end)
+    end
   end)
 end
 
-space_window_observer:subscribe("space_windows_change", debounced_update)
+space_window_observer:subscribe("space_windows_change", function(env)
+  update_space_windows()
+end)
 
 -- Initial window state update
-debounced_update()
+update_space_windows()
 
--- Enhanced spaces indicator with better animations
-local spaces_indicator = sbar.add("item", "spaces_indicator", {
+-- Simplified spaces indicator - removed problematic features
+local spaces_indicator = sbar.add("item", {
   padding_left = -3,
   padding_right = -5,
   icon = {
@@ -235,7 +174,6 @@ local spaces_indicator = sbar.add("item", "spaces_indicator", {
     padding_right = 9,
     color = colors.grey,
     string = icons.switch.on,
-    font = { size = 16 }
   },
   label = {
     width = 0,
@@ -243,97 +181,46 @@ local spaces_indicator = sbar.add("item", "spaces_indicator", {
     padding_right = 8,
     string = "Spaces",
     color = colors.bg1,
-    font = { style = "Medium" }
   },
   background = {
     color = colors.with_alpha(colors.grey, 0.0),
     border_color = colors.with_alpha(colors.bg1, 0.0),
-    corner_radius = 6,
   }
 })
 
--- Fixed event name for menu swapping
 spaces_indicator:subscribe("swap_menus_and_spaces", function(env)
   local currently_on = spaces_indicator:query().icon.value == icons.switch.on
-  
-  sbar.animate("tanh", 20, function()
-    spaces_indicator:set({
-      icon = {
-        string = currently_on and icons.switch.off or icons.switch.on,
-        color = currently_on and colors.red or colors.green
-      }
-    })
-  end)
+  spaces_indicator:set({
+    icon = currently_on and icons.switch.off or icons.switch.on
+  })
 end)
 
 spaces_indicator:subscribe("mouse.entered", function(env)
-  sbar.animate("tanh", 25, function()
+  sbar.animate("tanh", 30, function()
     spaces_indicator:set({
       background = {
-        color = colors.with_alpha(colors.grey, 1.0),
-        border_color = colors.with_alpha(colors.bg1, 1.0),
+        color = { alpha = 1.0 },
+        border_color = { alpha = 1.0 },
       },
-      icon = { 
-        color = colors.bg1,
-        font = { size = 18 }
-      },
-      label = { 
-        width = "dynamic",
-        color = colors.bg1
-      }
+      icon = { color = colors.bg1 },
+      label = { width = "dynamic" }
     })
   end)
 end)
 
 spaces_indicator:subscribe("mouse.exited", function(env)
-  sbar.animate("tanh", 25, function()
+  sbar.animate("tanh", 30, function()
     spaces_indicator:set({
       background = {
-        color = colors.with_alpha(colors.grey, 0.0),
-        border_color = colors.with_alpha(colors.bg1, 0.0),
+        color = { alpha = 0.0 },
+        border_color = { alpha = 0.0 },
       },
-      icon = { 
-        color = colors.grey,
-        font = { size = 16 }
-      },
-      label = { 
-        width = 0,
-        color = colors.bg1
-      }
+      icon = { color = colors.grey },
+      label = { width = 0, }
     })
   end)
 end)
 
 spaces_indicator:subscribe("mouse.clicked", function(env)
-  -- Add click animation
-  sbar.animate("tanh", 8, function()
-    spaces_indicator:set({
-      background = { color = colors.with_alpha(colors.blue, 0.3) }
-    })
-  end)
-  
-  sbar.delay(0.1, function()
-    sbar.trigger("swap_menus_and_spaces")
-  end)
-end)
-
--- Add initial workspace highlighting
-sbar.delay(0.5, function()
-  sbar.exec("aerospace list-workspaces --focused", function(focused_workspace)
-    local current = focused_workspace:match("^%s*(.-)%s*$")
-    if current and spaces[current] then
-      spaces[current]:set({
-        icon = { 
-          highlight = true,
-          color = colors.blue,
-          font = { size = 16 }
-        },
-        label = { highlight = true },
-        background = { 
-          border_color = colors.blue,
-          color = colors.with_alpha(colors.blue, 0.2)
-        }
-      })
-    end
-  end)
+  sbar.trigger("swap_menus_and_spaces")
 end)
