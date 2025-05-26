@@ -8,10 +8,10 @@ in
     #──────────────────────────────────────────────────────────────────
     imports = [ 
         ../modules/shared
-   ] ++ lib.optionals pkgs.stdenv.isDarwin [
+#   ] ++ lib.optionals pkgs.stdenv.isDarwin [
         ../modules/owl
-   ] ++ lib.optionals pkgs.stdenv.isLinux [
-       ../modules/crow
+#   ] ++ lib.optionals pkgs.stdenv.isLinux [
+#       ../modules/crow
     ];
 
     # Enable home-manager

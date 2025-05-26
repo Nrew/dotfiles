@@ -3,15 +3,15 @@ local icons = require("icons")
 local settings = require("settings")
 local app_icons = require("helpers.app_icons")
 
-local item_order = ""
 local spaces = {}
 
 sbar.exec("aerospace list-workspaces --all", function(workspace_list)
   for space_name in workspace_list:gmatch("[^\r\n]+") do
     local space = sbar.add("space", "space." .. space_name, {
+      space = space_name,
       icon = {
         font = { family = settings.font.space_numbers },
-        string = string.sub(space_name, 3),
+        string = space_name,
         padding_left = 11,
         padding_right = 4,
         color = colors.white,
@@ -48,10 +48,12 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       }
     })
 
-    local space_padding = sbar.add("item", "space.padding." .. space_name, {
+    -- Padding space
+    sbar.add("item", "space.padding." .. space_name, {
+	space = space_name,
         script = "",
         width = settings.group_paddings,
-      })
+	})
 
     local space_popup = sbar.add("item", {
       position = "popup." .. space.name,
@@ -67,7 +69,7 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
     })
 
     space:subscribe("aerospace_workspace_change", function(env)
-      local selected = env.FOCUSED_WORKSPACE == space_name
+      local selected = env.SELECTED == "true"
       space:set({
         icon = { highlight = selected },
         label = { highlight = selected },
@@ -83,18 +85,14 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
         space_popup:set({ background = { image = "space." .. env.SID } })
         space:set({ popup = { drawing = "toggle" } })
       else
-        sbar.exec("aerospace workspace " .. space_name)
+        sbar.exec("aerospace workspace " .. env.SID)
       end
     end)
 
     space:subscribe("mouse.exited", function(_)
       space:set({ popup = { drawing = false } })
     end)
-
-    item_order = item_order .. " " .. space.name .. " " .. space_padding.name
   end
-
-  sbar.exec("sketchybar --reorder apple " .. item_order .. " front_app")
 end)
 
 -- Efficient global space window observer
