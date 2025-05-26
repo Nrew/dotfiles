@@ -4,13 +4,14 @@ local settings = require("settings")
 local app_icons = require("helpers.app_icons")
 
 local item_order = ""
+local spaces = {}
 
-sbar.exec("aerospace list-workspaces --all", function(spaces)
-  for space_name in spaces:gmatch("[^\r\n]+") do
-    local space = sbar.add("item", "space." .. space_name, {
+sbar.exec("aerospace list-workspaces --all", function(workspace_list)
+  for space_name in workspace_list:gmatch("[^\r\n]+") do
+    local space = sbar.add("space", "space." .. space_name, {
       icon = {
         font = { family = settings.font.space_numbers },
-        string = i,
+        string = string.sub(space_name, 3),
         padding_left = 11,
         padding_right = 4,
         color = colors.white,
@@ -35,7 +36,9 @@ sbar.exec("aerospace list-workspaces --all", function(spaces)
       popup = { background = { border_width = 5, border_color = colors.black } }
     })
 
-    -- Single item bracket for space items to achieve double border on highlight
+    -- Store space reference for global updates
+    spaces[space_name] = space
+
     local space_bracket = sbar.add("bracket", { space.name }, {
       background = {
         color = colors.transparent,
@@ -45,7 +48,6 @@ sbar.exec("aerospace list-workspaces --all", function(spaces)
       }
     })
 
-    -- Padding space
     local space_padding = sbar.add("item", "space.padding." .. space_name, {
         script = "",
         width = settings.group_paddings,
@@ -66,9 +68,8 @@ sbar.exec("aerospace list-workspaces --all", function(spaces)
 
     space:subscribe("aerospace_workspace_change", function(env)
       local selected = env.FOCUSED_WORKSPACE == space_name
-      local color = selected and colors.grey or colors.bg2
       space:set({
-        icon = { highlight = selected, },
+        icon = { highlight = selected },
         label = { highlight = selected },
         background = { border_color = selected and colors.black or colors.bg2 }
       })
@@ -89,13 +90,65 @@ sbar.exec("aerospace list-workspaces --all", function(spaces)
     space:subscribe("mouse.exited", function(_)
       space:set({ popup = { drawing = false } })
     end)
+
+    item_order = item_order .. " " .. space.name .. " " .. space_padding.name
   end
+
+  sbar.exec("sketchybar --reorder apple " .. item_order .. " front_app")
 end)
 
+-- Efficient global space window observer
 local space_window_observer = sbar.add("item", {
   drawing = false,
   updates = true,
 })
+
+-- Batch update function for better performance
+local function update_space_windows()
+  sbar.exec("aerospace list-windows --format '%{workspace}|%{app-name}' --all", function(windows_output)
+    local workspace_apps = {}
+
+    -- Parse all windows in one go
+    for line in windows_output:gmatch("[^\r\n]+") do
+      local workspace, app = line:match("([^|]+)|(.+)")
+      if workspace and app then
+        if not workspace_apps[workspace] then
+          workspace_apps[workspace] = {}
+        end
+        workspace_apps[workspace][app] = true
+      end
+    end
+
+    -- Update all spaces
+    for space_name, space in pairs(spaces) do
+      local apps = workspace_apps[space_name] or {}
+      local icon_line = ""
+      local no_app = true
+
+      for app, _ in pairs(apps) do
+        no_app = false
+        local lookup = app_icons[app]
+        local icon = (lookup == nil) and app_icons["default"] or lookup
+        icon_line = icon_line .. " " .. icon
+      end
+
+      if no_app then
+        icon_line = " —"
+      end
+
+      sbar.animate("tanh", 10, function()
+        space:set({ label = icon_line })
+      end)
+    end
+  end)
+end
+
+space_window_observer:subscribe("space_windows_change", function(env)
+  update_space_windows()
+end)
+
+-- Initial window state update
+update_space_windows()
 
 local spaces_indicator = sbar.add("item", {
   padding_left = -3,
@@ -118,24 +171,6 @@ local spaces_indicator = sbar.add("item", {
     border_color = colors.with_alpha(colors.bg1, 0.0),
   }
 })
-
-space_window_observer:subscribe("space_windows_change", function(env)
-  local icon_line = ""
-  local no_app = true
-  for app, count in pairs(env.INFO.apps) do
-    no_app = false
-    local lookup = app_icons[app]
-    local icon = ((lookup == nil) and app_icons["default"] or lookup)
-    icon_line = icon_line .. "" .. icon
-  end
-
-  if (no_app) then
-    icon_line = ""
-  end
-  sbar.animate("tanh", 10, function()
-    spaces[env.INFO.space]:set({ label = icon_line })
-  end)
-end)
 
 spaces_indicator:subscribe("swap_menus_and_spaces", function(env)
   local currently_on = spaces_indicator:query().icon.value == icons.switch.on

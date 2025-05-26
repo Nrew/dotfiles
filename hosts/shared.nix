@@ -35,6 +35,7 @@ let user = "nrew"; in
         imagemagick # Image rendering  
         fastfetch   # Fast system information tool
         fzf         # Fuzzy finder for the terminal
+        spotify     # Music streaming service
     ];
 
     # ────────────────────────────────────────────────────────────────

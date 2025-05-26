@@ -1,8 +1,6 @@
 { config, pkgs, lib, user, ... }:
 let
     user = "nrew";
-    isDarwin = pkgs.stdenv.isDarwin;
-    isLinux = pkgs.stdenv.isLinux;
 in
 {
     #──────────────────────────────────────────────────────────────────
@@ -10,10 +8,10 @@ in
     #──────────────────────────────────────────────────────────────────
     imports = [ 
         ../modules/shared
-   # ] ++ lib.optionals isDarwin [
+   ] ++ lib.optionals pkgs.stdenv.isDarwin [
         ../modules/owl
-   # ] ++ lib.optionals isLinux [
-   #     ../modules/crow
+   ] ++ lib.optionals pkgs.stdenv.isLinux [
+       ../modules/crow
     ];
 
     # Enable home-manager
