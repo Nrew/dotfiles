@@ -68,36 +68,48 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       }
     })
 
-    -- Enhanced workspace change with animation (like spaces_indicator)
+    -- Enhanced workspace change with active highlighting (gold for current)
     space:subscribe("aerospace_workspace_change", function(env)
       local selected = env.SELECTED == "true"
       
       sbar.animate("tanh", 30, function()
         space:set({
-          icon = { highlight = selected },
-          label = { highlight = selected },
-          background = { border_color = selected and colors.black or colors.bg2 }
+          icon = { 
+            highlight = selected,
+            color = selected and colors.yellow or colors.white -- Gold for active workspace
+          },
+          label = { 
+            highlight = selected,
+            color = selected and colors.yellow or colors.grey -- Gold for active workspace
+          },
+          background = { 
+            border_color = selected and colors.yellow or colors.bg2, -- Gold border for active
+            color = selected and colors.with_alpha(colors.yellow, 0.2) or colors.bg1 -- Gold background for active
+          }
         })
         space_bracket:set({
-          background = { border_color = selected and colors.grey or colors.bg2 }
+          background = { 
+            border_color = selected and colors.yellow or colors.bg2, -- Gold bracket for active
+            color = selected and colors.with_alpha(colors.yellow, 0.1) or colors.transparent
+          }
         })
       end)
     end)
 
-    -- Add hover animations (like spaces_indicator pattern)
+    -- Add hover animations (using spaces_indicator colors)
     space:subscribe("mouse.entered", function(env)
       sbar.animate("tanh", 30, function()
         space:set({
           background = {
-            color = colors.with_alpha(colors.blue, 0.3),
-            border_color = colors.blue,
+            color = colors.with_alpha(colors.grey, 1.0), -- Same as spaces_indicator
+            border_color = colors.grey,
           },
-          icon = { color = colors.blue },
+          icon = { color = colors.bg1 }, -- Same as spaces_indicator
         })
         space_bracket:set({
           background = {
-            color = colors.with_alpha(colors.blue, 0.1),
-            border_color = colors.blue,
+            color = colors.with_alpha(colors.grey, 0.5),
+            border_color = colors.grey,
           }
         })
       end)
@@ -109,16 +121,16 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       sbar.animate("tanh", 30, function()
         space:set({
           background = {
-            color = colors.bg1,
-            border_color = selected and colors.black or colors.bg2,
+            color = selected and colors.with_alpha(colors.yellow, 0.2) or colors.bg1, -- Return to gold if active
+            border_color = selected and colors.yellow or colors.bg2, -- Return to gold if active
           },
-          icon = { color = colors.white },
+          icon = { color = selected and colors.yellow or colors.white }, -- Return to gold if active
           popup = { drawing = false }
         })
         space_bracket:set({
           background = {
-            color = colors.transparent,
-            border_color = selected and colors.grey or colors.bg2,
+            color = selected and colors.with_alpha(colors.yellow, 0.1) or colors.transparent, -- Return to gold if active
+            border_color = selected and colors.yellow or colors.bg2, -- Return to gold if active
           }
         })
       end)
