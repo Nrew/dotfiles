@@ -7,12 +7,16 @@ local app_icons = require("helpers.app_icons")
 local spaces_props = {}
 
 local function update_workspaces_visuals(focused_workspace)
+	print("[DEBUG] update_workspaces_visuals CALLED. Focused workspace SHOULD BE: '".. tostring(focused_workspace) .. "'")
   for name, data in pairs(spaces_props) do
     local is_active = (name == focused_workspace)
     data.is_active = is_active
 
     local query_result = data.item:query()
-    local is_hovered = query_result.mouse.over == "true"
+    local is_hovered = false
+    if query_result and query_result.mouse then
+	is_hovered = query_result.mouse.over == "true"
+    end
 
     if not is_hovered then
       sbar.animate("tanh", 30, function()
@@ -37,14 +41,24 @@ end
 
 local aerospace_listener = sbar.add("item", "aerospace_listener", { drawing = false })
 aerospace_listener:subscribe("aerospace_workspace_change", function(env)
-  if env.WORKSPACE then
-    update_workspaces_visuals(env.WORKSPACE)
+	print("[DEBUG] aerospace_workspace_change EVENT recieved. env.WORKSPACE: '".. tostring(env.WORKSPACE) .. "', env.FOCUSED_WORKSPACE: '".. tostring(env.FOCUSED_WORKSPACE).. "'")
+  if env.FOCUSED_WORKSPACE then
+    update_workspaces_visuals(env.FOCUSED_WORKSPACE)
   else
+	  print("[DEBUG] env.FOCUSED_WORKSPACE is nil, falling back to sbar.exec for focused workspace.")
     sbar.exec("aerospace list-workspaces --focused", function(focused_raw)
       local focused = focused_raw:match("^%s*(.-)%s*$")
       if focused then update_workspaces_visuals(focused) end
     end)
   end
+end)
+
+aerospace_listener:subscribe("system_woke", function(env)
+    sbar.exec("aerospace list-workspaces --focused", function(focused_raw)
+      local focused = focused_raw:match("^%s*(.-)%s*$")
+      if focused then update_workspaces_visuals(focused) end
+    end)
+    update_workspace()
 end)
 
 local function update_workspace()
@@ -188,7 +202,7 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
 	drawing = true,
 	script = "",
 	width = settings.group_paddings,
-	backgroud = {drawing = false},
+	background = {drawing = false},
 	label = {drawing = false},
 	icon = {drawing = false}
       })
