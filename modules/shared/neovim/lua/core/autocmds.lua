@@ -1,7 +1,3 @@
--- Autocmds Configuration
--- Follows Google Lua Style Guide
--- Description: Auto commands for neovim
-
 local M = {}
 
 function M.setup()

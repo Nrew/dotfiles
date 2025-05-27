@@ -1,7 +1,3 @@
--- Neovim Options Configuration
--- Follows Google Lua Style Guide
--- Description: Core neovim options and settings
-
 local M = {}
 
 function M.setup()

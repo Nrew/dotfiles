@@ -84,7 +84,7 @@ local LSP_SERVERS = {
 -- Common on_attach function
 local function on_attach(client, bufnr)
   -- Enable completion triggered by <c-x><c-o>
-  vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+  vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
   
   -- LSP key mappings
   local opts = { noremap = true, silent = true, buffer = bufnr }
@@ -102,7 +102,7 @@ local function on_attach(client, bufnr)
   vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
   vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
   vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-  vim.keymap.set("n", "<leader>f", function()
+  vim.keymap.set("n", "<leader>cf", function()
     vim.lsp.buf.format({ async = true })
   end, opts)
 end

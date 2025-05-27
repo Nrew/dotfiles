@@ -179,6 +179,7 @@ in
             ]))
             nvim-treesitter-context
             nvim-ts-autotag
+            nvim-treesitter-textobjects
 
             # Git integration
             gitsigns-nvim
