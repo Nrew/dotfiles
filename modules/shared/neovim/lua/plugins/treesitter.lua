@@ -1,7 +1,15 @@
 local M = {}
 
+-- Helper function to safely check nixCats
+local function safe_nixcats(category)
+  if type(nixCats) == "function" then
+    return nixCats(category)
+  end
+  return false
+end
+
 function M.setup()
-  if not nixCats("general") then
+  if not safe_nixcats("general") then
     return
   end
   
@@ -66,8 +74,6 @@ function M.setup()
   require("treesitter-context").setup({
     enable = true,
     max_lines = 0,
-    trim_scope = "outer",
-    min_window_height = 0,
     patterns = {
       default = {
         "class",

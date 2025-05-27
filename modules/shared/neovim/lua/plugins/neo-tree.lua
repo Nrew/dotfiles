@@ -1,7 +1,15 @@
 local M = {}
 
+-- Helper function to safely check nixCats
+local function safe_nixcats(category)
+  if type(nixCats) == "function" then
+    return nixCats(category)
+  end
+  return false
+end
+
 function M.setup()
-  if not nixCats("general") then
+  if not safe_nixcats("general") then
     return
   end
   

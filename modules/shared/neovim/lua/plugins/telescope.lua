@@ -1,10 +1,6 @@
 local M = {}
 
 function M.setup()
-  if not nixCats("general") then
-    return
-  end
-  
   local telescope = require("telescope")
   local actions = require("telescope.actions")
   
@@ -35,7 +31,6 @@ function M.setup()
         "%.pyc",
         "%.class",
       },
-      generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
       winblend = 0,
       border = {},
       borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },

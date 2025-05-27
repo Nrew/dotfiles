@@ -310,6 +310,7 @@ in
           };
           # anything else to pass and grab in lua with 'nixCats.extra'
           extra = { 
+            nixdExtras.nixpkgs = ''import ${pkgs.path} {}'';
           };
         };
       };
