@@ -84,7 +84,7 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
   end
 
   for _, space_name in ipairs(workspace_names) do 
-    local item = sbar.add("space", "space." .. space_name, {
+    local space_item = sbar.add("space", "space." .. space_name, {
       space = space_name,
       icon = {
         font = { family = settings.font.space_numbers },
@@ -109,7 +109,7 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
     })
 
     local bracket_item_name = "bracket." .. space_name
-    local bracket_item = sbar.add("bracket", { space_name }, {
+    local bracket_item = sbar.add("bracket", bracket_item_name, { "space." .. space_name }, {
       background = {
         color = colors.transparent,
         border_color = colors.bg2,
@@ -118,8 +118,8 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       }
     })
 
-    local popup_item = sbar.add("item", "popup." .. space_name, {
-      position = "popup." .. space_name,
+    local popup_item = sbar.add("item", "popup." .. space_item , {
+      position = "popup." .. space_item.name,
       padding_left = 5,
       padding_right = 0,
       background = {
@@ -129,16 +129,16 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
     })
 
     spaces_props[space_name] = {
-      item = item,
+      item = space_item ,
       bracket = bracket_item,
       popup = popup_item,
       is_active = false
     }
 
     -- Add hover animations with gold coloring
-    item:subscribe("mouse.entered", function(env)
+    space_item :subscribe("mouse.entered", function(env)
       sbar.animate("tanh", 30, function()
-        item:set({
+        space_item :set({
           background = {
             color = colors.with_alpha(colors.yellow, 0.3), -- Gold hover background
             border_color = colors.yellow, -- Gold hover border
@@ -154,11 +154,11 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       end)
     end)
 
-    item:subscribe("mouse.exited", function(env)
+    space_item :subscribe("mouse.exited", function(env)
       local data = spaces_props[space_name]
       local is_active = data.is_active
       sbar.animate("tanh", 30, function()
-        item:set({
+        space_item:set({
           background = {
             color = is_active and colors.with_alpha(colors.red, 0.2) or colors.bg1, -- Return to red if active
             border_color = is_active and colors.red or colors.bg2, -- Return to red if active
@@ -174,10 +174,10 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       end)
     end)
     
-    item:subscribe("mouse.clicked", function(env)
+    space_item:subscribe("mouse.clicked", function(env)
       if env.BUTTON == "other" then
         popup_item:set({ background = { image = "space." .. space_name } })
-        item:set({ popup = { drawing = "toggle" } })
+        space_item:set({ popup = { drawing = "toggle" } })
       else
         sbar.exec("aerospace workspace " .. space_name)
       end
