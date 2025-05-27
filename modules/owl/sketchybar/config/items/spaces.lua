@@ -104,7 +104,7 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       },
       padding_right = 1 + (settings.group_paddings or 0),
       padding_left = 1,
-      background = { color = colors.bg1, border_width = 1, height = 26, border_color = colors.black, },
+      background = { color = colors.bg1, border_width = 1, height = 26, border_color = colors.black },
       popup = { background = { border_width = 5, border_color = colors.black } }
     })
 
@@ -118,25 +118,25 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       }
     })
 
-    local popup_item = sbar.add("item", "popup." .. space_item , {
+    local popup_item = sbar.add("item", "popup." .. space_name , {
       position = "popup." .. space_item.name,
       padding_left = 5,
       padding_right = 0,
       background = {
         drawing = true,
-        image = { corner_radius = 9, scale = 0.25, },
+        image = { corner_radius = 9, scale = 0.2, },
       }
     })
 
     spaces_props[space_name] = {
-      item = space_item ,
+      item = space_item,
       bracket = bracket_item,
       popup = popup_item,
       is_active = false
     }
 
     -- Add hover animations with gold coloring
-    space_item :subscribe("mouse.entered", function(env)
+    space_item:subscribe("mouse.entered", function(env)
       sbar.animate("tanh", 30, function()
         space_item :set({
           background = {
@@ -148,13 +148,13 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
         bracket_item:set({
           background = {
             color = colors.with_alpha(colors.yellow, 0.1), -- Gold hover bracket
-            border_color = colors.yellow,
+            border_color = colors.yellow
           }
         })
       end)
     end)
 
-    space_item :subscribe("mouse.exited", function(env)
+    space_item:subscribe("mouse.exited", function(env)
       local data = spaces_props[space_name]
       local is_active = data.is_active
       sbar.animate("tanh", 30, function()
@@ -179,7 +179,7 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
         popup_item:set({ background = { image = "space." .. space_name } })
         space_item:set({ popup = { drawing = "toggle" } })
       else
-        sbar.exec("aerospace workspace " .. space_name)
+        sbar.exec("aerospace workspace " .. env.SID)
       end
     end)
   end
@@ -202,7 +202,7 @@ space_window_observer:subscribe("space_window_change", function(env)
 end)
 
 
-local spaces_indicator = sbar.add("item", "space_indicator", {
+local spaces_indicator = sbar.add("item", "spaces_indicator", {
   padding_left = -3, padding_right = -5,
   icon = { padding_left = 8, padding_right = 9, color = colors.grey, string = icons.switch.on },
   label = { width = 0, padding_left = 0, padding_right = 8, string = "Spaces", color = colors.bg1 },
@@ -210,7 +210,7 @@ local spaces_indicator = sbar.add("item", "space_indicator", {
 })
 
 spaces_indicator:subscribe("swap_menus_and_spaces", function(env)
-  local currently_on = spaces_indicator:query().icon.value == icons.switch.on
+  local currently_on = spaces_indicator:query().icon.string == icons.switch.on
   spaces_indicator:set({ icon = currently_on and icons.switch.off or icons.switch.on })
 end)
 
@@ -235,7 +235,7 @@ spaces_indicator:subscribe("mouse.exited", function(env)
         border_color = { alpha = 0.0 },
       },
       icon = { color = colors.grey },
-      label = { width = 0, }
+      label = { width = 0 }
     })
   end)
 end)
