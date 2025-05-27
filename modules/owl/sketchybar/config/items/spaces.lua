@@ -38,18 +38,6 @@ local function update_workspaces_visuals(focused_workspace)
   end
 end
 
-local aerospace_listener = sbar.add("item", "aerospace_listener", { drawing = false, updates = true })
-aerospace_listener:subscribe("aerospace_workspace_change", function(env)
-  if env.FOCUSED_WORKSPACE then
-    update_workspaces_visuals(env.FOCUSED_WORKSPACE)
-  else
-    sbar.exec("aerospace list-workspaces --focused", function(focused_raw)
-      local focused = focused_raw:match("^%s*(.-)%s*$")
-      if focused then update_workspaces_visuals(focused) end
-    end)
-  end
-end)
-
 local function update_workspace()
   sbar.exec("aerospace list-windows --format '%{workspace}|%{app-name}' --all", function(windows_output)
     local workspace_apps = {}
@@ -79,6 +67,41 @@ local function update_workspace()
     end
   end)
 end
+
+local function refresh_all_aerospace_info()
+  sbar.exec("aerospace list-workspaces --focused", function(focused_raw)
+    local focused_workspace_name = focused_raw:match("^%s*(.-)%s*$")
+    if focused_workspace_name then
+      update_workspaces_visuals(focused_workspace_name)
+    else
+      update_workspaces_visuals(nil)
+    end
+  end)
+  update_workspace()
+end
+
+
+local aerospace_listener = sbar.add("item", "aerospace_listener", { drawing = false, updates = true })
+aerospace_listener:subscribe("aerospace_workspace_change", function(env)
+  if env.FOCUSED_WORKSPACE then
+    update_workspaces_visuals(env.FOCUSED_WORKSPACE)
+  else
+    refresh_all_aerospace_info()
+  end
+end)
+
+aerospace_listener:subscribe("system_woke", function(env)
+  sbar.delay(1.5, function()
+    refresh_all_aerospace_info()
+    update_workspace()
+  end)
+end)
+
+aerospace_listener:subscribe("display_change", function(env)
+  sbar.delay(0.5, function()
+    refresh_all_aerospace_info()
+  end)
+end)
 
 sbar.exec("aerospace list-workspaces --all", function(workspace_list)
   local workspace_names = {}

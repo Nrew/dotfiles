@@ -11,7 +11,7 @@ function M.setup()
   -- LSP server configurations
   local servers = {
     lua_ls = {
-      condition = function() return utils.nixcats("lua") end,
+      condition = function() return utils("lua") end,
       settings = {
         Lua = {
           runtime = { version = "LuaJIT" },

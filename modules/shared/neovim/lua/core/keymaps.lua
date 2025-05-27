@@ -92,7 +92,6 @@ function M.setup()
   utils.keymap("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic quickfix" })
   
   -- Plugin-specific keymaps (when plugins are available)
-  if utils.nixcats("general") then
     -- Telescope
     utils.keymap("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "Find Files" })
     utils.keymap("n", "<leader>fg", "<cmd>Telescope live_grep<cr>", { desc = "Live Grep" })
@@ -146,7 +145,6 @@ function M.setup()
     
     -- Highlights under cursor
     utils.keymap("n", "<leader>ui", vim.show_pos, { desc = "Inspect Pos" })
-  end
 end
 
 return M
