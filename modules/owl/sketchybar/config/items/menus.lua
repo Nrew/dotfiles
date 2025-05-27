@@ -1,5 +1,4 @@
 local colors = require("colors")
-local icons = require("icons")
 local settings = require("settings")
 
 local menu_watcher = sbar.add("item", {
@@ -46,12 +45,12 @@ local function update_menus(env)
   sbar.exec("$CONFIG_DIR/helpers/menus/bin/menus -l", function(menus)
     sbar.set('/menu\\..*/', { drawing = false })
     menu_padding:set({ drawing = true })
-    id = 1
+    local i = 1
     for menu in string.gmatch(menus, '[^\r\n]+') do
-      if id < max_items then
-        menu_items[id]:set( { label = menu, drawing = true } )
+      if i < max_items then
+        menu_items[i]:set( { label = menu, drawing = true } )
       else break end
-      id = id + 1
+      i = i + 1
     end
   end)
 end
