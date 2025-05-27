@@ -83,7 +83,7 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
     table.insert(workspace_names, name)
   end
 
-  for _, space_name in ipairs(workspace_names) do 
+  for i, space_name in ipairs(workspace_names) do 
     local space_item = sbar.add("space", "space." .. space_name, {
       space = space_name,
       icon = {
@@ -102,7 +102,7 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
         highlight_color = colors.white,
         font = "sketchybar-app-font:Regular:16.0",
       },
-      padding_right = 1 + (settings.group_paddings or 0),
+      padding_right = 1,
       padding_left = 1,
       background = { color = colors.bg1, border_width = 1, height = 26, border_color = colors.black },
       popup = { background = { border_width = 5, border_color = colors.black } }
@@ -118,13 +118,13 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       }
     })
 
-    local popup_item = sbar.add("item", "popup." .. space_name , {
+    local popup_item = sbar.add("item", "popup." .. space_name, {
       position = "popup." .. space_item.name,
       padding_left = 5,
       padding_right = 0,
       background = {
         drawing = true,
-        image = { corner_radius = 9, scale = 0.2, },
+        image = { corner_radius = 9, scale = 0.2 },
       }
     })
 
@@ -138,16 +138,16 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
     -- Add hover animations with gold coloring
     space_item:subscribe("mouse.entered", function(env)
       sbar.animate("tanh", 30, function()
-        space_item :set({
+        space_item:set({
           background = {
-            color = colors.with_alpha(colors.yellow, 0.3), -- Gold hover background
-            border_color = colors.yellow, -- Gold hover border
+            color = colors.with_alpha(colors.yellow, 0.3),
+            border_color = colors.yellow,
           },
-          icon = { color = colors.yellow }, -- Gold hover icon
+          icon = { color = colors.yellow },
         })
         bracket_item:set({
           background = {
-            color = colors.with_alpha(colors.yellow, 0.1), -- Gold hover bracket
+            color = colors.with_alpha(colors.yellow, 0.1),
             border_color = colors.yellow
           }
         })
@@ -182,6 +182,17 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
         sbar.exec("aerospace workspace " .. env.SID)
       end
     end)
+
+    if i < #workspace_names and (settings.group_paddings or 0) > 0 then
+      sbar.add("item", "spacer_after." .. space_name, {
+	drawing = true,
+	script = "",
+	width = settings.group_paddings,
+	backgroud = {drawing = false},
+	label = {drawing = false},
+	icon = {drawing = false}
+      })
+    end
   end
 
   sbar.exec("aerospace list-workspaces --focused", function(focused_raw)
@@ -197,7 +208,7 @@ local space_window_observer = sbar.add("item", "space_window_observer", {
   updates = true,
 })
 
-space_window_observer:subscribe("space_window_change", function(env)
+space_window_observer:subscribe("space_windows_change", function(env)
   update_workspace()
 end)
 

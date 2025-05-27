@@ -154,6 +154,7 @@ let user = "nrew"; in
             "sf-symbols"
             "homebrew/cask-fonts/font-sf-mono"
             "homebrew/cask-fonts/font-sf-pro"
+	    "zen-browser"
         ]; 
         taps = [                                    # Add additional Homebrew taps
             "nikitabobko/tap"                       # Aerospace tap
