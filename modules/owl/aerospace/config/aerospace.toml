@@ -47,6 +47,11 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 # Default Layout & Behavior Settings
 #─────────────────────────────────────────────────────────────────────
 
+non-empty-workspaces-root-containers-layout-on-startup = 'smart'
+
+# How the default creation of windows will look.
+default-root-container-layout = 'tiles'
+
 # Possible values: horizontal|vertical|auto
 # 'auto' means: wide monitor (anything wider than high) gets horizontal orientation,
 #               tall monitor (anything higher than wide) gets vertical orientation
@@ -92,7 +97,6 @@ on-focus-changed = ['move-mouse window-lazy-center']
 
   # All possible modifiers: cmd, alt, ctrl, shift
 
-  
   # You can uncomment this line to open up terminal with alt + enter shortcut
   # See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
   # alt-enter = 'exec-and-forget open -n /System/Applications/Utilities/Terminal.app'

@@ -8,7 +8,7 @@
     ./fzf
     ./git
     ./kitty
-    #./neovim
+    ./neovim
     ./starship
     ./ghostty
     ./spicetify

@@ -7,7 +7,6 @@ local app_icons = require("helpers.app_icons")
 local spaces_props = {}
 
 local function update_workspaces_visuals(focused_workspace)
-	print("[DEBUG] update_workspaces_visuals CALLED. Focused workspace SHOULD BE: '".. tostring(focused_workspace) .. "'")
   for name, data in pairs(spaces_props) do
     local is_active = (name == focused_workspace)
     data.is_active = is_active
@@ -41,11 +40,9 @@ end
 
 local aerospace_listener = sbar.add("item", "aerospace_listener", { drawing = false, updates = true })
 aerospace_listener:subscribe("aerospace_workspace_change", function(env)
-	print("[DEBUG] aerospace_workspace_change EVENT recieved. env.WORKSPACE: '".. tostring(env.WORKSPACE) .. "', env.FOCUSED_WORKSPACE: '".. tostring(env.FOCUSED_WORKSPACE).. "'")
   if env.FOCUSED_WORKSPACE then
     update_workspaces_visuals(env.FOCUSED_WORKSPACE)
   else
-	  print("[DEBUG] env.FOCUSED_WORKSPACE is nil, falling back to sbar.exec for focused workspace.")
     sbar.exec("aerospace list-workspaces --focused", function(focused_raw)
       local focused = focused_raw:match("^%s*(.-)%s*$")
       if focused then update_workspaces_visuals(focused) end
