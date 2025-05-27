@@ -39,7 +39,7 @@ local function update_workspaces_visuals(focused_workspace)
   end
 end
 
-local aerospace_listener = sbar.add("item", "aerospace_listener", { drawing = false })
+local aerospace_listener = sbar.add("item", "aerospace_listener", { drawing = false, updates = true })
 aerospace_listener:subscribe("aerospace_workspace_change", function(env)
 	print("[DEBUG] aerospace_workspace_change EVENT recieved. env.WORKSPACE: '".. tostring(env.WORKSPACE) .. "', env.FOCUSED_WORKSPACE: '".. tostring(env.FOCUSED_WORKSPACE).. "'")
   if env.FOCUSED_WORKSPACE then
@@ -51,14 +51,6 @@ aerospace_listener:subscribe("aerospace_workspace_change", function(env)
       if focused then update_workspaces_visuals(focused) end
     end)
   end
-end)
-
-aerospace_listener:subscribe("system_woke", function(env)
-    sbar.exec("aerospace list-workspaces --focused", function(focused_raw)
-      local focused = focused_raw:match("^%s*(.-)%s*$")
-      if focused then update_workspaces_visuals(focused) end
-    end)
-    update_workspace()
 end)
 
 local function update_workspace()
@@ -174,15 +166,15 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
       sbar.animate("tanh", 30, function()
         space_item:set({
           background = {
-            color = is_active and colors.with_alpha(colors.red, 0.2) or colors.bg1, -- Return to red if active
-            border_color = is_active and colors.red or colors.bg2, -- Return to red if active
+            color = is_active and colors.with_alpha(colors.red, 0.2) or colors.bg1,
+            border_color = is_active and colors.red or colors.bg2,
           },
-          icon = { color = is_active and colors.red or colors.white }, -- Return to red if active
+          icon = { color = is_active and colors.red or colors.white },
         })
         bracket_item:set({
           background = {
-            color = is_active and colors.with_alpha(colors.red, 0.1) or colors.transparent, -- Return to red if active
-            border_color = is_active and colors.red or colors.bg2, -- Return to red if active
+            color = is_active and colors.with_alpha(colors.red, 0.1) or colors.transparent,
+            border_color = is_active and colors.red or colors.bg2,
           }
         })
       end)
@@ -199,12 +191,12 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
 
     if i < #workspace_names and (settings.group_paddings or 0) > 0 then
       sbar.add("item", "spacer_after." .. space_name, {
-	drawing = true,
-	script = "",
-	width = settings.group_paddings,
-	background = {drawing = false},
-	label = {drawing = false},
-	icon = {drawing = false}
+        drawing = true,
+        script = "",
+        width = settings.group_paddings,
+        background = {drawing = false},
+        label = {drawing = false},
+        icon = {drawing = false}
       })
     end
   end
