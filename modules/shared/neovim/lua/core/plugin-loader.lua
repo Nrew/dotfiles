@@ -1,55 +1,10 @@
--- Centralized plugin loader with dependency management
-local utils = require("utils")
+local utils = require("core.utils")
+
 local M = {}
 
--- Plugin registry with metadata and dependencies
 local PLUGIN_REGISTRY = {
-  -- Core plugins (loaded first)
-  colorscheme = {
-    category = "general",
-    priority = 1,
-    setup_fn = function()
-      require("rose-pine").setup({
-        variant = "main",
-        dark_variant = "main",
-        bold_vert_split = false,
-        dim_nc_background = false,
-        disable_background = false,
-        disable_float_background = false,
-        disable_italics = false,
-        groups = {
-          background = "#191724",
-          background_nc = "#191724",
-          panel = "#1f1d2e",
-          panel_nc = "#1f1d2e",
-          border = "#26233a",
-          comment = "#6e6a86",
-          link = "#31748f",
-          punctuation = "#908caa",
-          error = "#eb6f92",
-          hint = "#c4a7e7",
-          info = "#9ccfd8",
-          warn = "#f6c177",
-          headings = {
-            h1 = "#c4a7e7",
-            h2 = "#9ccfd8",
-            h3 = "#ebbcba",
-            h4 = "#f6c177",
-            h5 = "#31748f",
-            h6 = "#9ccfd8",
-          }
-        },
-        highlight_groups = {
-          ColorColumn = { bg = "#1f1d2e" },
-          CursorLine = { bg = "none" },
-          StatusLine = { fg = "#e0def4", bg = "#1f1d2e" },
-        }
-      })
-      vim.cmd("colorscheme rose-pine")
-    end,
-  },
+  theme = { category = "general", priority = 1, config_module = "plugins.theme" },
   
-  -- Foundation plugins
   treesitter = {
     category = "general",
     priority = 2,
@@ -69,7 +24,6 @@ local PLUGIN_REGISTRY = {
     config_module = "plugins.completion",
   },
   
-  -- UI plugins
   telescope = {
     category = "general",
     priority = 5,
@@ -85,14 +39,14 @@ local PLUGIN_REGISTRY = {
   lualine = {
     category = "general",
     priority = 7,
-    dependencies = { "colorscheme" },
+    dependencies = { "theme" },
     config_module = "plugins.lualine",
   },
   
   bufferline = {
     category = "general",
     priority = 8,
-    dependencies = { "colorscheme" },
+    dependencies = { "theme" },
     config_module = "plugins.bufferline",
   },
   
@@ -114,7 +68,6 @@ local PLUGIN_REGISTRY = {
     config_module = "plugins.indent-blankline",
   },
   
-  -- Editor enhancement plugins
   ["mini-pairs"] = {
     category = "general",
     priority = 12,
@@ -158,7 +111,6 @@ local PLUGIN_REGISTRY = {
     config_module = "plugins.todo-comments",
   },
   
-  -- Git plugins
   gitsigns = {
     category = "general",
     priority = 19,
@@ -171,7 +123,6 @@ local PLUGIN_REGISTRY = {
     config_module = "plugins.lazygit",
   },
   
-  -- Additional plugins
   copilot = {
     category = "general",
     priority = 21,
@@ -197,21 +148,20 @@ local PLUGIN_REGISTRY = {
   },
 }
 
--- Track loaded plugins to avoid duplicates
 local loaded_plugins = {}
 
--- Load a single plugin with error handling
 local function load_plugin(name, config)
+  assert(type(name) == "string" and name ~= "", "Plugin name must be a non-empty string")
+  assert(type(config) == "table" and config.category, "Plugin config must be table with category")
+  
   if loaded_plugins[name] then
     return true
   end
   
-  -- Check if required category is enabled
-  if not utils.nixcats(config.category) then
+  if not utils.has_category(config.category) then
     return false
   end
   
-  -- Check dependencies
   if config.dependencies then
     for _, dep in ipairs(config.dependencies) do
       if not loaded_plugins[dep] then
@@ -229,12 +179,9 @@ local function load_plugin(name, config)
   
   local success = false
   
-  -- Load plugin configuration
   if config.setup_fn then
-    -- Custom setup function
     success = utils.safe_call(config.setup_fn, string.format("plugin '%s' custom setup", name))
   elseif config.config_module then
-    -- Load from module
     local plugin_module = utils.safe_require(config.config_module)
     if plugin_module and type(plugin_module.setup) == "function" then
       success = utils.safe_call(plugin_module.setup, string.format("plugin '%s' module setup", name))
@@ -253,16 +200,17 @@ local function load_plugin(name, config)
   return success
 end
 
--- Load all plugins in priority order
 function M.load_all()
-  if not utils.nixcats("general") then
+  if not utils.has_category("general") then
     vim.notify("nixCats general category not enabled, skipping plugin loading", vim.log.levels.INFO)
     return
   end
   
-  -- Sort plugins by priority
   local sorted_plugins = {}
   for name, config in pairs(PLUGIN_REGISTRY) do
+    assert(type(config) == "table", string.format("Plugin '%s' config must be a table", name))
+    assert(config.category, string.format("Plugin '%s' must have a category", name))
+    
     table.insert(sorted_plugins, { name = name, config = config })
   end
   
@@ -270,19 +218,17 @@ function M.load_all()
     return (a.config.priority or 999) < (b.config.priority or 999)
   end)
   
-  -- Load colorscheme immediately
-  local colorscheme_config = PLUGIN_REGISTRY.colorscheme
-  if colorscheme_config then
-    load_plugin("colorscheme", colorscheme_config)
+  local theme_config = PLUGIN_REGISTRY.theme
+  if theme_config then
+    load_plugin("theme", theme_config)
   end
   
-  -- Load remaining plugins with a small delay for better startup performance
   vim.defer_fn(function()
     local loaded_count = 0
     local total_count = #sorted_plugins
     
     for _, item in ipairs(sorted_plugins) do
-      if item.name ~= "colorscheme" then  -- Skip colorscheme as it's already loaded
+      if item.name ~= "theme" then
         if load_plugin(item.name, item.config) then
           loaded_count = loaded_count + 1
         end
@@ -296,8 +242,9 @@ function M.load_all()
   end, 50)
 end
 
--- Load a specific plugin manually
 function M.load_plugin(name)
+  assert(type(name) == "string" and name ~= "", "Plugin name must be a non-empty string")
+  
   local config = PLUGIN_REGISTRY[name]
   if not config then
     vim.notify(string.format("Unknown plugin: %s", name), vim.log.levels.ERROR)
@@ -307,7 +254,6 @@ function M.load_plugin(name)
   return load_plugin(name, config)
 end
 
--- Get list of available plugins
 function M.list_plugins()
   local plugins = {}
   for name, config in pairs(PLUGIN_REGISTRY) do
@@ -321,8 +267,8 @@ function M.list_plugins()
   return plugins
 end
 
--- Check if a plugin is loaded
 function M.is_loaded(name)
+  assert(type(name) == "string", "Plugin name must be a string")
   return loaded_plugins[name] or false
 end
 

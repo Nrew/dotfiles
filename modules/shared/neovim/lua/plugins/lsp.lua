@@ -1,17 +1,20 @@
-local utils = require("utils")
+local utils = require("core.utils")
 local M = {}
 
 function M.setup()
-  local lspconfig = require("lspconfig")
+  local lspconfig = utils.safe_require("lspconfig")
+  assert(lspconfig, "CRITICAL: nvim-lspconfig is required but not available")
+  
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   
-  -- Enhanced capabilities from blink.cmp
-  capabilities = require("blink.cmp").get_lsp_capabilities(capabilities)
+  local blink_cmp = utils.safe_require("blink.cmp")
+  if blink_cmp and blink_cmp.get_lsp_capabilities then
+    capabilities = blink_cmp.get_lsp_capabilities(capabilities)
+  end
   
-  -- LSP server configurations
   local servers = {
     lua_ls = {
-      condition = function() return utils("lua") end,
+      condition = function() return utils.has_category("lua") end,
       settings = {
         Lua = {
           runtime = { version = "LuaJIT" },
@@ -26,7 +29,7 @@ function M.setup()
     },
     
     nixd = {
-      condition = function() return utils.nixcats("nix") end,
+      condition = function() return utils.has_category("nix") end,
       settings = {
         nixd = {
           nixpkgs = { expr = "import <nixpkgs> { }" },
@@ -36,14 +39,15 @@ function M.setup()
     },
     
     tsserver = {
-      condition = function() return utils.nixcats("typescript") end,
+      condition = function() return utils.has_category("typescript") end,
       on_attach = function(client, bufnr)
+        assert(client and client.server_capabilities, "LSP client must have server_capabilities")
         client.server_capabilities.documentFormattingProvider = false
       end,
     },
     
     pyright = {
-      condition = function() return utils.nixcats("python") end,
+      condition = function() return utils.has_category("python") end,
       settings = {
         python = {
           analysis = {
@@ -56,7 +60,7 @@ function M.setup()
     },
     
     rust_analyzer = {
-      condition = function() return utils.nixcats("rust") end,
+      condition = function() return utils.has_category("rust") end,
       settings = {
         ["rust-analyzer"] = {
           cargo = { allFeatures = true },
@@ -66,7 +70,7 @@ function M.setup()
     },
     
     gopls = {
-      condition = function() return utils.nixcats("go") end,
+      condition = function() return utils.has_category("go") end,
       settings = {
         gopls = {
           analyses = { unusedparams = true },
@@ -76,13 +80,15 @@ function M.setup()
     },
     
     clangd = {
-      condition = function() return utils.nixcats("c") end,
+      condition = function() return utils.has_category("c") end,
       cmd = { "clangd", "--background-index" },
     },
   }
   
-  -- Common on_attach function
   local function on_attach(client, bufnr)
+    assert(client, "LSP client cannot be nil")
+    assert(type(bufnr) == "number" and bufnr > 0, "Buffer number must be a positive integer")
+    
     local map = utils.keymap
     local opts = { buffer = bufnr }
     
@@ -100,26 +106,32 @@ function M.setup()
     end, utils.merge_tables(opts, { desc = "Format code" }))
   end
   
-  -- Setup each LSP server
   for server_name, config in pairs(servers) do
+    assert(type(config) == "table", string.format("Server '%s' config must be a table", server_name))
+    
     if not config.condition or config.condition() then
+      assert(lspconfig[server_name], string.format("lspconfig does not support server '%s'", server_name))
+      
       local setup_config = {
         capabilities = capabilities,
         on_attach = config.on_attach or on_attach,
       }
       
-      -- Merge server-specific settings
       for key, value in pairs(config) do
         if key ~= "condition" then
           setup_config[key] = value
         end
       end
       
-      lspconfig[server_name].setup(setup_config)
+      utils.safe_call(
+        function() lspconfig[server_name].setup(setup_config) end,
+        string.format("LSP server '%s' setup", server_name)
+      )
     end
   end
   
-  -- Configure LSP UI
+  assert(vim.diagnostic, "vim.diagnostic API not available")
+  
   vim.diagnostic.config({
     virtual_text = {
       prefix = "●",
@@ -135,7 +147,6 @@ function M.setup()
     severity_sort = true,
   })
   
-  -- Set diagnostic signs
   local signs = {
     Error = " ",
     Warn = " ",
@@ -148,7 +159,8 @@ function M.setup()
     vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
   end
   
-  -- Configure hover and signature help windows
+  assert(vim.lsp.handlers, "vim.lsp.handlers not available")
+  
   vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
     vim.lsp.handlers.hover,
     { border = "rounded" }

@@ -228,7 +228,6 @@ sbar.exec("aerospace list-workspaces --all", function(workspace_list)
   update_workspace()
 end)
 
--- Enhanced window observer to also handle workspace highlighting
 local space_window_observer = sbar.add("item", "space_window_observer", {
   drawing = false,
   updates = true,
