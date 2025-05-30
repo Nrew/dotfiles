@@ -1,34 +1,23 @@
+local utils = require("core.utils")
 local M = {}
 
 function M.setup()
-  if not nixCats("general") then
-    return
-  end
-  
-  require("Comment").setup({
-    padding = true,
-    sticky = true,
-    ignore = nil,
-    toggler = {
-      line = "gcc",
-      block = "gbc",
-    },
-    opleader = {
-      line = "gc",
-      block = "gb",
-    },
-    extra = {
-      above = "gcO",
-      below = "gco",
-      eol = "gcA",
-    },
-    mappings = {
-      basic = true,
-      extra = true,
-    },
-    pre_hook = nil,
-    post_hook = nil,
-  })
+  local comment = utils.safe_require("Comment")
+  if not comment then return end
+
+  utils.safe_call(function()
+    comment.setup({
+      padding = true,
+      sticky = true,
+      ignore = "^$",
+      toggler = { line = "gcc", block = "gbc" },
+      opleader = { line = "gc", block = "gb" },
+      extra = { above = "gcO", below = "gco", eol = "gcA" },
+      mappings = { basic = true, extra = true },
+      pre_hook = nil,
+      post_hook = nil,
+    })
+  end, "comment setup")
 end
 
 return M

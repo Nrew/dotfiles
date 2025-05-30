@@ -1,124 +1,77 @@
+local utils = require("core.utils")
 local M = {}
 
 function M.setup()
-  local telescope = require("telescope")
-  local actions = require("telescope.actions")
+  local telescope = utils.safe_require("telescope")
+  local actions = utils.safe_require("telescope.actions")
   
-  telescope.setup({
+  -- INVARIANT: Both telescope and actions must be available
+  assert(telescope, "CRITICAL INVARIANT FAILED: telescope is required")
+  assert(actions, "CRITICAL INVARIANT FAILED: telescope.actions is required")
+  assert(type(telescope.setup) == "function", "INVARIANT FAILED: telescope.setup must be function")
+  assert(type(telescope.load_extension) == "function", "INVARIANT FAILED: telescope.load_extension must be function")
+
+  -- INVARIANT: Essential actions must exist
+  local required_actions = { "close", "move_selection_next", "move_selection_previous", "send_to_qflist", "open_qflist" }
+  for _, action_name in ipairs(required_actions) do
+    assert(actions[action_name], string.format("INVARIANT FAILED: actions.%s must exist", action_name))
+  end
+
+  local config = {
     defaults = {
       prompt_prefix = " ",
       selection_caret = " ",
       path_display = { "truncate" },
-      selection_strategy = "reset",
       sorting_strategy = "ascending",
       layout_strategy = "horizontal",
       layout_config = {
-        horizontal = {
-          prompt_position = "top",
-          preview_width = 0.6,
-          results_width = 0.8,
-        },
+        horizontal = { prompt_position = "top", preview_width = 0.6 },
         width = 0.9,
         height = 0.8,
-        preview_cutoff = 120,
       },
-      file_ignore_patterns = {
-        "%.git/",
-        "node_modules/",
-        "target/",
-        "%.cache/",
-        "__pycache__/",
-        "%.pyc",
-        "%.class",
-      },
-      winblend = 0,
-      border = {},
-      borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
-      color_devicons = true,
-      dynamic_preview_title = true,
+      file_ignore_patterns = { "%.git/", "node_modules/", "__pycache__/" },
       mappings = {
         i = {
           ["<esc>"] = actions.close,
-          ["<C-n>"] = actions.cycle_history_next,
-          ["<C-p>"] = actions.cycle_history_prev,
           ["<C-j>"] = actions.move_selection_next,
           ["<C-k>"] = actions.move_selection_previous,
-          ["<CR>"] = actions.select_default,
-          ["<C-x>"] = actions.select_horizontal,
-          ["<C-v>"] = actions.select_vertical,
-          ["<C-t>"] = actions.select_tab,
-          ["<C-u>"] = actions.preview_scrolling_up,
-          ["<C-d>"] = actions.preview_scrolling_down,
-          ["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
-          ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
           ["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
-          ["<M-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
-        },
-        n = {
-          ["<esc>"] = actions.close,
-          ["<CR>"] = actions.select_default,
-          ["<C-x>"] = actions.select_horizontal,
-          ["<C-v>"] = actions.select_vertical,
-          ["<C-t>"] = actions.select_tab,
-          ["j"] = actions.move_selection_next,
-          ["k"] = actions.move_selection_previous,
-          ["H"] = actions.move_to_top,
-          ["M"] = actions.move_to_middle,
-          ["L"] = actions.move_to_bottom,
-          ["gg"] = actions.move_to_top,
-          ["G"] = actions.move_to_bottom,
-          ["<C-u>"] = actions.preview_scrolling_up,
-          ["<C-d>"] = actions.preview_scrolling_down,
-          ["?"] = actions.which_key,
         },
       },
     },
-    
     pickers = {
-      find_files = {
-        theme = "dropdown",
-        previewer = false,
-        find_command = { "fd", "--type", "f", "--hidden", "--exclude", ".git" },
-      },
-      live_grep = {
-        additional_args = function()
-          return { "--hidden", "--glob", "!.git/*" }
-        end,
-      },
-      buffers = {
-        theme = "dropdown",
-        previewer = false,
-        initial_mode = "normal",
-        mappings = {
-          i = {
-            ["<c-d>"] = actions.delete_buffer,
-          },
-          n = {
-            ["dd"] = actions.delete_buffer,
-          },
-        },
-      },
-      git_files = {
-        theme = "dropdown",
-        previewer = false,
-      },
-      help_tags = {
-        theme = "ivy",
-      },
+      find_files = { theme = "dropdown", previewer = false },
+      buffers = { theme = "dropdown", previewer = false },
+      live_grep = { theme = "ivy" },
     },
-    
     extensions = {
       fzf = {
         fuzzy = true,
         override_generic_sorter = true,
         override_file_sorter = true,
-        case_mode = "smart_case",
       },
     },
-  })
-  
-  -- Load extensions
-  telescope.load_extension("fzf")
+  }
+
+  -- INVARIANT: Config structure must be valid
+  assert(type(config.defaults) == "table", "INVARIANT FAILED: defaults must be table")
+  assert(type(config.defaults.mappings) == "table", "INVARIANT FAILED: mappings must be table")
+  assert(type(config.defaults.mappings.i) == "table", "INVARIANT FAILED: insert mode mappings must be table")
+  assert(type(config.pickers) == "table", "INVARIANT FAILED: pickers must be table")
+  assert(type(config.extensions) == "table", "INVARIANT FAILED: extensions must be table")
+
+  local success = utils.safe_call(function()
+    telescope.setup(config)
+    
+    -- INVARIANT: FZF extension must be loadable if configured
+    local fzf_available = pcall(telescope.load_extension, "fzf")
+    if not fzf_available then
+      vim.notify("FZF extension not available, telescope may be slower", vim.log.levels.WARN)
+    end
+  end, "telescope setup")
+
+  -- INVARIANT: Telescope setup must succeed
+  assert(success, "CRITICAL INVARIANT FAILED: telescope setup must succeed")
 end
 
 return M

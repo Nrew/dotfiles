@@ -1,54 +1,19 @@
+local utils = require("core.utils")
 local M = {}
 
 function M.setup()
-  if not nixCats("general") then
-    return
-  end
-  
-  -- Disable tab mapping to let other completion handle it
-  vim.g.copilot_no_tab_map = true
-  vim.g.copilot_assume_mapped = true
-  vim.g.copilot_tab_fallback = ""
-  
-  -- Custom copilot mappings
-  vim.keymap.set("i", "<C-J>", "copilot#Accept('\\<CR>')", 
-    { expr = true, silent = true, desc = "Accept copilot suggestion" })
-  vim.keymap.set("i", "<C-\\>", "copilot#Suggest()", 
-    { expr = true, silent = true, desc = "Trigger copilot suggestion" })
-  vim.keymap.set("i", "<C-]>", "copilot#Dismiss()", 
-    { expr = true, silent = true, desc = "Dismiss copilot suggestion" })
-  
-  -- Auto commands for enabling/disabling copilot
-  vim.api.nvim_create_autocmd("InsertEnter", {
-    callback = function()
-      vim.g.copilot_enabled = true
-    end,
-    desc = "Enable copilot in insert mode",
-  })
-  
-  vim.api.nvim_create_autocmd("InsertLeave", {
-    callback = function()
-      vim.g.copilot_enabled = false
-    end,
-    desc = "Disable copilot in normal mode",
-  })
-  
-  -- Commands for toggling copilot
-  vim.api.nvim_create_user_command("CopilotEnable", function()
-    vim.cmd("Copilot enable")
-    vim.notify("Copilot enabled", vim.log.levels.INFO)
-  end, { desc = "Enable Copilot" })
-  
-  vim.api.nvim_create_user_command("CopilotDisable", function()
-    vim.cmd("Copilot disable")
-    vim.notify("Copilot disabled", vim.log.levels.INFO)
-  end, { desc = "Disable Copilot" })
-  
-  vim.api.nvim_create_user_command("CopilotToggle", function()
-    vim.cmd("Copilot toggle")
-    local status = vim.fn["copilot#Enabled"]() and "enabled" or "disabled"
-    vim.notify("Copilot " .. status, vim.log.levels.INFO)
-  end, { desc = "Toggle Copilot" })
+  local copilot = utils.safe_require("copilot")
+  if not copilot then return end
+
+  utils.safe_call(function()
+    copilot.setup({
+      panel = { enabled = true, auto_refresh = false, keymap = { jump_prev = "[[", jump_next = "]]", accept = "<CR>", refresh = "gr", open = "<M-CR>" } },
+      suggestion = { enabled = true, auto_trigger = false, debounce = 75, keymap = { accept = "<M-l>", accept_word = false, accept_line = false, next = "<M-]>", prev = "<M-[>", dismiss = "<C-]>" } },
+      filetypes = { yaml = false, markdown = false, help = false, gitcommit = false, gitrebase = false, hgcommit = false, svn = false, cvs = false, ["."] = false },
+      copilot_node_command = "node",
+      server_opts_overrides = {},
+    })
+  end, "copilot setup")
 end
 
 return M
