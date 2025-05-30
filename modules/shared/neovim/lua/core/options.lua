@@ -1,116 +1,168 @@
+-- nixcats options - consolidated implementation
 local M = {}
 
-function M.setup()
-  local g   = vim.g   -- Global variables
-  local opt = vim.opt -- Set options
+-- Constants
+local CONFIG = {
+  UNDO_DIR = "undodir",
+  SCROLLOFF = 8,
+  PUMP = { HEIGHT = 10, BLEND = 10 },
+  TIMING = { UPDATE = 100, TIMEOUT = 300 },
+  NUMBER_WIDTH = 2,
+}
 
-  -- ──────────────────────────────────────────────────────────────────
-  -- Global Variables (vim.g)
-  -- ──────────────────────────────────────────────────────────────────
-  g.mapleader         = " "
-  g.maplocalleader    = " "
-  g.have_nerd_fonts   = true -- Assume Nerd Fonts are managed by Nix
-
-  -- ──────────────────────────────────────────────────────────────────
-  -- Core Editor Behavior & File Handling
-  -- ──────────────────────────────────────────────────────────────────
-  opt.mouse           = "a"           -- Enable mouse support in all modes
-  opt.clipboard       = "unnamedplus" -- Use system clipboard
-
-  opt.swapfile        = false         -- Do not create swap files
-  opt.backup          = false         -- Do not create backup files
-  opt.undofile        = true          -- Enable persistent undo
-
-  local undodir_path  = vim.fn.stdpath("data") .. "/undodir"
-  opt.undodir         = undodir_path
-  if vim.fn.isdirectory(vim.fn.expand(undodir_path)) == 0 then
-    local ok, _ = pcall(vim.fn.mkdir, undodir_path, "p")
-    if not ok then
-      vim.notify("Failed to create undo directory: " .. undodir_path, vim.log.levels.WARN, { title = "Options Setup" })
+local function ensure_directory(path)
+  if vim.fn.isdirectory(vim.fn.expand(path)) == 0 then
+    local status, err = pcall(vim.fn.mkdir, path, "p")
+    if not status then
+      vim.notify(string.format("Failed to create directory: %s (%s)", path, tostring(err)), vim.log.levels.WARN)
+      return false
     end
   end
+  return true
+end
 
-  opt.confirm         = true          -- Prompt before discarding unsaved changes
-  opt.autowriteall    = true          -- Automatically save on certain actions
-  opt.hidden          = true          -- Allow switching buffers without saving
-  opt.isfname:append("@-@")           -- Add '@', '-' to filename characters
+-- Consolidated option setting
+local function set_options(option_groups)
+  local opt, g = vim.opt, vim.g
+  
+  for group_name, options in pairs(option_groups) do
+    for key, value in pairs(options) do
+      if group_name == "global" then
+        g[key] = value
+      else
+        opt[key] = value
+      end
+    end
+  end
+end
 
-  opt.updatetime      = 100           -- Interval for CursorHold, plugin updates (ms)
-  opt.timeoutlen      = 300           -- Time to wait for a mapped sequence (ms)
+local function get_option_groups()
+  local undo_path = vim.fn.stdpath("data") .. "/" .. CONFIG.UNDO_DIR
+  if not undo_path or #undo_path == 0 then
+    error("INVARIANT FAILED: unable to determine data directory path")
+  end
+  ensure_directory(undo_path)
+  
+  return {
+    global = {
+      mapleader = " ",
+      maplocalleader = " ",
+      have_nerd_fonts = true,
+    },
+    
+    core = {
+      mouse = "a",
+      clipboard = "unnamedplus",
+      swapfile = false,
+      backup = false,
+      undofile = true,
+      undodir = undo_path,
+      confirm = true,
+      autowriteall = true,
+      hidden = true,
+      updatetime = CONFIG.TIMING.UPDATE,
+      timeoutlen = CONFIG.TIMING.TIMEOUT,
+    },
+    
+    ui = {
+      termguicolors = true,
+      number = true,
+      relativenumber = true,
+      numberwidth = CONFIG.NUMBER_WIDTH,
+      signcolumn = "yes:1",
+      colorcolumn = "80,100",
+      wrap = true,
+      linebreak = true,
+      breakindent = true,
+      showbreak = "↪ ",
+      scrolloff = CONFIG.SCROLLOFF,
+      sidescrolloff = CONFIG.SCROLLOFF,
+      pumheight = CONFIG.PUMP.HEIGHT,
+      pumblend = CONFIG.PUMP.BLEND,
+      showmode = false,
+      showtabline = 2,
+      laststatus = 3,
+      cmdheight = 1,
+      showcmd = false,
+      fillchars = { eob = " ", diff = "╱", vert = "│", fold = " " },
+    },
+    
+    editing = {
+      ignorecase = true,
+      smartcase = true,
+      hlsearch = true,
+      incsearch = true,
+      inccommand = "nosplit",
+      completeopt = { "menuone", "noselect", "preview" },
+      expandtab = true,
+      tabstop = 2,
+      softtabstop = 2,
+      shiftwidth = 2,
+      autoindent = true,
+      smartindent = true,
+      list = true,
+      listchars = { tab = "󰌒 ", trail = "·", nbsp = "␣", extends = "⟩", precedes = "⟨" },
+      splitbelow = true,
+      splitright = true,
+      splitkeep = "screen",
+      jumpoptions = "view",
+      foldmethod = "expr",
+      foldexpr = "nvim_treesitter#foldexpr()",
+      foldlevel = 99,
+      foldlevelstart = 99,
+      foldenable = true,
+      foldcolumn = "0",
+    },
+  }
+end
 
-  -- ──────────────────────────────────────────────────────────────────
-  -- UI & Appearance
-  -- ──────────────────────────────────────────────────────────────────
-  opt.termguicolors   = true          -- Enable 24-bit RGB colors
+function M.setup()
+  if not vim.opt or not vim.g or type(vim.fn.stdpath) ~= "function" then
+    error("CRITICAL INVARIANT FAILED: required vim APIs not available")
+  end
+  
+  local option_groups = get_option_groups()
+  set_options(option_groups)
+  
+  -- Handle special cases
+  vim.opt.isfname:append("@-@")
+  vim.opt.shortmess:append("sIc")
+  
+  vim.notify("NixCats options configured", vim.log.levels.INFO)
+end
 
-  opt.number          = true          -- Show line numbers
-  opt.relativenumber  = true          -- Show relative line numbers
-  opt.numberwidth     = 2             -- Min columns for line number
+function M.validate_setup()
+  local checks = {
+    { vim.g.mapleader == " ", "mapleader not set correctly" },
+    { vim.opt.undofile:get(), "undofile not enabled" },
+    { vim.opt.updatetime:get() == CONFIG.TIMING.UPDATE, "updatetime not set correctly" },
+    { vim.opt.scrolloff:get() >= CONFIG.SCROLLOFF, "scrolloff too low" },
+  }
+  
+  local errors = {}
+  for _, check in ipairs(checks) do
+    if not check[1] then
+      table.insert(errors, check[2])
+    end
+  end
+  
+  if #errors > 0 then
+    vim.notify("Options validation failed: " .. table.concat(errors, ", "), vim.log.levels.ERROR)
+    return false
+  end
+  
+  return true
+end
 
-  opt.signcolumn      = "yes:1"       -- Always show signcolumn, width 1
-  opt.colorcolumn     = "80,100"      -- Highlight columns 80 and 100 (adjust as needed)
-
-  opt.wrap            = true          -- Enable soft text wrapping
-  opt.linebreak       = true          -- Wrap lines at word boundaries
-  opt.breakindent     = true          -- Maintain indentation for wrapped lines
-  opt.showbreak       = "↪ "          -- Character for wrapped lines
-
-  opt.scrolloff       = 8             -- Keep 8 lines visible around cursor
-  opt.sidescrolloff   = 8             -- Keep 8 columns visible around cursor
-
-  opt.pumheight       = 10            -- Max items in popup menu
-  opt.pumblend        = 10            -- Pseudo-transparency for popup menu
-
-  opt.showmode        = false         -- Statusline handles mode display
-  opt.showtabline     = 2             -- Always show the tabline
-  opt.laststatus      = 3             -- Always show a global statusline
-  opt.cmdheight       = 1             -- Height of command line (0 if noice.nvim manages it)
-  opt.showcmd         = false         -- Statusline/noice handles partial command display
-
-  opt.fillchars       = { eob = " ", diff = "╱", vert = "│", fold = " " }
-  opt.shortmess:append("sIc")         -- s:no search count, I:no intro, c:completion msgs
-
-  -- ──────────────────────────────────────────────────────────────────
-  -- Editing & Search
-  -- ──────────────────────────────────────────────────────────────────
-  opt.ignorecase      = true          -- Ignore case in search
-  opt.smartcase       = true          -- Override ignorecase if uppercase used
-  opt.hlsearch        = true          -- Highlight all search matches
-  opt.incsearch       = true          -- Show search results incrementally
-  opt.inccommand      = "nosplit"     -- Live preview for :s (or 'split')
-
-  opt.completeopt     = { "menuone", "noselect", "preview" } -- Autocomplete options
-
-  opt.expandtab       = true          -- Use spaces instead of tabs
-  opt.tabstop         = 2             -- Spaces for a TAB character
-  opt.softtabstop     = 2             -- Spaces for TAB key in insert mode
-  opt.shiftwidth      = 2             -- Spaces for auto/manual indent
-  opt.autoindent      = true          -- Copy indent from current line
-  opt.smartindent     = true          -- Smarter indenting for C-like languages
-
-  opt.list            = true          -- Show invisible characters
-  opt.listchars       = { tab = "󰌒 ", trail = "·", nbsp = "␣", extends = "⟩", precedes = "⟨" }
-  -- Fallback: opt.listchars = { tab = '> ', trail = '·', nbsp = '_', extends = '>', precedes = '<' }
-
-  -- ──────────────────────────────────────────────────────────────────
-  -- Window Management & Navigation
-  -- ──────────────────────────────────────────────────────────────────
-  opt.splitbelow      = true          -- New horizontal splits go below
-  opt.splitright      = true          -- New vertical splits go right
-  opt.splitkeep       = "screen"      -- Stabilize view on window split/close
-  opt.jumpoptions     = "view"        -- Restore view on jumps
-
-  -- ──────────────────────────────────────────────────────────────────
-  -- Folding 
-  -- ──────────────────────────────────────────────────────────────────
-  opt.foldmethod      = "expr"        -- Use expression for folding
-  opt.foldexpr        = "nvim_treesitter#foldexpr()" -- Treesitter folding expression
-  opt.foldlevel       = 99            -- Start with most folds open
-  opt.foldlevelstart  = 99            -- Fold level for new buffers
-  opt.foldenable      = true          -- Enable folding
-  opt.foldcolumn      = "0"           -- '0' hides fold column, '1' shows it
-
-  vim.notify("NixCats Neovim options loaded!", vim.log.levels.INFO, { title = "Neovim Setup" })
+function M.get_config_summary()
+  return {
+    leader = vim.g.mapleader,
+    updatetime = vim.opt.updatetime:get(),
+    scrolloff = vim.opt.scrolloff:get(),
+    undofile = vim.opt.undofile:get(),
+    termguicolors = vim.opt.termguicolors:get(),
+    relativenumber = vim.opt.relativenumber:get(),
+  }
 end
 
 return M
