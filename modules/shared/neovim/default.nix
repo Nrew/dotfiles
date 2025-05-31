@@ -9,11 +9,11 @@ let
       lazygit ripgrep fd curl unzip git tree-sitter
       stdenv.cc.cc cmake gnumake
     ];
-    
+
     formatters = with pkgs; [
       prettierd shfmt stylua nixfmt-rfc-style rustfmt black
     ];
-    
+
     lua = with pkgs; [ lua-language-server ];
     nix = with pkgs; [ nixd ];
     go = with pkgs; [ gopls delve golint golangci-lint gotools go-tools go ];
@@ -22,7 +22,7 @@ let
     typescript = with pkgs; [ typescript-language-server nodejs yarn eslint ];
     c = with pkgs; [ gcc clang cmake ];
   };
-  
+
   # Core plugin collections
   corePlugins = with pkgs.vimPlugins; [
     rose-pine telescope-nvim telescope-fzf-native-nvim which-key-nvim
@@ -41,7 +41,7 @@ let
   ];
   
   # Treesitter configuration with essential parsers
-  treesitterConfig = (nvim-treesitter.withPlugins (p: with p; [
+  treesitterConfig = with pkgs.vimPlugins; (nvim-treesitter.withPlugins (p: with p; [
     # Core parsers - always needed
     lua vim vimdoc query bash comment
     # Git parsers
@@ -80,7 +80,7 @@ in {
   config = {
     nixCats = {
       enable = true;
-      
+
       addOverlays = [ (utils.standardPluginOverlay inputs) ];
       packageNames = [ "nvim" ];
       luaPath = ./.;
