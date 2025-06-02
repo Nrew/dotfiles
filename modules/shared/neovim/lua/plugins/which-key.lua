@@ -44,22 +44,20 @@ function M.setup()
       },
     })
 
-    which_key.register({
-      f = {
-        name = "+find",
-        f = { "<cmd>Telescope find_files<cr>", "Find files" },
-        g = { "<cmd>Telescope live_grep<cr>", "Live grep" },
-        b = { "<cmd>Telescope buffers<cr>", "Find buffers" },
-        h = { "<cmd>Telescope help_tags<cr>", "Help tags" },
-        r = { "<cmd>Telescope oldfiles<cr>", "Recent files" },
-      },
-      g = { name = "+git" },
-      l = { name = "+lsp" },
-      s = { name = "+search" },
-      t = { name = "+toggle" },
-      w = { name = "+windows" },
-      x = { name = "+diagnostics" },
-    }, { prefix = "<leader>" })
+    which_key.add({
+      { "<leader>f", group = "find" },
+      { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Find buffers" },
+      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files" },
+      { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live grep" },
+      { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help tags" },
+      { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent files" },
+      { "<leader>g", group = "git" },
+      { "<leader>l", group = "lsp" },
+      { "<leader>s", group = "search" },
+      { "<leader>t", group = "toggle" },
+      { "<leader>w", group = "windows" },
+      { "<leader>x", group = "diagnostics" },
+    })
   end, "which-key setup")
 end
 

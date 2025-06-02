@@ -7,7 +7,7 @@ function M.setup()
   assert(utils.has_category("general"), "INVARIANT FAILED: general category must be enabled for LSP")
   
   local lspconfig = utils.safe_require("lspconfig")
-  assert(lspconfig, "CRITICAL INVARIANT FAILED: nvim-lspconfig is required but not available")
+  assert(lspconfig, "INVARIANT FAILED: nvim-lspconfig is required but not available")
 
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   assert(capabilities, "INVARIANT FAILED: LSP capabilities must be available")
@@ -19,7 +19,6 @@ function M.setup()
   end
 
   local function setup_keymaps(client, bufnr)
-    -- INVARIANTS: LSP client and buffer must be valid
     assert(client, "INVARIANT FAILED: LSP client cannot be nil")
     assert(type(bufnr) == "number" and bufnr > 0, "INVARIANT FAILED: buffer number must be positive integer")
     assert(client.server_capabilities, "INVARIANT FAILED: client must have server_capabilities")
@@ -27,7 +26,6 @@ function M.setup()
     local map = utils.keymap
     local opts = { buffer = bufnr }
     
-    -- INVARIANT: keymap function must be available
     assert(type(map) == "function", "INVARIANT FAILED: utils.keymap must be function")
     
     local mappings = {
@@ -66,14 +64,6 @@ function M.setup()
       condition = function() return utils.has_category("nix") end,
       settings = { nixd = { nixpkgs = { expr = "import <nixpkgs> { }" } } },
     },
-    ts_ls = {
-      condition = function() return utils.has_category("typescript") end,
-      on_attach = function(client, bufnr)
-        assert(client and client.server_capabilities, "INVARIANT FAILED: TS server must have capabilities")
-        client.server_capabilities.documentFormattingProvider = false
-        setup_keymaps(client, bufnr)
-      end,
-    },
     tsserver = {
       condition = function() return utils.has_category("typescript") end,
       on_attach = function(client, bufnr)
@@ -101,12 +91,10 @@ function M.setup()
   }
 
   for server_name, config in pairs(servers) do
-    -- INVARIANT: Server config must be valid table
     assert(type(config) == "table", string.format("INVARIANT FAILED: %s config must be table", server_name))
     assert(type(config.condition) == "function", string.format("INVARIANT FAILED: %s must have condition function", server_name))
     
     if config.condition() then
-      -- INVARIANT: Server must exist in lspconfig if condition is met
       assert(lspconfig[server_name], string.format("INVARIANT FAILED: %s not available in lspconfig", server_name))
       
       local setup_config = {
@@ -120,7 +108,6 @@ function M.setup()
         end
       end
       
-      -- INVARIANT: Setup must succeed
       local success = utils.safe_call(
         function() lspconfig[server_name].setup(setup_config) end,
         string.format("LSP server '%s' setup", server_name)
@@ -129,7 +116,6 @@ function M.setup()
     end
   end
 
-  -- INVARIANT: vim.diagnostic API must be available
   assert(vim.diagnostic, "INVARIANT FAILED: vim.diagnostic API not available")
   assert(vim.diagnostic.config, "INVARIANT FAILED: vim.diagnostic.config function not available")
 
@@ -144,12 +130,10 @@ function M.setup()
 
   local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
   for type, icon in pairs(signs) do
-    -- INVARIANT: Sign definition must not fail
     assert(type(icon) == "string" and #icon > 0, string.format("INVARIANT FAILED: %s icon must be non-empty string", type))
     vim.fn.sign_define("DiagnosticSign" .. type, { text = icon, texthl = "DiagnosticSign" .. type })
   end
 
-  -- INVARIANT: LSP handlers must exist
   assert(vim.lsp.handlers, "INVARIANT FAILED: vim.lsp.handlers not available")
   assert(vim.lsp.handlers.hover, "INVARIANT FAILED: hover handler not available")
   assert(vim.lsp.handlers.signature_help, "INVARIANT FAILED: signature_help handler not available")

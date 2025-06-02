@@ -135,12 +135,12 @@ let user = "nrew"; in
         brews = [                                   # Install CLI tools via Homebrew
             # `brew install`
             "mas"
-	        "lua"
+	          "lua"
             "spicetify-cli"
             "gowall"
-	        "switchaudio-osx"
+	          "switchaudio-osx"
             "nowplaying-cli"
-	        "sketchybar"
+	          "sketchybar"
         ];
         casks = [                                   # Install GUI apps via Homebrew
             # `brew install --cask`
@@ -154,7 +154,7 @@ let user = "nrew"; in
             "sf-symbols"
             "homebrew/cask-fonts/font-sf-mono"
             "homebrew/cask-fonts/font-sf-pro"
-	    "zen-browser"
+	          "zen"
         ]; 
         taps = [                                    # Add additional Homebrew taps
             "nikitabobko/tap"                       # Aerospace tap

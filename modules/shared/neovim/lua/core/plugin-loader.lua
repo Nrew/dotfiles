@@ -21,7 +21,6 @@ local PLUGIN_REGISTRY = {
   ["todo-comments"] =    { category = "general", priority = 18, module = "plugins.todo-comments" },
   gitsigns =             { category = "general", priority = 19, module = "plugins.gitsigns" },
   lazygit =              { category = "general", priority = 20, module = "plugins.lazygit" },
-  copilot =              { category = "general", priority = 21, module = "plugins.copilot" },
   project =              { category = "general", priority = 22, module = "plugins.project" },
   persistence =          { category = "general", priority = 23, module = "plugins.persistence" },
   yazi =                 { category = "general", priority = 24, module = "plugins.yazi" },
