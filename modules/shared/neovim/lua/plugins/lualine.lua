@@ -1,6 +1,15 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    event = "DeferredUIEnter",
+    load = function(name)
+      vim.cmd.packadd(name)
+      vim.cmd.packadd("lualine-lsp-progress")
+    end,
+  }
+
 function M.setup()
   local lualine = utils.safe_require("lualine")
   if not lualine then return end

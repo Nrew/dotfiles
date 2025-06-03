@@ -1,8 +1,14 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    event = { "BufReadPre", "BufNewFile"}
+    on_require = { "lspconfig" },
+  }
+end
+
 function M.setup()
-  -- INVARIANT: nixCats must be available and properly configured
   assert(utils.has_category, "INVARIANT FAILED: utils.has_category function not available")
   assert(utils.has_category("general"), "INVARIANT FAILED: general category must be enabled for LSP")
   
@@ -42,7 +48,6 @@ function M.setup()
     }
     
     for _, mapping in ipairs(mappings) do
-      -- INVARIANT: Each mapping must have required fields
       assert(#mapping >= 4, "INVARIANT FAILED: mapping must have mode, key, action, description")
       map(mapping[1], mapping[2], mapping[3], utils.merge_tables(opts, { desc = mapping[4] }))
     end

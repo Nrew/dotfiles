@@ -96,6 +96,7 @@ function M.safe_require(module_name)
     )
     return nil
   end
+
   return module
 end
 

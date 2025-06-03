@@ -1,6 +1,12 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    event = "DeferredUIEnter",
+  }
+end
+
 function M.setup()
   local surround = utils.safe_require("nvim-surround")
   if not surround then return end

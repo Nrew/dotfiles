@@ -1,6 +1,12 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    event = "DeferredUIEnter"
+  }
+end
+
 function M.setup()
   local persistence = utils.safe_require("persistence")
   if not persistence then return end

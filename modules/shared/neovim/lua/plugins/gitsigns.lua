@@ -1,6 +1,12 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    event = "DeferredUIEnter",
+  }
+end
+
 function M.setup()
   local gitsigns = utils.safe_require("gitsigns")
   if not gitsigns then return end

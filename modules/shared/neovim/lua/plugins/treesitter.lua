@@ -1,6 +1,12 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    event = "DeferredUIEnter",
+  }
+end
+
 function M.setup()
   local configs = utils.safe_require("nvim-treesitter.configs")
   if not configs then return end

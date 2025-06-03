@@ -1,6 +1,17 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    keys = {
+      { "<leader>xx", desc = "Toggle Trouble" },
+      { "<leader>xw", desc = "Workspace Diagnostics" },
+      { "<leader>xd", desc = "Document Diagnostics" },
+      { "gR",         desc = "LSP References" },
+    }
+  }
+end
+
 function M.setup()
   local trouble = utils.safe_require("trouble")
   if not trouble then return end

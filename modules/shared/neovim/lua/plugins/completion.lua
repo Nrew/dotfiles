@@ -1,6 +1,12 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    event = "InsertEnter"
+  }
+end
+
 function M.setup()
   -- INVARIANT: nixCats must be available
   assert(utils.has_category, "INVARIANT FAILED: utils.has_category function not available")

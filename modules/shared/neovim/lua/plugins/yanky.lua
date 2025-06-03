@@ -1,6 +1,12 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    event = "DeferredUIEnter"
+  }
+end
+
 function M.setup()
   local yanky = utils.safe_require("yanky")
   if not yanky then return end

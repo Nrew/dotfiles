@@ -1,6 +1,12 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    event = "DeferredUIEnter",
+  }
+end
+
 function M.setup()
   local which_key = utils.safe_require("which-key")
   if not which_key then return end

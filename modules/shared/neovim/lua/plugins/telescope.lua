@@ -1,6 +1,21 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    keys = {
+      { "<leader>ff", desc = "Find Files" },
+      { "<leader>fg", desc = "Live Grep"  },
+      { "<leader>fb", desc = "Buffers"    },
+      { "<leader>fh", desc = "Help Tags"  },
+      { "<leader>fr", desc = "Recent Files" },
+      { "<leader>fc", desc = "Colorscheme" },
+      { "<leader>fs", desc = "Document Symbols" },
+      { "<leader>fS", desc = "Workspace Symbols" },
+    }
+  }
+end
+
 function M.setup()
   local telescope = utils.safe_require("telescope")
   local actions = utils.safe_require("telescope.actions")

@@ -1,6 +1,12 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    event = "DeferredUIEnter",
+  }
+end
+
 function M.setup()
   local bufferline = utils.safe_require("bufferline")
   if not bufferline then return end

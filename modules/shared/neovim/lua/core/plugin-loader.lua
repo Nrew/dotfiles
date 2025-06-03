@@ -1,29 +1,29 @@
 local M = {}
 
 local PLUGIN_REGISTRY = {
-  theme      =           { category = "general", priority = 1,  module = "plugins.theme" },
-  treesitter =           { category = "general", priority = 2,  module = "plugins.treesitter" },
-  lsp        =           { category = "general", priority = 3,  module = "plugins.lsp" },
-  completion =           { category = "general", priority = 4,  dependencies = { "lsp" }, module = "plugins.completion" },
-  telescope  =           { category = "general", priority = 5,  module = "plugins.telescope" },
-  ["neo-tree"] =         { category = "general", priority = 6,  module = "plugins.neo-tree" },
-  lualine =              { category = "general", priority = 7,  dependencies = { "theme" }, module = "plugins.lualine" },
-  bufferline =           { category = "general", priority = 8,  dependencies = { "theme" }, module = "plugins.bufferline" },
-  ["which-key"] =        { category = "general", priority = 9,  module = "plugins.which-key" },
-  noice =                { category = "general", priority = 10, module = "plugins.noice" },
-  ["indent-blankline"] = { category = "general", priority = 11, module = "plugins.indent-blankline" },
-  ["mini-pairs"] =       { category = "general", priority = 12, module = "plugins.mini-pairs" },
-  comment =              { category = "general", priority = 13, module = "plugins.comment" },
-  flash =                { category = "general", priority = 14, module = "plugins.flash" },
-  surround =             { category = "general", priority = 15, module = "plugins.surround" },
-  yanky =                { category = "general", priority = 16, module = "plugins.yanky" },
-  trouble =              { category = "general", priority = 17, dependencies = { "lsp" }, module = "plugins.trouble" },
-  ["todo-comments"] =    { category = "general", priority = 18, module = "plugins.todo-comments" },
-  gitsigns =             { category = "general", priority = 19, module = "plugins.gitsigns" },
-  lazygit =              { category = "general", priority = 20, module = "plugins.lazygit" },
-  project =              { category = "general", priority = 22, module = "plugins.project" },
-  persistence =          { category = "general", priority = 23, module = "plugins.persistence" },
-  yazi =                 { category = "general", priority = 24, module = "plugins.yazi" },
+  theme      =           { category = "general", priority = 999, module = "plugins.theme" },
+  treesitter =           { category = "general", priority = 50,  module = "plugins.treesitter" },
+  lsp        =           { category = "general", priority = 800, module = "plugins.lsp" },
+  completion =           { category = "general", priority = 700, dependencies = { "lsp" }, module = "plugins.completion" },
+  telescope  =           { category = "general", priority = 50,  module = "plugins.telescope" },
+  ["neo-tree"] =         { category = "general", priority = 50,  module = "plugins.neo-tree" },
+  lualine    =           { category = "general", priority = 50,  dependencies = { "theme" }, module = "plugins.lualine" },
+  bufferline =           { category = "general", priority = 50,  dependencies = { "theme" }, module = "plugins.bufferline" },
+  ["which-key"] =        { category = "general", priority = 50,  module = "plugins.which-key" },
+  noice      =           { category = "general", priority = 50,  module = "plugins.noice" },
+  ["indent-blankline"] = { category = "general", priority = 50,  module = "plugins.indent-blankline" },
+  ["mini-pairs"] =       { category = "general", priority = 50,  module = "plugins.mini-pairs" },
+  comment    =           { category = "general", priority = 50,  module = "plugins.comment" },
+  flash      =           { category = "general", priority = 50,  module = "plugins.flash" },
+  surround   =           { category = "general", priority = 50,  module = "plugins.surround" },
+  yanky      =           { category = "general", priority = 50,  module = "plugins.yanky" },
+  trouble    =           { category = "general", priority = 50,  dependencies = { "lsp" }, module = "plugins.trouble" },
+  ["todo-comments"] =    { category = "general", priority = 50,  module = "plugins.todo-comments" },
+  gitsigns   =           { category = "general", priority = 50,  module = "plugins.gitsigns" },
+  lazygit    =           { category = "general", priority = 50,  module = "plugins.lazygit" },
+  project    =           { category = "general", priority = 50,  module = "plugins.project" },
+  persistence =          { category = "general", priority = 50,  module = "plugins.persistence" },
+  yazi       =           { category = "general", priority = 50,  module = "plugins.yazi" },
 }
 
 
@@ -74,7 +74,7 @@ local function get_specs()
   end
 
   table.sort(specs, function(a, b)
-    return (a.spec.priority or 0) > (b.spec.priority or 0)
+    return (a.spec.priority or 50) > (b.spec.priority or 50)
   end)
 
   return specs
@@ -113,25 +113,50 @@ function M.load_plugin(name, spec)
     return false
   end
 
+  local utils = require('core.utils')
+  local lze   = utils.safe_require('lze')
+
+  local lze_spec = {
+    name,
+    enabled = utils.has_category(spec.category or "general"),
+    priority = spec.priority or 50,
+    after   = function()
+      local status, plugin = pcall(require, spec.module)
+      if not status then
+        mark_failed(name, "module not found: " .. tostring(plugin))
+        return
+      end
+
+      if type(plugin.setup) ~= "function" then
+        mark_failed(name, "no setup function")
+        return
+      end
+
+      local setup_ok = pcall(plugin.setup)
+
+      if not setup_ok then
+        mark_failed(name, "setup_failed")
+        return
+      end
+
+      mark_loaded(name)
+    end,
+  }
+
   local status, plugin = pcall(require, spec.module)
-  if not status then
-    mark_failed(name, "module not found")
+  if status and type(plugin.load) == "function" then
+    local p_config = plugin.load()
+    for key, value in pairs(p_config) do
+      lze_spec[key] = value
+    end
+  end
+
+  local success, err = pcall(lze.load, { lze_spec })
+  if not sucess then
+    mark_failed(name, "lze load failed: " .. tostring(err))
     return false
   end
 
-  if type(plugin.setup) ~= "function" then
-    mark_failed(name, "no setup function")
-    return false
-  end
-
-  local setup_ok = pcall(plugin.setup)
-  
-  if not setup_ok then
-    mark_failed(name, "setup_failed")
-    return false
-  end
-
-  mark_loaded(name)
   return true
 end
 

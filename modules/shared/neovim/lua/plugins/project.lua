@@ -1,6 +1,12 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    event = "DeferredUIEnter"
+  }
+end
+
 function M.setup()
   local project = utils.safe_require("project_nvim")
   if not project then return end

@@ -1,14 +1,18 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+
+  }
+end
+
 function M.setup()
-  -- INVARIANT: System must be capable of setting colorschemes
   assert(vim.cmd.colorscheme, "INVARIANT FAILED: vim.cmd.colorscheme not available")
   
   local rose_pine = utils.safe_require("rose-pine")
   
   if not rose_pine then
-    -- NEGATIVE PATH: Rose-pine not available, must have fallback
     assert(vim.fn.exists(":colorscheme"), "INVARIANT FAILED: colorscheme command must exist")
     local success = utils.safe_call(function() 
       vim.cmd.colorscheme("habamax") 
@@ -17,7 +21,6 @@ function M.setup()
     return
   end
 
-  -- INVARIANT: Rose-pine must have setup function
   assert(type(rose_pine.setup) == "function", "INVARIANT FAILED: rose-pine.setup must be function")
 
   local config = {
@@ -50,17 +53,14 @@ function M.setup()
     },
   }
 
-  -- INVARIANT: Config must have required structure
   assert(type(config.groups) == "table", "INVARIANT FAILED: groups must be table")
   assert(type(config.highlight_groups) == "table", "INVARIANT FAILED: highlight_groups must be table")
 
   local success = utils.safe_call(function()
     rose_pine.setup(config)
     
-    -- INVARIANT: Colorscheme must be settable
     vim.cmd.colorscheme("rose-pine")
     
-    -- INVARIANT: Current colorscheme must be rose-pine after setting
     local current_colorscheme = vim.g.colors_name
     assert(current_colorscheme == "rose-pine", 
            string.format("INVARIANT FAILED: expected rose-pine colorscheme, got %s", tostring(current_colorscheme)))
@@ -71,7 +71,6 @@ function M.setup()
       Search = { fg = "#191724", bg = "#f6c177" },
     }
     
-    -- INVARIANT: Custom highlights must be applied
     for group, opts in pairs(custom_highlights) do
       assert(type(group) == "string" and #group > 0, "INVARIANT FAILED: highlight group must be non-empty string")
       assert(type(opts) == "table", "INVARIANT FAILED: highlight opts must be table")
@@ -79,7 +78,6 @@ function M.setup()
     end
   end, "rose-pine setup")
 
-  -- INVARIANT: Theme setup must succeed
   assert(success, "CRITICAL INVARIANT FAILED: rose-pine theme setup must succeed")
 end
 

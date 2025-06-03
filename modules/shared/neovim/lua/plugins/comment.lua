@@ -1,6 +1,15 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    keys = { 
+      { "gc", mode = { "n", "v" }, desc = "Toggle comment" },
+      { "gb", mode = { "n", "v" }, desc = "Toggle block comment" },
+    },
+  }
+end
+
 function M.setup()
   local comment = utils.safe_require("Comment")
   if not comment then return end

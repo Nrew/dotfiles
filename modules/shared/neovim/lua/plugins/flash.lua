@@ -1,6 +1,18 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    keys = {
+      { "s", mode = { "n", "x", "o" }, desc = "Flash" },
+      { "S", mode = { "n", "x", "o" }, desc = "Flash Treesitter" },
+      { "r", mode = "o",               desc = "Remote Flash" },
+      { "R", mode = { "o", "x" },      desc = "Treesitter Search" },
+      { "<c-s>", mode = "c"            desc = "Toggle Flash Search" },
+    }
+  }
+end
+
 function M.setup()
   local flash = utils.safe_require("flash")
   if not flash then return end

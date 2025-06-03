@@ -1,6 +1,15 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    keys = {
+      { "<leader>e", desc = "Toggle file explorer" },
+      { "<leader>o", desc = "Focus file explorer"  },
+    }
+  }
+end
+
 function M.setup()
   local neo_tree = utils.safe_require("neo-tree")
   if not neo_tree then return end

@@ -25,7 +25,7 @@ let
 
   # Core plugin collections
   corePlugins = with pkgs.vimPlugins; [
-    rose-pine telescope-nvim telescope-fzf-native-nvim which-key-nvim
+    lze lzextras rose-pine telescope-nvim telescope-fzf-native-nvim which-key-nvim
     lualine-nvim nvim-web-devicons bufferline-nvim neo-tree-nvim
     trouble-nvim mini-icons
   ];

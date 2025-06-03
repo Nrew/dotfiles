@@ -1,6 +1,12 @@
 local utils = require("core.utils")
 local M = {}
 
+function M.load()
+  return {
+    event = "DeferredUIEnter"
+  }
+end
+
 function M.setup()
   local todo_comments = utils.safe_require("todo-comments")
   if not todo_comments then return end
