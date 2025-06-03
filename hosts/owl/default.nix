@@ -75,9 +75,9 @@ let user = "nrew"; in
                 # persistent-apps = [                     # Add pinned apps
                 #     "/Applications/Discord.app"
                 #     "${pkgs.kitty}/Applications/kitty.app"
-                # ];                                      
+                # ];
                 tilesize = 30;                          # Set dock tile size
-                            
+
                 # wvous-bl-corner = 1;                  # Configure hot corners (bottom-left: Mission Control)
                 # wvous-br-corner = 1;                  # Configure hot corners (bottom-right: Mission Control)
                 # wvous-tl-corner = 1;                  # Configure hot corners (top-left: Mission Control)
@@ -117,7 +117,7 @@ let user = "nrew"; in
     # ────────────────────────────────────────────────────────────────
     # @see:
     #   - https://github.com/ryan4yin/nix-config
-    #   
+    #
     #  NOTE: Your can find all available options in:
     #    https://daiderd.com/nix-darwin/manual/index.html
     #
@@ -144,12 +144,12 @@ let user = "nrew"; in
         ];
         casks = [                                   # Install GUI apps via Homebrew
             # `brew install --cask`
-            "aerospace"           
-            "anki"                
-            "discord"             
-            "obsidian"            
-            "raycast"             
-            "visual-studio-code"  
+            "aerospace"
+            "anki"
+            "discord"
+            "obsidian"
+            "raycast"
+            "visual-studio-code"
             "ghostty"
             "sf-symbols"
             "homebrew/cask-fonts/font-sf-mono"

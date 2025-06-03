@@ -2,7 +2,7 @@
 
 let
   utils = inputs.nixCats.utils;
-  
+
   # Language-specific tool collections for better organization
   languageTools = {
     core = with pkgs; [
@@ -29,17 +29,17 @@ let
     lualine-nvim nvim-web-devicons bufferline-nvim neo-tree-nvim
     trouble-nvim mini-icons
   ];
-  
+
   # UI enhancement plugins
   uiPlugins = with pkgs.vimPlugins; [
     noice-nvim nvim-notify dressing-nvim indent-blankline-nvim
   ];
-  
+
   # LSP and completion plugins
   lspPlugins = with pkgs.vimPlugins; [
     nvim-lspconfig blink-cmp none-ls-nvim
   ];
-  
+
   # Treesitter configuration with essential parsers
   treesitterConfig = with pkgs.vimPlugins; (nvim-treesitter.withPlugins (p: with p; [
     # Core parsers - always needed
@@ -53,20 +53,20 @@ let
     # Data parsers
     json json5 yaml toml markdown markdown_inline
   ]));
-  
+
   # Editing enhancement plugins
   editingPlugins = with pkgs.vimPlugins; [
     mini-pairs nvim-surround comment-nvim flash-nvim yanky-nvim
     vim-tmux-navigator stabilize-nvim vim-bbye project-nvim
     nvim-spectre yazi-nvim persistence-nvim
   ];
-  
+
   # Development tools
   devPlugins = with pkgs.vimPlugins; [
-    gitsigns-nvim lazygit-nvim copilot-vim nvim-colorizer-lua
+    gitsigns-nvim lazygit-nvim nvim-colorizer-lua
     render-markdown-nvim todo-comments-nvim
   ];
-  
+
   # Language-specific plugin collections
   languagePlugins = {
     nix = with pkgs.vimPlugins; [ vim-nix ];
@@ -76,7 +76,7 @@ let
 
 in {
   imports = [ inputs.nixCats.homeModule ];
-  
+
   config = {
     nixCats = {
       enable = true;
@@ -105,7 +105,7 @@ in {
         python3.libraries = {};
         extraWrapperArgs = {};
       });
-      
+
       packageDefinitions.replace = {
         nvim = { pkgs, ... }: {
           settings = {
@@ -116,7 +116,7 @@ in {
             hosts.python3.enable = true;
             hosts.node.enable = true;
           };
-          
+
           # Enable all language categories wanted
           categories = {
             general = true;
@@ -128,8 +128,8 @@ in {
             typescript = true;
             c = true;
           };
-          
-          extra = { 
+
+          extra = {
             nixdExtras.nixpkgs = ''import ${pkgs.path} {}'';
           };
         };

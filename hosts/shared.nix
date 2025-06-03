@@ -24,7 +24,7 @@ let user = "nrew"; in
         cmake       # Cross-platform build system generator
         jq          # A lightweight and flexible command-line JSON processor
         cargo       # Rust package manager
-	    texinfo     # Needed for compiling tools like Emacs
+	      texinfo     # Needed for compiling tools like Emacs
         btop        # System-wide resource monitor
         neovim      # Modern text editor
         git         # Version control system

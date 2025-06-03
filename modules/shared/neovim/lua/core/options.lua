@@ -1,4 +1,3 @@
--- nixcats options - consolidated implementation
 local M = {}
 
 -- Constants
@@ -21,7 +20,6 @@ local function ensure_directory(path)
   return true
 end
 
--- Consolidated option setting
 local function set_options(option_groups)
   local opt, g = vim.opt, vim.g
   
@@ -39,7 +37,7 @@ end
 local function get_option_groups()
   local undo_path = vim.fn.stdpath("data") .. "/" .. CONFIG.UNDO_DIR
   if not undo_path or #undo_path == 0 then
-    error("INVARIANT FAILED: unable to determine data directory path")
+    error("Unable to determine data directory path")
   end
   ensure_directory(undo_path)
   
