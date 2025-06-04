@@ -1,38 +1,12 @@
-local utils = require("core.utils")
 local M = {}
 
-function M.load()
-  return {
-    keys = {
-      { "<leader>ff", desc = "Find Files" },
-      { "<leader>fg", desc = "Live Grep"  },
-      { "<leader>fb", desc = "Buffers"    },
-      { "<leader>fh", desc = "Help Tags"  },
-      { "<leader>fr", desc = "Recent Files" },
-      { "<leader>fc", desc = "Colorscheme" },
-      { "<leader>fs", desc = "Document Symbols" },
-      { "<leader>fS", desc = "Workspace Symbols" },
-    }
-  }
-end
-
 function M.setup()
-  local telescope = utils.safe_require("telescope")
-  local actions = utils.safe_require("telescope.actions")
-  
-  -- INVARIANT: Both telescope and actions must be available
-  assert(telescope, "CRITICAL INVARIANT FAILED: telescope is required")
-  assert(actions, "CRITICAL INVARIANT FAILED: telescope.actions is required")
-  assert(type(telescope.setup) == "function", "INVARIANT FAILED: telescope.setup must be function")
-  assert(type(telescope.load_extension) == "function", "INVARIANT FAILED: telescope.load_extension must be function")
+  local ok, telescope = pcall(require, "telescope")
+  if not ok then return end
 
-  -- INVARIANT: Essential actions must exist
-  local required_actions = { "close", "move_selection_next", "move_selection_previous", "send_to_qflist", "open_qflist" }
-  for _, action_name in ipairs(required_actions) do
-    assert(actions[action_name], string.format("INVARIANT FAILED: actions.%s must exist", action_name))
-  end
+  local actions = require("telescope.actions")
 
-  local config = {
+  telescope.setup({
     defaults = {
       prompt_prefix = " ",
       selection_caret = " ",
@@ -66,27 +40,10 @@ function M.setup()
         override_file_sorter = true,
       },
     },
-  }
+  })
 
-  -- INVARIANT: Config structure must be valid
-  assert(type(config.defaults) == "table", "INVARIANT FAILED: defaults must be table")
-  assert(type(config.defaults.mappings) == "table", "INVARIANT FAILED: mappings must be table")
-  assert(type(config.defaults.mappings.i) == "table", "INVARIANT FAILED: insert mode mappings must be table")
-  assert(type(config.pickers) == "table", "INVARIANT FAILED: pickers must be table")
-  assert(type(config.extensions) == "table", "INVARIANT FAILED: extensions must be table")
-
-  local success = utils.safe_call(function()
-    telescope.setup(config)
-    
-    -- INVARIANT: FZF extension must be loadable if configured
-    local fzf_available = pcall(telescope.load_extension, "fzf")
-    if not fzf_available then
-      vim.notify("FZF extension not available, telescope may be slower", vim.log.levels.WARN)
-    end
-  end, "telescope setup")
-
-  -- INVARIANT: Telescope setup must succeed
-  assert(success, "CRITICAL INVARIANT FAILED: telescope setup must succeed")
+  -- Load fzf extension if available
+  pcall(telescope.load_extension, "fzf")
 end
 
 return M
