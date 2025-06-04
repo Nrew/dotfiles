@@ -1,54 +1,83 @@
--- init.lua - Streamlined plugin loading with preserved customizations
 require("core.options")
 require("core.keymaps")
 require("core.autocmds")
 
-local function safe_setup(module_name)
-  local ok, module = pcall(require, module_name)
-  if ok and type(module.setup) == "function" then
-    pcall(module.setup)
+local loaded = {}
+local failed = {}
+
+local function load_plugin(name)
+  local module_path = "plugins." .. name
+  local status, module = pcall(require, module_path)
+
+  if not status then
+    failed[name] = "module not found: " .. tostring(module)
+    return false
   end
+
+  if type(module.setup) ~= "function" then
+    failed[name] = "no setup function"
+    return false
+  end
+
+  local setup_ok, setup_err = pcall(module.setup)
+  if not setup_ok then
+    failed[name] = "setup failed: " .. tostring(setup_err)
+    return false
+  end
+
+  loaded[name] = true
+  return true
 end
 
--- Essential (immediate load)
-safe_setup("plugins.theme")
-safe_setup("plugins.treesitter")
+local function show_results()
+  local loaded_list = {}
+  local failed_list = {}
 
--- LSP ecosystem (on file open)
-vim.api.nvim_create_autocmd({"BufReadPre", "BufNewFile"}, {
-  once = true,
-  callback = function()
-    safe_setup("plugins.lsp")
-    safe_setup("plugins.completion")
-    safe_setup("plugins.trouble")
+  for name in pairs(loaded) do
+    table.insert(loaded_list, name)
   end
+
+  for name, reason in pairs(failed) do
+    table.insert(failed_list, name .. " (" .. reason .. ")")
+  end
+
+  table.sort(loaded_list)
+  table.sort(failed_list)
+
+  local message = string.format(
+    "Plugin Loading Results:\n\nLoaded (%d): \n%s\n\nFailed (%d): \n%s",
+    #loaded_list,
+    #loaded_list > 0 and "✔ " .. table.concat(loaded_list, "\n✔ ") or "None",
+    #failed_list,
+    #failed_list > 0 and "✘ " .. table.concat(failed_list, "\n✘ ") or "None"
+  )
+
+  vim.notify(message, vim.log.levels.INFO, { title = "Plugin Loader" })
+end
+
+load_plugin("theme")
+
+vim.api.nvim_create_autocmd("User", {
+  pattern = "DeferredUIEnter",
+  callback = function()
+    -- Load plugins
+    local plugins = {
+      "treesitter", "lsp", "completion", "telescope", "neo-tree",
+      "lualine", "bufferline", "which-key", "noice", "indent-blankline", 
+      "mini-pairs", "comment", "flash", "surround", "yanky", "trouble",
+      "todo-comments", "gitsigns", "lazygit", "project", "persistence", "yazi"
+    }
+
+    for _, plugin in ipairs(plugins) do
+      load_plugin(plugin)
+    end
+
+    vim.schedule(show_results)
+  end,
 })
 
--- UI (deferred 50ms)
 vim.defer_fn(function()
-  safe_setup("plugins.telescope")
-  safe_setup("plugins.neo-tree")
-  safe_setup("plugins.lualine")
-  safe_setup("plugins.bufferline")
-  safe_setup("plugins.which-key")
-  safe_setup("plugins.gitsigns")
-  safe_setup("plugins.indent-blankline")
-  safe_setup("plugins.todo-comments")
+  vim.api.nvim_exec_autocmds("UserAutoCommands", { pattern = "DeferredUIEnter" })
 end, 50)
 
--- Editing (on interaction)
-vim.api.nvim_create_autocmd({"InsertEnter", "CmdlineEnter"}, {
-  once = true,
-  callback = function()
-    safe_setup("plugins.comment")
-    safe_setup("plugins.surround")
-    safe_setup("plugins.flash")
-    safe_setup("plugins.mini-pairs")
-  end
-})
-
--- Git tools (on demand)
-vim.api.nvim_create_user_command("LazyGit", function()
-  safe_setup("plugins.lazygit")
-  vim.cmd("LazyGit")
-end, {})
+vim.notify("NixCats Neovim ready", vim.log.levels.INFO)
