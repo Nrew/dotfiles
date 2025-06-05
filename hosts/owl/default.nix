@@ -110,8 +110,6 @@ let user = "nrew"; in
         ];
     };
 
-    services.sketchybar.enable = true;
-
     # ────────────────────────────────────────────────────────────────
     # Homebrew-Specific Settings
     # ────────────────────────────────────────────────────────────────
@@ -128,7 +126,6 @@ let user = "nrew"; in
     #        1. right click on the running app's icon in Dock, select "Options" -> "Show in Finder" and delete it
     #    4. hold down the Option key, a `x` button will appear on the icon, click it to remove the icon
     # ────────────────────────────────────────────────────────────────
-    
 
     homebrew = {
         enable = true;
@@ -167,4 +164,6 @@ let user = "nrew"; in
             upgrade = true;                         # Automatically upgrade Homebrew packages
         };
     };
+
+    services.sketchybar.enable = true;
 }

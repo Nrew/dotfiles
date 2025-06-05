@@ -77,7 +77,7 @@ vim.api.nvim_create_autocmd("User", {
 })
 
 vim.defer_fn(function()
-  vim.api.nvim_exec_autocmds("UserAutoCommands", { pattern = "DeferredUIEnter" })
+  vim.api.nvim_exec_autocmds("User", { pattern = "DeferredUIEnter" })
 end, 50)
 
 vim.notify("NixCats Neovim ready", vim.log.levels.INFO)
