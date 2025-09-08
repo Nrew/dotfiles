@@ -119,7 +119,7 @@ let user = "nrew"; in
     #  NOTE: Your can find all available options in:
     #    https://daiderd.com/nix-darwin/manual/index.html
     #
-    #  NOTE：To remove the uninstalled APPs icon from Launchpad:
+    #  NOTE: To remove the uninstalled APPs icon from Launchpad:
     #    1. `sudo nix store gc --debug` & `sudo nix-collect-garbage --delete-old`
     #    2. click on the uninstalled APP's icon in Launchpad, it will show a question mark
     #    3. if the app starts normally:
@@ -128,42 +128,41 @@ let user = "nrew"; in
     # ────────────────────────────────────────────────────────────────
 
     homebrew = {
-        enable = true;
-        brews = [                                   # Install CLI tools via Homebrew
-            # `brew install`
-            "mas"
-	          "lua"
-            "spicetify-cli"
-            "gowall"
-	          "switchaudio-osx"
-            "nowplaying-cli"
-	          "sketchybar"
-        ];
-        casks = [                                   # Install GUI apps via Homebrew
-            # `brew install --cask`
-            "aerospace"
-            "anki"
-            "discord"
-            "obsidian"
-            "raycast"
-            "visual-studio-code"
-            "ghostty"
-            "sf-symbols"
-            "homebrew/cask-fonts/font-sf-mono"
-            "homebrew/cask-fonts/font-sf-pro"
-	          "zen"
-        ]; 
-        taps = [                                    # Add additional Homebrew taps
-            "nikitabobko/tap"                       # Aerospace tap
-            "felixkratz/formulae"                   # Sketchybar tap
-        ];               
-        masApps = {};                               # Add any macOS App Store apps here
-        onActivation = {
-            cleanup = "zap";                        # Cleanup unused Homebrew packages on activation
-            autoUpdate = true;                      # Automatically update Homebrew packages
-            upgrade = true;                         # Automatically upgrade Homebrew packages
-        };
+      enable = true;
+      brews = [                                   # Install CLI tools via Homebrew
+        # `brew install`
+        "mas"
+	      "lua"
+        "spicetify-cli"
+        "gowall"
+	      "switchaudio-osx"
+        "nowplaying-cli"
+	      "sketchybar"
+      ];
+      casks = [                                   # Install GUI apps via Homebrew
+        # `brew install --cask`
+        "aerospace"
+        "anki"
+        "discord"
+        "obsidian"
+        "raycast"
+        "visual-studio-code"
+        "ghostty"
+        "sf-symbols"
+        "homebrew/cask-fonts/font-sf-mono"
+        "homebrew/cask-fonts/font-sf-pro"
+        "zen"
+      ];
+      taps = [                                    # Add additional Homebrew taps
+        "nikitabobko/tap"                       # Aerospace tap
+        "felixkratz/formulae"                   # Sketchybar tap
+      ];
+      masApps = {};                               # Add any macOS App Store apps here
+      onActivation = {
+        cleanup = "zap";                        # Cleanup unused Homebrew packages on activation
+        autoUpdate = true;                      # Automatically update Homebrew packages
+        upgrade = true;                         # Automatically upgrade Homebrew packages
+      };
     };
-
     services.sketchybar.enable = true;
 }

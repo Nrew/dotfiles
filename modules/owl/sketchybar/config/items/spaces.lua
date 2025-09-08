@@ -121,7 +121,7 @@ sbar.exec("aerospace list-workspaces --all --format '%{workspace}%{monitor-appki
         border_color = colors.black
       },
       click_script = "aerospace workspace " .. workspace_id,
-      display = monitor_id -- Assign to correct monitor
+      display = monitor_id
     })
 
     -- Store reference
@@ -143,26 +143,6 @@ sbar.exec("aerospace list-workspaces --all --format '%{workspace}%{monitor-appki
         })
       end
     end)
-
-    -- Hover effects
-    workspace:subscribe("mouse.entered", function()
-      workspace:set({
-        background = { color = colors.with_alpha(colors.yellow, 0.3), border_color = colors.yellow },
-        icon = { color = colors.yellow }
-      })
-    end)
-
-    workspace:subscribe("mouse.exited", function()
-      local query = workspace:query()
-      local is_focused = query.icon.highlight == "true"
-      workspace:set({
-        background = {
-          color = is_focused and colors.with_alpha(colors.red, 0.2) or colors.bg1,
-          border_color = is_focused and colors.red or colors.bg2
-        },
-        icon = { color = is_focused and colors.red or colors.white }
-      })
-    end)
   end
 
   -- Initial refresh
@@ -172,7 +152,6 @@ sbar.exec("aerospace list-workspaces --all --format '%{workspace}%{monitor-appki
   local refresh_trigger = sbar.add("item", "refresh_trigger", { drawing = false, updates = true })
 
   -- App/window changes - just refresh workspace content
-  refresh_trigger:subscribe("aerospace_focus_change", refreshWorkspaces)
   refresh_trigger:subscribe("space_windows_change", refreshWorkspaces)
 
   -- Monitor changes - full refresh with monitor reassignment
@@ -186,7 +165,6 @@ sbar.exec("aerospace list-workspaces --all --format '%{workspace}%{monitor-appki
   end)
 end)
 
--- Spaces indicator
 local spaces_indicator = sbar.add("item", "spaces_indicator", {
   padding_left = -3,
   padding_right = -5,

@@ -35,7 +35,6 @@ let user = "nrew"; in
         imagemagick # Image rendering  
         fastfetch   # Fast system information tool
         fzf         # Fuzzy finder for the terminal
-        spotify     # Music streaming service
     ];
 
     # ────────────────────────────────────────────────────────────────
@@ -71,8 +70,8 @@ let user = "nrew"; in
     nixpkgs.config.allowUnfree = true; # Allow unfree packages to be installed
 
     nix = {
-        # Set the Nix package as the default to ensure Nix commands are available system-wide
-        package = pkgs.nix;
+      # Set the Nix package as the default to ensure Nix commands are available system-wide
+      package = pkgs.nix;
 	    settings = {
             trusted-users = [ "@admin" "${user}" ];
             substituters = [ "https://nix-community.cachix.org" "https://cache.nixos.org" ];

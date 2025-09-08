@@ -39,7 +39,7 @@ in
         # when a new Home Manager release introduces backwards
         # incompatible changes.
         stateVersion = "24.11";
-        
+
         # Theme configuration
         sessionVariables = {
             TERM = "xterm-256color";
