@@ -97,7 +97,7 @@
       mkDarwinConfiguration = system: hostname:
         let
           sharedSpecialArgs = {
-            inherit inputs self user;
+            inherit inputs self user system;
           };
         in 
           darwin.lib.darwinSystem { 

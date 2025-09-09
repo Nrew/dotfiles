@@ -11,8 +11,6 @@
     ./neovim
     ./starship
     ./ghostty
-    ./spicetify
     ./btop
-    ./spotify-player
   ];
 }

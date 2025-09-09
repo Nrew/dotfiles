@@ -1,17 +1,18 @@
-{ config, pkgs, lib, user, ... }:
+{ config, pkgs, lib, user, system, ... }:
 let
-    user = "nrew";
+  isDarwin = lib.hasSuffix "darwin" system;
+  isLinux  = lib.hasSuffix "linux"  system;
 in
 {
     #──────────────────────────────────────────────────────────────────
     # Imports & Core Configuration
     #──────────────────────────────────────────────────────────────────
-    imports = [ 
-        ../modules/shared
-#   ] ++ lib.optionals pkgs.stdenv.isDarwin [
-        ../modules/owl
-#   ] ++ lib.optionals pkgs.stdenv.isLinux [
-#       ../modules/crow
+    imports = [
+      ../modules/shared
+    ] ++ lib.optionals isDarwin [
+      ../modules/owl
+    ] ++ lib.optionals isLinux  [
+      ../modules/crow
     ];
 
     # Enable home-manager
@@ -19,7 +20,7 @@ in
 
     # XDG Configuration
     xdg = {
-        enable = true;
+    enable = true;
         configHome = "${config.home.homeDirectory}/.config";
         cacheHome = "${config.home.homeDirectory}/.cache";
         dataHome = "${config.home.homeDirectory}/.local/share";
