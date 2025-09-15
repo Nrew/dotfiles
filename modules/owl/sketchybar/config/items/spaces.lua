@@ -4,166 +4,144 @@ local settings = require("settings")
 local app_icons = require("helpers.app_icons")
 
 local workspaces = {}
+local workspace_app_cache = {}
+local icon_cache = {}
 
-local function getWorkspaceIcons(apps)
-  if not apps or #apps == 0 then
-    return " —"
-  end
+-- CONSTANTS
+local EMPTY_WORKSPACE_ICON = "-"
+local DEFAULT_ICON = app_icons["default"] or "?"
 
-  local icons_list = {}
-  for _, app in ipairs(apps) do
-    table.insert(icons_list, app_icons[app] or app_icons["default"])
+local function get_app_icon(app_name)
+  if not icon_cache[app_name] then
+    icon_cache[app_name] = app_icons[app_name] or DEFAULT_ICON
   end
-  return table.concat(icons_list, " ")
+  return icon_cache[app_name]
 end
 
--- Update workspace appearance
-local function updateWorkspace(workspace_id, apps, is_focused)
-  local workspace = workspaces[workspace_id]
-  if not workspace then return end
+local function parse_workspace_data(output)
+  local workspace_apps = {}
+  if not output then return workspace_apps end
 
-  local icons_string = getWorkspaceIcons(apps)
+  for workspace, app in output:gmatch("[^\r\n]+") do
+    workspace_apps[workspace] = workspace_apps[workspace] or {}
+    table.insert(workspace_apps[workspace], app)
+  end
 
-  workspace:set({
+  return workspace_apps
+end
+
+local function create_icons_string(app)
+  if not apps or #apps == 0 then
+    return EMPTY_WORKSPACE_ICON
+  end
+
+  local icons_array = {}
+  for i=1, #apps do
+    icons_array[i] = get_app_icon(app[i])
+  end
+  return table.concat(icons_array, " ")
+end
+
+
+
+local function update_workspace_labels()
+  sbar.exec("aerospace list-windows --all --format '%{workspace} %{app-name}'", function (output)
+    local workspace_apps = parse_workspace_data(output)
+    local updates = {}
+
+    for id, item in pairs(workspaces) do
+      local apps = workspace_apps[id]
+      local icons_string = create_icons_string(apps)
+
+      -- Only update if the label has actually changed
+      if workspace_app_cache[id] ~= icons_string then
+        workspace_app_cache[id] = icons_string
+        updates[#updates + 1] = { item = item, label = icons_string }
+      end
+    end
+
+    -- Perform all updates in a single batch
+    if #updates > 0 then
+      for _, update in ipairs(updates) do
+        update.item:set({ lavel = { string = update.label } })
+      end
+    end
+  end)
+end
+
+
+local FOCUSED_STYLE = {
+  icon  = { highlight = true },
+  label = { highlight = true },
+  background = { border_color = colors.red, color = colors.with_alpha(colors.red, 0.2) }
+}
+local UNFOCUSED_STYLE = {
+  icon  = { highlight = false },
+  label = { highlight = false },
+  background = { border_color = colors.bg2, color = colors.bg1 }
+}
+
+local function create_workspace(workspace_name)
+  local workspace_item = sbar.add("item", "space." .. workspace_name, {
     icon = {
-      highlight = is_focused,
-      color = is_focused and colors.red or colors.white
+      font = { family = settings.font.space_numbers },
+      string = workspace_name,
+      padding_left  = 11,
+      padding_right = 4,
+      color = colors.white,
+      highlight_color = colors.red,
+      y_offset = 1
     },
     label = {
-      string = icons_string,
-      highlight = is_focused,
-      color = is_focused and colors.red or colors.grey
+      padding_left  = 4,
+      padding_right = 12,
+      color = colors.gray,
+      highlight_color = colors.red,
+      font = "sketchybar-app-font:Regular:16.0",
+      string = EMPTY_WORKSPACE_ICON
     },
     background = {
-      border_color = is_focused and colors.red or colors.bg2,
-      color = is_focused and colors.with_alpha(colors.red, 0.2) or colors.bg1
-    }
+      color = colors.bg1,
+      border_width = 1,
+      height = 26, 
+      vorder_color = colors.bg2
+    },
+    click_script = "aerospace workspace " .. workspace_name,
   })
+
+  workspace_item:subscribe("aerospace_workspace_change", function(env)
+    local is_focused = (env.FOCUSED_WORKSPACE == workspace_name)
+    workspace_item:set(is_focused and FOCUSED_STYLE or UNFOCUSED_STYLE)
+  end)
+
+  workspaces[workspace_name] = workspace_item
 end
 
--- Update workspace-to-monitor assignments
-local function updateMonitorAssignments()
-  sbar.exec("aerospace list-workspaces --all --format '%{workspace}%{monitor-appkit-nsscreen-screens-id}' --json", function(workspaces_monitors)
-    for _, entry in ipairs(workspaces_monitors) do
-      local workspace_id = entry.workspace
-      local monitor_id = math.floor(entry["monitor-appkit-nsscreen-screens-id"])
-
-      if workspaces[workspace_id] then
-        workspaces[workspace_id]:set({
-          display = monitor_id
-        })
-      end
+local function initalize_workspaces()
+  sbar.exec("aerospace list-workspaces --all", function(output)
+    if not output then return end
+    
+    for workspace_name in output:gmatch("^%s*(.-)%s*$") do
+      create_workspace(workspace_name)
     end
+    
+    update_workspace_labels()
   end)
 end
 
-local function refreshWorkspaces()
-  sbar.exec("aerospace list-windows --all --format '%{workspace}%{app-name}' --json", function(windows_data)
-    local workspace_apps = {}
-
-    -- Parse windows data
-    for _, entry in ipairs(windows_data) do
-      local workspace_id = entry.workspace
-      local app = entry["app-name"]
-
-      if workspace_id and app then
-        workspace_apps[workspace_id] = workspace_apps[workspace_id] or {}
-        table.insert(workspace_apps[workspace_id], app)
-      end
-    end
-
-    -- Get focused workspace
-    sbar.exec("aerospace list-workspaces --focused", function(focused_output)
-      local focused = focused_output:match("^%s*(.-)%s*$")
-
-      -- Update all workspaces
-      for workspace_id, _ in pairs(workspaces) do
-        updateWorkspace(workspace_id, workspace_apps[workspace_id], workspace_id == focused)
-      end
-    end)
-  end)
+local update_timer = nil
+local function debounced_update()
+  if update_timer then sbar.cancel(update_timer) end
+  update_timer = sbar.delay(0.1, update_workspace_labels)
 end
 
-local function fullRefresh()
-  updateMonitorAssignments()
-  refreshWorkspaces()
-end
-
-sbar.exec("aerospace list-workspaces --all --format '%{workspace}%{monitor-appkit-nsscreen-screens-id}' --json", function(workspaces_data)
-  for _, entry in ipairs(workspaces_data) do
-    local workspace_id = entry.workspace
-    local monitor_id = math.floor(entry["monitor-appkit-nsscreen-screens-id"])
-
-    local workspace = sbar.add("item", "space." .. workspace_id, {
-      icon = {
-        font = { family = settings.font.space_numbers },
-        string = workspace_id,
-        padding_left = 11,
-        padding_right = 4,
-        color = colors.white,
-        highlight_color = colors.blue,
-        y_offset = 1
-      },
-      label = {
-        padding_left = 4,
-        padding_right = 12,
-        color = colors.grey,
-        highlight_color = colors.white,
-        font = "sketchybar-app-font:Regular:16.0",
-        string = " —"
-      },
-      padding_right = 1,
-      padding_left = 1,
-      background = {
-        color = colors.bg1,
-        border_width = 1,
-        height = 26,
-        border_color = colors.black
-      },
-      click_script = "aerospace workspace " .. workspace_id,
-      display = monitor_id
-    })
-
-    -- Store reference
-    workspaces[workspace_id] = workspace
-
-    -- Focus change handler
-    workspace:subscribe("aerospace_workspace_change", function(env)
-      if env.FOCUSED_WORKSPACE == workspace_id then
-        workspace:set({
-          icon = { highlight = true, color = colors.red },
-          label = { highlight = true, color = colors.red },
-          background = { border_color = colors.red, color = colors.with_alpha(colors.red, 0.2) }
-        })
-      else
-        workspace:set({
-          icon = { highlight = false, color = colors.white },
-          label = { highlight = false, color = colors.grey },
-          background = { border_color = colors.bg2, color = colors.bg1 }
-        })
-      end
-    end)
-  end
-
-  -- Initial refresh
-  fullRefresh()
-
-  -- Set up refresh events
-  local refresh_trigger = sbar.add("item", "refresh_trigger", { drawing = false, updates = true })
-
-  -- App/window changes - just refresh workspace content
-  refresh_trigger:subscribe("space_windows_change", refreshWorkspaces)
-
-  -- Monitor changes - full refresh with monitor reassignment
-  refresh_trigger:subscribe("display_change", function()
-    print("Display change detected - updating monitor assignments")
-    fullRefresh()
-  end)
-
-  refresh_trigger:subscribe("system_woke", function()
-    sbar.delay(1.5, fullRefresh)
-  end)
+local event_handler = sbar.add("item", "aerospace_event_handler", { drawing = false })
+event_handler:subscribe({ "aerospace_window_change", "display_change" }, update_workspace_labels)
+event_handler:subscribe("aerospace_workspace_change", debounced_update)
+event_handler:subscribe("system_woke", function()
+  sbar.delay(1.0, update_workspace_labels)
 end)
+
 
 local spaces_indicator = sbar.add("item", "spaces_indicator", {
   padding_left = -3,
@@ -211,3 +189,5 @@ end)
 spaces_indicator:subscribe("mouse.clicked", function()
   sbar.trigger("swap_menus_and_spaces")
 end)
+
+initalize_workspaces()

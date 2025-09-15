@@ -137,11 +137,11 @@ let user = "nrew"; in
         "gowall"
 	      "switchaudio-osx"
         "nowplaying-cli"
-	      "sketchybar"
+      # "sketchybar"
       ];
       casks = [                                   # Install GUI apps via Homebrew
         # `brew install --cask`
-        "aerospace"
+        #"aerospace"
         "anki"
         "discord"
         "obsidian"
@@ -164,5 +164,5 @@ let user = "nrew"; in
         upgrade = true;                         # Automatically upgrade Homebrew packages
       };
     };
-    services.sketchybar.enable = true;
+  #services.sketchybar.enable = true;
 }

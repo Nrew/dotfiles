@@ -4,41 +4,41 @@ let
   # Rose Pine base theme colors
   roseTheme = {
     # Base colors
-    base = "#191724";
+    base    = "#191724";
     surface = "#1f1d2e";
     overlay = "#26233a";
-    muted = "#6e6a86";
-    subtle = "#908caa";
-    text = "#e0def4";
-    love = "#eb6f92";
-    gold = "#f6c177";
-    rose = "#ebbcba";
-    pine = "#31748f";
-    foam = "#9ccfd8";
-    iris = "#c4a7e7";
+    muted   = "#6e6a86";
+    subtle  = "#908caa";
+    text    = "#e0def4";
+    love    = "#eb6f92";
+    gold    = "#f6c177";
+    rose    = "#ebbcba";
+    pine    = "#31748f";
+    foam    = "#9ccfd8";
+    iris    = "#c4a7e7";
     
     # Semantic colors
-    background = "#191724";
-    foreground = "#e0def4";
-    surface1 = "#1f1d2e";
-    surface2 = "#26233a";
+    background  = "#191724";
+    foreground  = "#e0def4";
+    surface1    = "#1f1d2e";
+    surface2    = "#26233a";
     
     # UI colors
-    red = "#eb6f92";
-    orange = "#ebbcba";
-    yellow = "#f6c177";
-    green = "#9ccfd8";
-    blue = "#31748f";
+    red     = "#eb6f92";
+    orange  = "#ebbcba";
+    yellow  = "#f6c177";
+    green   = "#9ccfd8";
+    blue    = "#31748f";
     magenta = "#c4a7e7";
-    cyan = "#9ccfd8";
-    white = "#e0def4";
+    cyan    = "#9ccfd8";
+    white   = "#e0def4";
     
     # Additional colors
-    accent = "#c4a7e7";
-    error = "#eb6f92";
+    accent  = "#c4a7e7";
+    error   = "#eb6f92";
     warning = "#f6c177";
     success = "#9ccfd8";
-    info = "#31748f";
+    info    = "#31748f";
     
     # Transparency levels
     alpha = {
