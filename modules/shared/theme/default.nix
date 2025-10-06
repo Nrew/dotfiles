@@ -51,7 +51,7 @@ in
     
     wallpaperDir = lib.mkOption {
       type = lib.types.str;
-      default = "${config.home.homeDirectory}/.config/dotfiles/images";
+      default = "${config.home.homeDirectory}/.config/dotfiles/images/wallpapers";
     };
   };
   
