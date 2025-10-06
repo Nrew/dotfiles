@@ -47,7 +47,27 @@ function M.setup()
     },
     nixd = {
       condition = has_category("nix"),
-      settings = { nixd = { nixpkgs = { expr = "import <nixpkgs> { }" } } },
+      settings = { 
+        nixd = { 
+          nixpkgs = { 
+            expr = _G.nixCats("nixdExtras.nixpkgs") or "import <nixpkgs> { }"
+          },
+          formatting = {
+            command = { "nixfmt" }
+          },
+          options = {
+            nixos = {
+              expr = '(builtins.getFlake "/home/nrew/.config/dotfiles").nixosConfigurations.default.options'
+            },
+            ["nix-darwin"] = {
+              expr = '(builtins.getFlake "/Users/nrew/.config/dotfiles").darwinConfigurations.owl.options'
+            },
+            home_manager = {
+              expr = '(builtins.getFlake "/home/nrew/.config/dotfiles").homeConfigurations.default.options'
+            }
+          }
+        } 
+      },
     },
     tsserver = {
       condition = has_category("typescript"),

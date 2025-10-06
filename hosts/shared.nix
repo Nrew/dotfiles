@@ -10,36 +10,32 @@ let user = "nrew"; in
     imports = [];
 
     # ────────────────────────────────────────────────────────────────
-    # Shared System Packages
+    # System-Level Packages (Required for system services and daemons)
     # ────────────────────────────────────────────────────────────────
 
     environment.systemPackages = with pkgs; [
+        # System-level services and daemons
+        docker          # Requires system-level daemon
+        
+        # Core system utilities
+        git             # Version control system
+        git-lfs         # Git extension for large files
+        neovim          # System editor (fallback if home-manager fails)
+        
+        # Build tools (system-wide for compilation)
+        cmake           # Cross-platform build system generator
+        cargo           # Rust package manager
+        texinfo         # Needed for compiling tools like Emacs
+        
+        # Python environment (system-wide)
         (python3.withPackages (ps: with ps; [
             pip
             virtualenv
         ]))
-        
-        docker      # Requires system-level daemon
-        wget        # Command-line file downloader
-        curl        # Command-line URL transfer tool
-        cmake       # Cross-platform build system generator
-        jq          # A lightweight and flexible command-line JSON processor
-        cargo       # Rust package manager
-        texinfo     # Needed for compiling tools like Emacs
-        btop        # System-wide resource monitor
-        neovim      # Modern text editor
-        git         # Version control system
-        git-lfs     # Git extension for large files
-        tmux        # Terminal multiplexer
-        starship    # Cross-shell prompt
-        kitty       # Modern terminal emulator
-        imagemagick # Image rendering  
-        fastfetch   # Fast system information tool
-        fzf         # Fuzzy finder for the terminal
     ];
 
     # ────────────────────────────────────────────────────────────────
-    # Fonts Configuration
+    # Fonts Configuration (System-wide)
     # ────────────────────────────────────────────────────────────────
 
     fonts = {
@@ -55,7 +51,7 @@ let user = "nrew"; in
     };
 
     # ────────────────────────────────────────────────────────────────
-    # Environment Variables
+    # Environment Variables (System-wide)
     # ────────────────────────────────────────────────────────────────
 
     # Define system-wide environment variables

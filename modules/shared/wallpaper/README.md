@@ -1,15 +1,14 @@
 # Wallpaper Module
 
-A Nix-focused wallpaper management module for nix-darwin that provides interactive wallpaper selection with live preview.
+A Nix-focused wallpaper management module for nix-darwin that uses platform-appropriate tools.
 
 ## Features
 
-- 🖼️ Interactive wallpaper selection using fzf
-- 👁️ Live image preview in kitty terminal
-- 🎨 Theme-aware color scheme
+- 🖼️ **macOS**: Uses `gowall` for efficient wallpaper management
+- 🐧 **Linux**: Interactive fzf-based wallpaper selector with live preview
+- 👁️ Live image preview in kitty terminal (Linux)
+- 🎨 Theme-aware integration
 - 📁 Supports multiple image formats (jpg, jpeg, png, webp)
-- 🔗 Tracks current wallpaper via symlink
-- ✅ Full Nix store path integration
 
 ## Configuration
 
@@ -35,9 +34,15 @@ By default, wallpapers are loaded from `~/.config/dotfiles/images/wallpapers`. T
 
 ## Usage
 
-### Select a Wallpaper
+### macOS (gowall)
 
-Run the wallpaper selector:
+The module uses `gowall` on macOS, which must be installed via Homebrew:
+
+```bash
+brew install gowall
+```
+
+Then run the wallpaper command:
 
 ```bash
 wallpaper
@@ -45,13 +50,35 @@ wallpaper
 wp
 ```
 
-### Navigation
+Gowall provides:
+- Automatic wallpaper rotation
+- Support for multiple displays
+- Built-in wallpaper sources
+- Efficient macOS integration
 
+For gowall-specific options, pass them directly:
+
+```bash
+wallpaper --help           # Show gowall help
+wallpaper --interval 300   # Change wallpaper every 5 minutes
+```
+
+### Linux (fzf selector)
+
+On Linux, the module provides an interactive fzf-based selector:
+
+```bash
+wallpaper
+```
+
+**Navigation:**
 - `↑`/`↓` or `j`/`k` - Navigate through wallpapers
 - `Enter` - Select wallpaper
-- `Ctrl-d` - Scroll preview down
-- `Ctrl-u` - Scroll preview up
 - `Esc` or `Ctrl-c` - Cancel
+
+**Preview:**
+- Kitty terminal: Full image preview using kitty's icat
+- Fallback: Text-based info (filename, size, dimensions)
 
 ### Current Wallpaper
 
@@ -60,63 +87,42 @@ The current wallpaper is tracked via symlink at:
 ~/.local/state/current-wallpaper
 ```
 
-## Image Preview
+## Platform-Specific Details
 
-The module supports two preview modes:
+### macOS
 
-1. **Kitty Terminal** (recommended)
-   - Full image preview using kitty's icat
-   - Renders actual image in the preview pane
-   
-2. **Fallback Mode**
-   - Text-based preview showing:
-     - Filename
-     - File size
-     - Image dimensions (requires ImageMagick)
+- Uses `gowall` (Homebrew package)
+- Integrates with macOS desktop settings
+- Supports multiple displays
+- Automatic wallpaper rotation
 
-## Technical Details
+### Linux
 
-### Dependencies
-
-All dependencies are automatically installed via Nix:
-- `findutils` - File searching
-- `imagemagick` - Image information
-- `fzf` - Interactive selection
-- `kitty` - Image preview (optional, for better UX)
-
-### Nix Integration
-
-The module uses several Nix best practices:
-
-1. **Store Paths**: All utilities use explicit Nix store paths
-2. **String Interpolation**: Image formats defined in Nix, not shell
-3. **Type Safety**: Configuration validated at build time
-4. **Assertions**: Directory path validation
-
-### macOS Integration
-
-Uses native macOS System Events to set wallpaper:
-```applescript
-tell application "System Events" to tell every desktop to set picture to "<path>"
-```
+- Uses fzf for interactive selection
+- Kitty terminal image preview
+- ImageMagick for image information
+- Manual wallpaper setting
 
 ## Troubleshooting
 
-### No wallpapers found
+### macOS: gowall not found
 
-Ensure your wallpaper directory exists and contains supported image formats:
+Install gowall via Homebrew:
+```bash
+brew install gowall
+```
+
+### Linux: No wallpapers found
+
+Ensure your wallpaper directory exists and contains supported images:
 ```bash
 mkdir -p ~/.config/dotfiles/images/wallpapers
 ```
 
-### Preview not working
+### Preview not working (Linux)
 
 1. For kitty preview, ensure you're using kitty terminal
 2. For dimensions, ImageMagick is required (included automatically)
-
-### Wallpaper not applying
-
-Check that you have proper permissions and System Events access on macOS.
 
 ## Example Structure
 

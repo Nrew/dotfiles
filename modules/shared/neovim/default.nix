@@ -50,12 +50,12 @@ let
   # Language servers organized by category
   languageServers = {
     lua = [ pkgs.lua-language-server ];
-    nix = [ pkgs.nixd ];
-    typescript = [ pkgs.typescript-language-server pkgs.nodejs pkgs.eslint ];
-    python = [ pkgs.pyright pkgs.black pkgs.flake8 pkgs.isort ];
-    rust = [ pkgs.rust-analyzer pkgs.rustfmt pkgs.cargo ];
-    go = [ pkgs.gopls pkgs.delve pkgs.golint pkgs.golangci-lint pkgs.gotools pkgs.go-tools pkgs.go ];
-    c = [ pkgs.clang pkgs.gcc pkgs.cmake ];
+    nix = [ pkgs.nixd pkgs.nixfmt-rfc-style ];
+    typescript = [ pkgs.typescript-language-server pkgs.nodejs pkgs.eslint_d ];
+    python = [ pkgs.pyright pkgs.black pkgs.ruff ];
+    rust = [ pkgs.rust-analyzer pkgs.rustfmt ];
+    go = [ pkgs.gopls pkgs.delve pkgs.gotools pkgs.go-tools ];
+    c = [ pkgs.clang-tools pkgs.clang ];
   };
 
 in {
@@ -107,7 +107,8 @@ in {
           };
 
           extra = {
-            nixdExtras.nixpkgs = ''import ${pkgs.path} {}'';
+            # Provide nixpkgs path for nixd LSP
+            nixdExtras.nixpkgs = ''import ${pkgs.path} { }'';
           };
         };
       };
