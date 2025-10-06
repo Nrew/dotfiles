@@ -11,6 +11,28 @@ let
   wallpaperDir = config.theme.wallpaperDir;
   isDarwin = lib.hasSuffix "darwin" system;
 
+  # Gowall package from GitHub
+  gowall = pkgs.buildGoModule rec {
+    pname = "gowall";
+    version = "0.1.4";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "Achno";
+      repo = "gowall";
+      rev = "v${version}";
+      hash = "sha256-fWIKbd9C9CiWMHT2Gl/bp6i9RzGC6F+HTLrP51fm2sM=";
+    };
+
+    vendorHash = "sha256-/AhgDEY/XyKNHADzygD26eis+judODzJD8ua+kD7z5E=";
+
+    meta = with lib; {
+      description = "A tool to convert your Wallpapers with ImageMagick to make them more consistent";
+      homepage = "https://github.com/Achno/gowall";
+      license = licenses.mit;
+      maintainers = [];
+    };
+  };
+
   # Gowall wrapper for macOS
   gowallWrapper = pkgs.writeShellScriptBin "wallpaper" ''
     #!/usr/bin/env bash
@@ -25,13 +47,8 @@ let
       exit 1
     fi
 
-    # Use gowall (installed via Homebrew) for wallpaper management
-    if command -v gowall &> /dev/null; then
-      cd "$WALLPAPER_DIR" && gowall "$@"
-    else
-      echo "Error: gowall not found. Please install via Homebrew: brew install gowall" >&2
-      exit 1
-    fi
+    # Use gowall for wallpaper management
+    cd "$WALLPAPER_DIR" && ${gowall}/bin/gowall "$@"
   '';
 
   # Fallback selector for non-macOS systems

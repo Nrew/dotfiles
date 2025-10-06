@@ -37,6 +37,12 @@
 
     # Homebrew
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+
+    # Barik (macOS status bar)
+    barik = {
+      url = "github:mocki-toki/barik";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   #──────────────────────────────────────────────────────────────────

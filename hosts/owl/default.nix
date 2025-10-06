@@ -134,7 +134,6 @@ let user = "nrew"; in
         "mas"
 	      "lua"
         "spicetify-cli"
-        "gowall"
 	      "switchaudio-osx"
         "nowplaying-cli"
       # "sketchybar"

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, palette, ... }:
 
 let
   utils = inputs.nixCats.utils;
@@ -58,10 +58,36 @@ let
     c = [ pkgs.clang-tools pkgs.clang ];
   };
 
+  # Generate theme palette for neovim
+  themePalette = ''
+    -- Auto-generated theme palette from Nix
+    return {
+      background = "${palette.background}",
+      surface = "${palette.surface}",
+      overlay = "${palette.overlay}",
+      text = "${palette.text}",
+      subtext = "${palette.subtext}",
+      muted = "${palette.muted}",
+      primary = "${palette.primary}",
+      secondary = "${palette.secondary}",
+      success = "${palette.success}",
+      warning = "${palette.warning}",
+      error = "${palette.error}",
+      info = "${palette.info}",
+      border = "${palette.border}",
+      selection = "${palette.selection}",
+      cursor = "${palette.cursor}",
+      link = "${palette.link}",
+    }
+  '';
+
 in {
   imports = [ inputs.nixCats.homeModule ];
 
   config = {
+    # Write theme palette to Lua file
+    home.file.".config/nvim/lua/theme/palette.lua".text = themePalette;
+
     nixCats = {
       enable = true;
       addOverlays = [ (utils.standardPluginOverlay inputs) ];

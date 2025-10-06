@@ -1,8 +1,28 @@
 local M = {}
 
 function M.setup()
-  local ok, rose_pine = pcall(require, "rose-pine")
+  -- Load centralized theme palette from Nix
+  local ok, palette = pcall(require, "theme.palette")
   if not ok then
+    vim.notify("Theme palette not found, using fallback", vim.log.levels.WARN)
+    palette = {
+      background = "#191724",
+      surface = "#1f1d2e",
+      overlay = "#26233a",
+      text = "#e0def4",
+      subtext = "#908caa",
+      muted = "#6e6a86",
+      primary = "#c4a7e7",
+      secondary = "#ea9a97",
+      success = "#9ccfd8",
+      warning = "#f6c177",
+      error = "#eb6f92",
+      info = "#31748f",
+    }
+  end
+
+  local rose_pine_ok, rose_pine = pcall(require, "rose-pine")
+  if not rose_pine_ok then
     vim.cmd.colorscheme("habamax")
     return
   end
@@ -16,34 +36,34 @@ function M.setup()
     disable_float_background = false,
 
     groups = {
-      background = "#191724",
-      panel = "#1f1d2e",
-      border = "#26233a",
-      comment = "#6e6a86",
-      error = "#eb6f92",
-      hint = "#c4a7e7",
-      info = "#9ccfd8",
-      warn = "#f6c177",
+      background = palette.background,
+      panel = palette.surface,
+      border = palette.overlay,
+      comment = palette.muted,
+      error = palette.error,
+      hint = palette.primary,
+      info = palette.info,
+      warn = palette.warning,
     },
 
     highlight_groups = {
-      TelescopeBorder = { fg = "#26233a", bg = "#191724" },
-      NormalFloat = { bg = "#1f1d2e" },
-      FloatBorder = { fg = "#26233a", bg = "#1f1d2e" },
-      DiagnosticVirtualTextError = { fg = "#eb6f92", bg = "#2a273f" },
-      DiagnosticVirtualTextWarn = { fg = "#f6c177", bg = "#2a273f" },
-      DiagnosticVirtualTextInfo = { fg = "#9ccfd8", bg = "#2a273f" },
-      DiagnosticVirtualTextHint = { fg = "#c4a7e7", bg = "#2a273f" },
+      TelescopeBorder = { fg = palette.overlay, bg = palette.background },
+      NormalFloat = { bg = palette.surface },
+      FloatBorder = { fg = palette.overlay, bg = palette.surface },
+      DiagnosticVirtualTextError = { fg = palette.error, bg = palette.surface },
+      DiagnosticVirtualTextWarn = { fg = palette.warning, bg = palette.surface },
+      DiagnosticVirtualTextInfo = { fg = palette.info, bg = palette.surface },
+      DiagnosticVirtualTextHint = { fg = palette.primary, bg = palette.surface },
     },
   })
 
   vim.cmd.colorscheme("rose-pine")
 
-  -- Additional custom highlights
+  -- Additional custom highlights using centralized palette
   local custom_highlights = {
-    CursorLineNr = { fg = "#e0def4", bold = true },
-    Folded = { fg = "#908caa", bg = "#232136" },
-    Search = { fg = "#191724", bg = "#f6c177" },
+    CursorLineNr = { fg = palette.text, bold = true },
+    Folded = { fg = palette.subtext, bg = palette.overlay },
+    Search = { fg = palette.background, bg = palette.warning },
   }
 
   for group, opts in pairs(custom_highlights) do

@@ -1,10 +1,10 @@
 # Wallpaper Module
 
-A Nix-focused wallpaper management module for nix-darwin that uses platform-appropriate tools.
+A Nix-focused wallpaper management module that uses platform-appropriate tools.
 
 ## Features
 
-- 🖼️ **macOS**: Uses `gowall` for efficient wallpaper management
+- 🖼️ **macOS**: Uses `gowall` (Nix package) for efficient wallpaper management
 - 🐧 **Linux**: Interactive fzf-based wallpaper selector with live preview
 - 👁️ Live image preview in kitty terminal (Linux)
 - 🎨 Theme-aware integration
@@ -36,13 +36,7 @@ By default, wallpapers are loaded from `~/.config/dotfiles/images/wallpapers`. T
 
 ### macOS (gowall)
 
-The module uses `gowall` on macOS, which must be installed via Homebrew:
-
-```bash
-brew install gowall
-```
-
-Then run the wallpaper command:
+The module uses `gowall` on macOS, installed as a Nix package (no Homebrew needed):
 
 ```bash
 wallpaper
@@ -91,10 +85,11 @@ The current wallpaper is tracked via symlink at:
 
 ### macOS
 
-- Uses `gowall` (Homebrew package)
+- Uses `gowall` (Nix package from GitHub)
 - Integrates with macOS desktop settings
 - Supports multiple displays
 - Automatic wallpaper rotation
+- No Homebrew dependency required
 
 ### Linux
 
@@ -105,12 +100,11 @@ The current wallpaper is tracked via symlink at:
 
 ## Troubleshooting
 
-### macOS: gowall not found
+### macOS: Issues with gowall
 
-Install gowall via Homebrew:
-```bash
-brew install gowall
-```
+The module builds gowall from source as a Nix package. If you encounter issues:
+1. Ensure your Nix installation is up to date
+2. Try rebuilding: `darwin-rebuild switch --flake .#owl`
 
 ### Linux: No wallpapers found
 
