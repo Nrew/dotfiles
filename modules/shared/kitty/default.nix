@@ -62,9 +62,17 @@
       background_opacity = "0.97";
       background_blur = "24";
       
+      # Animation settings for smooth visual transitions
+      animation_duration = "0.15";
+      animation_curve = "ease-in-out";
+      
       shell_integration = "enabled";
       allow_remote_control = "yes";
+      listen_on = "unix:/tmp/kitty";
       enable_audio_bell = "no";
+      
+      # Run fastfetch on new window creation
+      startup_session = "${config.xdg.configHome}/kitty/startup.session";
       
       macos_option_as_alt = "yes";
       macos_quit_when_last_window_closed = "yes";
@@ -110,4 +118,9 @@
       "cmd+shift+r" = "load_config_file";
     };
   };
+  
+  # Kitty startup session for running fastfetch on new windows
+  home.file."${config.xdg.configHome}/kitty/startup.session".text = ''
+    launch fastfetch
+  '';
 }
