@@ -20,7 +20,7 @@
 
       logo = {
         type = "kitty-icat";
-        source = "${config.home.homeDirectory}/.config/fastfetch/logo/tvchany.png";
+        source = "${config.xdg.configHome}/fastfetch/logo/tvchany.png";
         padding.top = 1;
       };
 
