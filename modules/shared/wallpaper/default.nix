@@ -11,28 +11,6 @@ let
   wallpaperDir = config.theme.wallpaperDir;
   isDarwin = lib.hasSuffix "darwin" system;
 
-  # Gowall package from GitHub
-  gowall = pkgs.buildGoModule rec {
-    pname = "gowall";
-    version = "0.1.4";
-
-    src = pkgs.fetchFromGitHub {
-      owner = "Achno";
-      repo = "gowall";
-      rev = "v${version}";
-      hash = "sha256-fWIKbd9C9CiWMHT2Gl/bp6i9RzGC6F+HTLrP51fm2sM=";
-    };
-
-    vendorHash = "sha256-/AhgDEY/XyKNHADzygD26eis+judODzJD8ua+kD7z5E=";
-
-    meta = with lib; {
-      description = "A tool to convert your Wallpapers with ImageMagick to make them more consistent";
-      homepage = "https://github.com/Achno/gowall";
-      license = licenses.mit;
-      maintainers = [];
-    };
-  };
-
   # Gowall wrapper for macOS with image preview support
   gowallWrapper = pkgs.writeShellScriptBin "wallpaper" ''
     #!/usr/bin/env bash
@@ -49,7 +27,7 @@ let
 
     # Use gowall for wallpaper management with preview support
     # gowall supports image previews in terminal when using interactive mode
-    cd "$WALLPAPER_DIR" && ${gowall}/bin/gowall "$@"
+    cd "$WALLPAPER_DIR" && ${pkgs.gowall}/bin/gowall "$@"
   '';
 
   # Fallback selector for non-macOS systems
@@ -123,7 +101,7 @@ in
   config = lib.mkIf (config.theme.enable && cfg.enable) {
     # Use platform-appropriate wallpaper manager
     home.packages = if isDarwin then [
-      gowallWrapper  # Use gowall on macOS (installed via Homebrew)
+      gowallWrapper  # Use gowall on macOS (gowall is installed via home/packages.nix)
     ] else [
       fzfWallpaperSelector  # Use fzf-based selector on Linux
       pkgs.imagemagick
