@@ -147,7 +147,6 @@ let user = "nrew"; in
         "obsidian"
         "raycast"
         "visual-studio-code"
-        "ghostty"
         "sf-symbols"
         "homebrew/cask-fonts/font-sf-mono"
         "homebrew/cask-fonts/font-sf-pro"

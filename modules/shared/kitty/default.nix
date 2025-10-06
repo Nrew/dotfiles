@@ -21,6 +21,15 @@ in
     # ────────────────────────────────────────────────────────────────
     # Core Settings
     # ────────────────────────────────────────────────────────────────
+    
+    extraConfig = ''
+      font_features JetBrainsMonoNerdFont-Regular +zero +ss01
+
+      disable_ligatures never
+
+      adjust_line_height 110%
+      adjust_column_width 0
+    '';
 
     settings = {
       # Colors

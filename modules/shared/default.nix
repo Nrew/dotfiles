@@ -2,15 +2,16 @@
 
 {
   imports = [
-    ./fastfetch.nix
-    ./tmux.nix
-    ./zsh.nix
-    ./fzf
-    ./git
+    ./theme
+    ./wallpaper
     ./kitty
-    ./neovim
+    ./tmux
+    ./zsh
     ./starship
-    ./ghostty
+    ./neovim
+    ./git
+    ./fastfetch
+    ./fzf
     ./btop
   ];
 }

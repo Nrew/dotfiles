@@ -57,9 +57,15 @@
       # Nixpkgs Configuration
       #──────────────────────────────────────────────────────────────────
       
-      devShell = system: let pkgs = nixpkgs.legacyPackages.${system}; in {
+      devShell = system: let pkgs = pkgsFor system; in {
         default = with pkgs; mkShell {
-          nativeBuildInputs = with pkgs; [ bashInteractive git ];
+          nativeBuildInputs = with pkgs; [ 
+            bashInteractive
+            git 
+            nil 
+            nixpkgs-fmt
+          ];
+          
           shellHook = with pkgs; ''
             export EDITOR=vim
           '';
@@ -90,19 +96,31 @@
         "rollback" = mkApp "rollback" system;
       };
 
+
+      pkgsFor = system: import nixpkgs {
+        inherit system;
+        config = {
+          allowUnfree = true;
+          allowBroken = false;
+        };
+      };
+
+      mkSpecialArgs = system: {
+        inherit inputs self user system;
+        pkgs = pkgsFor system;
+      };
+
       #──────────────────────────────────────────────────────────────────
       # macOS (nix-darwin) Configuration
       #──────────────────────────────────────────────────────────────────
 
       mkDarwinConfiguration = system: hostname:
         let
-          sharedSpecialArgs = {
-            inherit inputs self user system;
-          };
+          specialArgs = mkSpecialArgs system;
         in 
           darwin.lib.darwinSystem { 
             inherit system;
-            specialArgs = sharedSpecialArgs;
+            specialArgs = specialArgs;
             modules = [
               (./. + "/hosts/${hostname}")
 
@@ -110,8 +128,10 @@
                 home-manager = {
                   useGlobalPkgs = true;
                   useUserPackages = true;
-                  extraSpecialArgs = sharedSpecialArgs;
+                  extraSpecialArgs = specialArgs;
                   users.${user} = import ./home;
+                
+                  backupFileExtension = "backup";
                 };
               } 
 
@@ -123,14 +143,7 @@
       #  Configuration
       #──────────────────────────────────────────────────────────────────
       
-      legacyPackages = forAllSystems (
-        system:
-        import nixpkgs {
-          inherit system;
-          config.allowUnfree = true;
-        }
-      );
-
+      legacyPackages = forAllSystems pkgsFor;
 
     in {
       inherit legacyPackages;
@@ -151,5 +164,9 @@
       #──────────────────────────────────────────────────────────────────
 
       overlays = import ./overlays { inherit inputs; };
+
+      formatter = forAllSystems (system:
+        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
+      );
     };
 }

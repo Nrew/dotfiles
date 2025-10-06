@@ -18,6 +18,7 @@ let user = "nrew"; in
             pip
             virtualenv
         ]))
+        
         docker      # Requires system-level daemon
         wget        # Command-line file downloader
         curl        # Command-line URL transfer tool

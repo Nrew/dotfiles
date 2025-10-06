@@ -8,14 +8,14 @@ in
 {
   programs.tmux = {
     enable = true;
-    shell = "${pkgs.zsh}/bin/zsh";
     terminal = "tmux-256color";
-    escapeTime = 0;
-    baseIndex = 1;
-    historyLimit = 10000;
-    keyMode = "vi";
-    prefix = "C-a";
     mouse = true;
+    baseIndex = 1;
+    escapeTime = 0;
+    historyLimit = 50000;
+    keyMode = "vi";
+    customPaneNavigationAndResize = true;
+    prefix = "C-space";
 
     extraConfig = ''
       # Define color scheme
