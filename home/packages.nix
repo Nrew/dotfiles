@@ -25,6 +25,8 @@ in
     btop            # Resource monitor
     fastfetch       # System info display
     imagemagick     # Image processing
+    gowall          # Image processing
+    
     
     # Terminal and shell
     tmux            # Terminal multiplexer

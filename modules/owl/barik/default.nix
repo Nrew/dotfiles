@@ -1,9 +1,6 @@
 { config, lib, pkgs, inputs, palette, ... }:
 
 {
-  # Barik status bar configuration
-  home.packages = [ inputs.barik.packages.${pkgs.system}.default ];
-  
   # Barik configuration file with aerospace integration
   home.file.".config/barik/barik.toml".text = ''
     # Barik Configuration

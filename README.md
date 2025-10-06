@@ -7,12 +7,11 @@
 
 This repository contains my personal NixOS and macOS (via nix-darwin) configurations, managed with Nix and Home Manager.
 
-## 📸 Screenshots
+## Screenshots
 
-## ⚙️ Supported Systems
-
+## Supported Systems
 
 *   **Linux:** `x86_64-linux`
 *   **macOS:** `aarch64-darwin`
 
-## 🚀 Installation
+## Installation

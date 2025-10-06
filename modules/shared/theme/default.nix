@@ -112,7 +112,7 @@ in
         set -e
         
         DOTFILES="${config.home.homeDirectory}/.config/dotfiles"
-        STATE_FILE="$DOTFILES/modules/shared/theme/theme-state.json"
+        STATE_FILE="$DOTFILES/modules/shared/theme/state.json"
         VARIANT="$1"
         
         if [ -z "$VARIANT" ]; then

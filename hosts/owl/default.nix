@@ -45,7 +45,7 @@ let user = "nrew"; in
         defaults = {
             ".GlobalPreferences" = { };
             LaunchServices = {
-                LSQuarantine = false;                  # Disable quarantine for downloaded files
+                LSQuarantine = false;                   # Disable quarantine for downloaded files
             };
             NSGlobalDomain = {
                 _HIHideMenuBar = true;                  # Hide the menu bar  
@@ -72,7 +72,7 @@ let user = "nrew"; in
                 expose-animation-duration = 0.15;       # Speed up Mission Control animation
                 show-recents = false;                   # Disable recent apps in the dock
                 showhidden = true;                      # Show hidden apps as translucent
-                # persistent-apps = [                     # Add pinned apps
+                # persistent-apps = [                   # Add pinned apps
                 #     "/Applications/Discord.app"
                 #     "${pkgs.kitty}/Applications/kitty.app"
                 # ];
@@ -129,18 +129,16 @@ let user = "nrew"; in
 
     homebrew = {
       enable = true;
-      brews = [                                   # Install CLI tools via Homebrew
+      brews = [                                 # Install CLI tools via Homebrew
         # `brew install`
         "mas"
 	      "lua"
         "spicetify-cli"
 	      "switchaudio-osx"
         "nowplaying-cli"
-      # "sketchybar"
       ];
-      casks = [                                   # Install GUI apps via Homebrew
+      casks = [                                 # Install GUI apps via Homebrew
         # `brew install --cask`
-        #"aerospace"
         "anki"
         "discord"
         "obsidian"
@@ -150,17 +148,18 @@ let user = "nrew"; in
         "homebrew/cask-fonts/font-sf-mono"
         "homebrew/cask-fonts/font-sf-pro"
         "zen"
+        "barik"
       ];
-      taps = [                                    # Add additional Homebrew taps
+      taps = [                                  # Add additional Homebrew taps
+        "mocki-toki/formulae"
         "nikitabobko/tap"                       # Aerospace tap
         "felixkratz/formulae"                   # Sketchybar tap
       ];
-      masApps = {};                               # Add any macOS App Store apps here
+      masApps = {};                             # Add any macOS App Store apps here
       onActivation = {
         cleanup = "zap";                        # Cleanup unused Homebrew packages on activation
         autoUpdate = true;                      # Automatically update Homebrew packages
         upgrade = true;                         # Automatically upgrade Homebrew packages
       };
     };
-  #services.sketchybar.enable = true;
 }
