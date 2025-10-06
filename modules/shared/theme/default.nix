@@ -4,10 +4,10 @@ let
   cfg = config.theme;
   
   # Import theme registry
-  registry = import ./registry.nix { inherit lib pkgs; };
+  registry = import ./registry.nix { inherit lib; };
   
   # Theme state file
-  themeStateFile = ./theme-state.json;
+  themeStateFile = ./state.json;
   
   # Read current theme selection
   themeState = 
@@ -20,6 +20,11 @@ let
     if themeState.custom != null
     then registry.mkTheme themeState.custom
     else registry.${themeState.variant};
+
+  paletteForJSON = lib.filterAttrs (
+    name: value:
+    lib.isString value || lib.isAttrs value
+  ) currentPalette;
 in
 {
   options.theme = {
@@ -62,7 +67,7 @@ in
       "theme/palette.json".text = builtins.toJSON {
         variant = themeState.variant;
         isCustom = themeState.custom != null;
-        colors = currentPalette;
+        colors = paletteForJSON;
         font = cfg.font;
         spacing = { borderRadius = cfg.borderRadius; gap = cfg.gap; };
       };

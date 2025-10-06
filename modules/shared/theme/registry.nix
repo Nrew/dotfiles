@@ -1,4 +1,4 @@
-{ pkgs, lib }:
+{ lib }:
 
 let
   # Helper functions
@@ -38,7 +38,7 @@ let
       constant    = syntax.constant or secondary;
       operator    = syntax.operator or subtext;
       punctuation = syntax.punctuation or subtext;
-    };
+    };  
   };
 
   themes = {
@@ -149,10 +149,8 @@ let
 
   exists = name: builtins.elem name available;
 
-in
-{
-  
+in themes // { 
     inherit mkTheme available exists;
-}
+  }
 
 

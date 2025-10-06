@@ -8,7 +8,8 @@
       continuation_prompt = "[▸▹ ](dimmed white)";
 
       format = ''
-        ($nix_shell$container$fill$git_metrics\n)$cmd_duration$hostname$localip$shlvl$shell$env_var$jobs$sudo$username$character
+        ($nix_shell$container$fill$git_metrics
+        )$cmd_duration$hostname$localip$shlvl$shell$env_var$jobs$sudo$username$character
       '';
 
       right_format = ''

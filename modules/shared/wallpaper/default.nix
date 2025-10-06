@@ -19,9 +19,9 @@ let
       exit 1
     fi
 
-    WALLPAPER_COUNT=$(find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.png"\) 2>/dev/null | wc -l | tr -d ' ')
+    WALLPAPER_COUNT=$(find \"$WALLPAPER_DIR\" -type f \( -iname "*.jpg" -o -iname "*.png" \) 2>/dev/null | wc -l | tr -d ' ')
 
-    if [ "$WALLPAPER_COUNT"  -eq 0 ]; then
+    if [ "$WALLPAPER_COUNT" -eq 0 ]; then
       echo "No wallpapers found"
       exit 1
     fi
