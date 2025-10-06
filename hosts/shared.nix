@@ -10,24 +10,18 @@ let user = "nrew"; in
     imports = [];
 
     # ────────────────────────────────────────────────────────────────
-    # System-Level Packages (Required for system services and daemons)
+    # System Packages
     # ────────────────────────────────────────────────────────────────
 
     environment.systemPackages = with pkgs; [
-        # System-level services and daemons
-        docker          # Requires system-level daemon
+        docker
+        git
+        git-lfs
+        neovim
+        cmake
+        cargo
+        texinfo
         
-        # Core system utilities
-        git             # Version control system
-        git-lfs         # Git extension for large files
-        neovim          # System editor (fallback if home-manager fails)
-        
-        # Build tools (system-wide for compilation)
-        cmake           # Cross-platform build system generator
-        cargo           # Rust package manager
-        texinfo         # Needed for compiling tools like Emacs
-        
-        # Python environment (system-wide)
         (python3.withPackages (ps: with ps; [
             pip
             virtualenv
@@ -35,39 +29,36 @@ let user = "nrew"; in
     ];
 
     # ────────────────────────────────────────────────────────────────
-    # Fonts Configuration (System-wide)
+    # Fonts Configuration
     # ────────────────────────────────────────────────────────────────
 
     fonts = {
         packages = with pkgs; [
-            # Nix 25.05
-            maple-mono.truetype         # Maple Mono font
-            maple-mono.NF-unhinted      # Maple Mono Nerd Font
-            nerd-fonts.symbols-only     # Symbols Nerd Font
-            nerd-fonts.jetbrains-mono   # JetBrainsMono Nerd Font
-            nerd-fonts.fira-code        # FiraCode Nerd Font
-            nerd-fonts.iosevka          # Iosevka Nerd Font
+            maple-mono.truetype
+            maple-mono.NF-unhinted
+            nerd-fonts.symbols-only
+            nerd-fonts.jetbrains-mono
+            nerd-fonts.fira-code
+            nerd-fonts.iosevka
         ];
     };
 
     # ────────────────────────────────────────────────────────────────
-    # Environment Variables (System-wide)
+    # Environment Variables
     # ────────────────────────────────────────────────────────────────
 
-    # Define system-wide environment variables
     environment.variables = {
-        LANG   = "en_US.UTF-8";  # Set the default system language
-        LC_ALL = "en_US.UTF-8";  # Set the default locale
+        LANG   = "en_US.UTF-8";
+        LC_ALL = "en_US.UTF-8";
     };
 
     # ────────────────────────────────────────────────────────────────
-    # Core Nix Settings
+    # Nix Settings
     # ────────────────────────────────────────────────────────────────
 
-    nixpkgs.config.allowUnfree = true; # Allow unfree packages to be installed
+    nixpkgs.config.allowUnfree = true;
 
     nix = {
-      # Set the Nix package as the default to ensure Nix commands are available system-wide
       package = pkgs.nix;
 	    settings = {
             trusted-users = [ "@admin" "${user}" ];
@@ -76,9 +67,9 @@ let user = "nrew"; in
         };
 
         gc = {
-            automatic = true;                                  # Enable automatic garbage collection
-            interval = { Weekday = 0; Hour = 2; Minute = 0; }; # Run garbage collection every Sunday at 2:00 AM
-            options = "--delete-older-than 30d";               # Delete generations older than 30 days
+            automatic = true;
+            interval = { Weekday = 0; Hour = 2; Minute = 0; };
+            options = "--delete-older-than 30d";
         };
 
         extraOptions = ''

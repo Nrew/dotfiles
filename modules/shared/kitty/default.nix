@@ -71,15 +71,15 @@
       listen_on = "unix:/tmp/kitty";
       enable_audio_bell = "no";
       
-      # Run fastfetch on new window creation
-      startup_session = "${config.xdg.configHome}/kitty/startup.session";
-      
       macos_option_as_alt = "yes";
       macos_quit_when_last_window_closed = "yes";
       macos_show_window_title_in = "none";
     };
 
-    
+    # Run fastfetch on new window creation
+    extraConfig = ''
+      exec fastfetch
+    '';
 
     # ────────────────────────────────────────────────────────────────
     # Keybindings
@@ -118,9 +118,4 @@
       "cmd+shift+r" = "load_config_file";
     };
   };
-  
-  # Kitty startup session for running fastfetch on new windows
-  home.file."${config.xdg.configHome}/kitty/startup.session".text = ''
-    launch fastfetch
-  '';
 }
