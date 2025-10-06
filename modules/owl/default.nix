@@ -2,7 +2,7 @@
 
 {
   imports = [
-    #./sketchybar
-    #./aerospace
+    ./barik
+    ./aerospace
   ];
 }

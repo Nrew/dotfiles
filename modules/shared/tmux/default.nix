@@ -60,7 +60,7 @@
       bind -T copy-mode-vi r send -X rectangle-toggle
       
       # Reload config
-      bind r source-file ~/.config/tmux/tmux.conf \; display "Config reloaded!"
+      bind r source-file ${config.xdg.configHome}/tmux/tmux.conf \; display "Config reloaded!"
       
       # Smart pane switching with awareness of Vim splits
       is_vim="ps -o state= -o comm= -t '#{pane_tty}' \

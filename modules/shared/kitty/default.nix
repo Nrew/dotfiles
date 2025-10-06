@@ -62,8 +62,13 @@
       background_opacity = "0.97";
       background_blur = "24";
       
+      # Animation settings for smooth visual transitions
+      animation_duration = "0.15";
+      animation_curve = "ease-in-out";
+      
       shell_integration = "enabled";
       allow_remote_control = "yes";
+      listen_on = "unix:/tmp/kitty";
       enable_audio_bell = "no";
       
       macos_option_as_alt = "yes";
@@ -71,7 +76,10 @@
       macos_show_window_title_in = "none";
     };
 
-    
+    # Run fastfetch on new window creation
+    extraConfig = ''
+      exec fastfetch
+    '';
 
     # ────────────────────────────────────────────────────────────────
     # Keybindings

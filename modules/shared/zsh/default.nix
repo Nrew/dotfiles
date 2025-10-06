@@ -10,7 +10,7 @@
     # History configuration
     history = {
       size = 10000;
-      path = "${config.home.homeDirectory}/zsh/history";
+      path = "${config.xdg.dataHome}/zsh/history";
       save = 10000;
       ignoreDups = true;
       share = true;

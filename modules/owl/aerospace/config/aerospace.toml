@@ -19,13 +19,13 @@ start-at-login = true
 after-login-command = []
 
 # Commands to run immediately after AeroSpace successfully starts up.
-after-startup-command = ['exec-and-forget sketchybar']
+after-startup-command = ['exec-and-forget barik']
 
-# Notify Sketchybar about workspace change
+# Notify barik about workspace changes
 exec-on-workspace-change = [
   '/bin/bash',
   '-c',
-  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE'
+  'pkill -SIGUSR1 barik 2>/dev/null || true'
 ]
 
 # ─────────────────────────────────────────────────────────────────────

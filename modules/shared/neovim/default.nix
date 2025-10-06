@@ -1,4 +1,4 @@
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, palette, ... }:
 
 let
   utils = inputs.nixCats.utils;
@@ -50,18 +50,44 @@ let
   # Language servers organized by category
   languageServers = {
     lua = [ pkgs.lua-language-server ];
-    nix = [ pkgs.nixd ];
-    typescript = [ pkgs.typescript-language-server pkgs.nodejs pkgs.eslint ];
-    python = [ pkgs.pyright pkgs.black pkgs.flake8 pkgs.isort ];
-    rust = [ pkgs.rust-analyzer pkgs.rustfmt pkgs.cargo ];
-    go = [ pkgs.gopls pkgs.delve pkgs.golint pkgs.golangci-lint pkgs.gotools pkgs.go-tools pkgs.go ];
-    c = [ pkgs.clang pkgs.gcc pkgs.cmake ];
+    nix = [ pkgs.nixd pkgs.nixfmt-rfc-style ];
+    typescript = [ pkgs.typescript-language-server pkgs.nodejs pkgs.eslint_d ];
+    python = [ pkgs.pyright pkgs.black pkgs.ruff ];
+    rust = [ pkgs.rust-analyzer pkgs.rustfmt ];
+    go = [ pkgs.gopls pkgs.delve pkgs.gotools pkgs.go-tools ];
+    c = [ pkgs.clang-tools pkgs.clang ];
   };
+
+  # Generate theme palette for neovim
+  themePalette = ''
+    -- Auto-generated theme palette from Nix
+    return {
+      background = "${palette.background}",
+      surface = "${palette.surface}",
+      overlay = "${palette.overlay}",
+      text = "${palette.text}",
+      subtext = "${palette.subtext}",
+      muted = "${palette.muted}",
+      primary = "${palette.primary}",
+      secondary = "${palette.secondary}",
+      success = "${palette.success}",
+      warning = "${palette.warning}",
+      error = "${palette.error}",
+      info = "${palette.info}",
+      border = "${palette.border}",
+      selection = "${palette.selection}",
+      cursor = "${palette.cursor}",
+      link = "${palette.link}",
+    }
+  '';
 
 in {
   imports = [ inputs.nixCats.homeModule ];
 
   config = {
+    # Write theme palette to Lua file
+    home.file.".config/nvim/lua/theme/palette.lua".text = themePalette;
+
     nixCats = {
       enable = true;
       addOverlays = [ (utils.standardPluginOverlay inputs) ];
@@ -107,7 +133,8 @@ in {
           };
 
           extra = {
-            nixdExtras.nixpkgs = ''import ${pkgs.path} {}'';
+            # Provide nixpkgs path for nixd LSP
+            nixdExtras.nixpkgs = ''import ${pkgs.path} { }'';
           };
         };
       };

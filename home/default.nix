@@ -8,6 +8,7 @@ in
     # Imports & Core Configuration
     #──────────────────────────────────────────────────────────────────
     imports = [
+        ./packages.nix
         ../modules/shared
     ] ++ lib.optionals pkgs.stdenv.isDarwin [
         ../modules/owl
@@ -60,18 +61,6 @@ in
             EDITOR = "nvim";
             VISUAL = "nvim";
         };
-
-        packages = with pkgs; [
-          ripgrep
-          fd
-          bat
-          eza
-          zoxide
-          jq
-          gh
-          ffmpeg
-          htop
-        ] ++ lib.optionals isDarwin [ m-cli ];
 
         shellAliases = {
           ls = "eza --icons --group-directories-first";

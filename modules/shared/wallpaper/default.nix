@@ -1,39 +1,79 @@
-{ config, lib, pkgs, palette, ... }:
+{ config, lib, pkgs, palette, system, ... }:
+
+# Wallpaper management module for nix-darwin
+# This module provides a Nix-focused wallpaper manager using gowall (for macOS)
+# - Integrates with gowall for efficient wallpaper management
+# - Supports theme system integration
+# - Platform-aware (uses gowall on macOS, fallback on Linux)
+
 let
   cfg = config.wallpaper;
   wallpaperDir = config.theme.wallpaperDir;
-  currentWallpaper = "${config.xdg.stateHome}/current-wallpaper";
+  isDarwin = lib.hasSuffix "darwin" system;
 
-  wallpaperSelector = pkgs.writeShellScriptBin "wallpaper" ''
-    #!usr/bin/env bash
+  # Gowall package from GitHub
+  gowall = pkgs.buildGoModule rec {
+    pname = "gowall";
+    version = "0.1.4";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "Achno";
+      repo = "gowall";
+      rev = "v${version}";
+      hash = "sha256-fWIKbd9C9CiWMHT2Gl/bp6i9RzGC6F+HTLrP51fm2sM=";
+    };
+
+    vendorHash = "sha256-/AhgDEY/XyKNHADzygD26eis+judODzJD8ua+kD7z5E=";
+
+    meta = with lib; {
+      description = "A tool to convert your Wallpapers with ImageMagick to make them more consistent";
+      homepage = "https://github.com/Achno/gowall";
+      license = licenses.mit;
+      maintainers = [];
+    };
+  };
+
+  # Gowall wrapper for macOS with image preview support
+  gowallWrapper = pkgs.writeShellScriptBin "wallpaper" ''
+    #!/usr/bin/env bash
+    set -euo pipefail
 
     WALLPAPER_DIR="${wallpaperDir}"
-    CURRENT_LINK="${currentWallpaper}"
 
-    if [ -f ~/.config/theme/palette.sh ]; then
-      source ~/.config/theme/palette.sh
+    # Validate wallpaper directory exists
+    if [ ! -d "$WALLPAPER_DIR" ]; then
+      echo "Error: Wallpaper directory not found: $WALLPAPER_DIR" >&2
+      echo "Please create the directory or update theme.wallpaperDir in your configuration." >&2
+      exit 1
     fi
+
+    # Use gowall for wallpaper management with preview support
+    # gowall supports image previews in terminal when using interactive mode
+    cd "$WALLPAPER_DIR" && ${gowall}/bin/gowall "$@"
+  '';
+
+  # Fallback selector for non-macOS systems
+  fzfWallpaperSelector = pkgs.writeShellScriptBin "wallpaper" ''
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    WALLPAPER_DIR="${wallpaperDir}"
+    CURRENT_LINK="${config.xdg.stateHome}/current-wallpaper"
+
+    # Source theme palette if available
+    PALETTE_FILE="${config.xdg.configHome}/theme/palette.sh"
+    [ -f "$PALETTE_FILE" ] && source "$PALETTE_FILE"
 
     if [ ! -d "$WALLPAPER_DIR" ]; then
-      echo "Wallpaper directory not found: $WALLPAPER_DIR"
+      echo "Error: Wallpaper directory not found: $WALLPAPER_DIR" >&2
       exit 1
     fi
 
-    WALLPAPER_COUNT=$(find \"$WALLPAPER_DIR\" -type f \( -iname "*.jpg" -o -iname "*.png" \) 2>/dev/null | wc -l | tr -d ' ')
-
-    if [ "$WALLPAPER_COUNT" -eq 0 ]; then
-      echo "No wallpapers found"
-      exit 1
-    fi
-
-    CURRENT_NAME=""
-    if [ -L "$CURRENT_LINK" ]; then
-      CURRENT_NAME=$(basename "$(readlink "$CURRENT_LINK")" 2>/dev/null || echo "")
-    fi
-
+    # Image preview function for fzf
     preview_image() {
-      local file = "$1"
-      if [ -n "$KITTY_WINDOW_ID" ]; then
+      local file="$1"
+      
+      if [ -n "''${KITTY_WINDOW_ID:-}" ]; then
         ${pkgs.kitty}/bin/kitten icat \
           --clear \
           --transfer-mode=memory \
@@ -41,40 +81,29 @@ let
           --place=''${FZF_PREVIEW_COLUMNS}x''${FZF_PREVIEW_LINES}@0x0 \
           "$file" 2>/dev/null
       else
-        echo "╔════════════════════════════════════════╗"
-        echo "║           Image Preview                ║"
-        echo "╚════════════════════════════════════════╝"
-        echo "$(basename "$file")"
-        echo "$(du -h "$file" | cut -f1)"
-
-        if command -v identify &> /dev/null; then
-          local dims=$(identify -format "%wx%h" "$file" 2>/dev/null)
-          [ -n "$dims" ] && echo "$dims"
+        echo "File: $(basename "$file")"
+        echo "Size: $(${pkgs.coreutils}/bin/du -h "$file" | cut -f1)"
+        if ${pkgs.imagemagick}/bin/identify -version &> /dev/null; then
+          local dims=$(${pkgs.imagemagick}/bin/identify -format "%wx%h" "$file" 2>/dev/null)
+          [ -n "$dims" ] && echo "Dimensions: $dims"
         fi
       fi
     }
 
     export -f preview_image
     
-    SELECTED=$(find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" -o -iname "*.webp" \) 2>/dev/null | \
+    SELECTED=$(${pkgs.findutils}/bin/find "$WALLPAPER_DIR" -type f \
+      \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null | \
       sed "s|$WALLPAPER_DIR/||" | \
       sort | \
       ${pkgs.fzf}/bin/fzf \
         --height=100% \
         --border=rounded \
-        --margin=1 \
-        --padding=1 \
         --preview="preview_image \"$WALLPAPER_DIR/{}\"" \
         --preview-window=right:60% \
         --prompt="🖼️  " \
-        --header="$WALLPAPER_COUNT wallpapers$([ -n "$CURRENT_NAME" ] && echo " • Current: $CURRENT_NAME" || echo "")" \
-        --color="fg:''${THEME_TEXT:-#2d2a25},bg:''${THEME_OVERLAY:-#e0dcd3}" \
-        --color="fg+:''${THEME_TEXT:-#2d2a25},bg+:''${THEME_PRIMARY:-#7c8a9e}" \
-        --color="info:''${THEME_MUTED:-#8a857d},prompt:''${THEME_PRIMARY:-#7c8a9e},pointer:''${THEME_ERROR:-#b87d7d}" \
-        --pointer="▶" \
-        --marker="✓" \
-        --no-scrollbar \
-        --bind="ctrl-d:preview-page-down,ctrl-u:preview-page-up")
+        --color="fg:''${THEME_TEXT:-${palette.text}},bg:''${THEME_OVERLAY:-${palette.overlay}}" \
+        --pointer="▶") || exit 0
     
     [ -z "$SELECTED" ] && exit 0
 
@@ -82,25 +111,27 @@ let
     mkdir -p "$(dirname "$CURRENT_LINK")"
     ln -sf "$WALLPAPER_PATH" "$CURRENT_LINK"
 
-    echo "$SELECTED"
-    osascript -e "tell application \"System Events\" to tell every desktop to set picture to \"$WALLPAPER_PATH\""
-    echo "Done"
+    echo "✅ Wallpaper set: $SELECTED"
   '';
 
-  in 
-  {
-    options.wallpaper = {
-      enable = lib.mkEnableOption "wallpaper management";
-    };
-    
-    config = lib.mkIf (config.theme.enable && cfg.enable) {
-      home.packages = [
-        wallpaperSelector
-        pkgs.imagemagick
-      ];
+in 
+{
+  options.wallpaper = {
+    enable = lib.mkEnableOption "wallpaper management";
+  };
+  
+  config = lib.mkIf (config.theme.enable && cfg.enable) {
+    # Use platform-appropriate wallpaper manager
+    home.packages = if isDarwin then [
+      gowallWrapper  # Use gowall on macOS (installed via Homebrew)
+    ] else [
+      fzfWallpaperSelector  # Use fzf-based selector on Linux
+      pkgs.imagemagick
+      pkgs.findutils
+    ];
 
-      home.shellAliases = {
-        wp = "wallpaper";
-      };
+    home.shellAliases = {
+      wp = "wallpaper";
     };
-  }
+  };
+}

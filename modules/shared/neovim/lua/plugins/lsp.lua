@@ -47,7 +47,27 @@ function M.setup()
     },
     nixd = {
       condition = has_category("nix"),
-      settings = { nixd = { nixpkgs = { expr = "import <nixpkgs> { }" } } },
+      settings = { 
+        nixd = { 
+          nixpkgs = { 
+            expr = _G.nixCats("nixdExtras.nixpkgs") or "import <nixpkgs> { }"
+          },
+          formatting = {
+            command = { "nixfmt" }
+          },
+          options = {
+            nixos = {
+              expr = string.format('(builtins.getFlake "%s/.config/dotfiles").nixosConfigurations.default.options', vim.env.HOME)
+            },
+            ["nix-darwin"] = {
+              expr = string.format('(builtins.getFlake "%s/.config/dotfiles").darwinConfigurations.owl.options', vim.env.HOME)
+            },
+            home_manager = {
+              expr = string.format('(builtins.getFlake "%s/.config/dotfiles").homeConfigurations.default.options', vim.env.HOME)
+            }
+          }
+        } 
+      },
     },
     tsserver = {
       condition = has_category("typescript"),

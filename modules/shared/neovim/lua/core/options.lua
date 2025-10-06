@@ -51,9 +51,11 @@ opt.listchars = { tab = "󰌒 ", trail = "·", extends = "⟩", precedes = "⟨"
 opt.splitbelow = true
 opt.splitright = true
 opt.splitkeep = "screen"
+opt.winblend = 10  -- Pseudo-transparency for floating windows
 
 -- Completion
 opt.completeopt = { "menuone", "noselect" }
+opt.pumblend = 10  -- Pseudo-transparency for popup menu
 
 -- Folding
 opt.foldmethod = "expr"
