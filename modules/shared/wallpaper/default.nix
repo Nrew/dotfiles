@@ -33,7 +33,7 @@ let
     };
   };
 
-  # Gowall wrapper for macOS
+  # Gowall wrapper for macOS with image preview support
   gowallWrapper = pkgs.writeShellScriptBin "wallpaper" ''
     #!/usr/bin/env bash
     set -euo pipefail
@@ -47,7 +47,8 @@ let
       exit 1
     fi
 
-    # Use gowall for wallpaper management
+    # Use gowall for wallpaper management with preview support
+    # gowall supports image previews in terminal when using interactive mode
     cd "$WALLPAPER_DIR" && ${gowall}/bin/gowall "$@"
   '';
 
@@ -60,7 +61,8 @@ let
     CURRENT_LINK="${config.xdg.stateHome}/current-wallpaper"
 
     # Source theme palette if available
-    [ -f ~/.config/theme/palette.sh ] && source ~/.config/theme/palette.sh
+    PALETTE_FILE="${config.xdg.configHome}/theme/palette.sh"
+    [ -f "$PALETTE_FILE" ] && source "$PALETTE_FILE"
 
     if [ ! -d "$WALLPAPER_DIR" ]; then
       echo "Error: Wallpaper directory not found: $WALLPAPER_DIR" >&2

@@ -57,13 +57,13 @@ function M.setup()
           },
           options = {
             nixos = {
-              expr = '(builtins.getFlake "/home/nrew/.config/dotfiles").nixosConfigurations.default.options'
+              expr = string.format('(builtins.getFlake "%s/.config/dotfiles").nixosConfigurations.default.options', vim.env.HOME)
             },
             ["nix-darwin"] = {
-              expr = '(builtins.getFlake "/Users/nrew/.config/dotfiles").darwinConfigurations.owl.options'
+              expr = string.format('(builtins.getFlake "%s/.config/dotfiles").darwinConfigurations.owl.options', vim.env.HOME)
             },
             home_manager = {
-              expr = '(builtins.getFlake "/home/nrew/.config/dotfiles").homeConfigurations.default.options'
+              expr = string.format('(builtins.getFlake "%s/.config/dotfiles").homeConfigurations.default.options', vim.env.HOME)
             }
           }
         } 

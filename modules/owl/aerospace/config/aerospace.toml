@@ -19,10 +19,14 @@ start-at-login = true
 after-login-command = []
 
 # Commands to run immediately after AeroSpace successfully starts up.
-after-startup-command = []
+after-startup-command = ['exec-and-forget barik']
 
-# Workspace change notifications can be handled by barik if needed
-exec-on-workspace-change = []
+# Notify barik about workspace changes
+exec-on-workspace-change = [
+  '/bin/bash',
+  '-c',
+  'pkill -SIGUSR1 barik 2>/dev/null || true'
+]
 
 # ─────────────────────────────────────────────────────────────────────
 # Normalization Settings

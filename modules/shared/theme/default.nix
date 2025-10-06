@@ -111,7 +111,7 @@ in
         #!/usr/bin/env bash
         set -e
         
-        DOTFILES="$HOME/.config/dotfiles"
+        DOTFILES="${config.home.homeDirectory}/.config/dotfiles"
         STATE_FILE="$DOTFILES/modules/shared/theme/theme-state.json"
         VARIANT="$1"
         
@@ -145,7 +145,7 @@ EOF
         
         echo "🔄 Reloading..."
         killall -SIGUSR1 kitty 2>/dev/null || true
-        tmux source-file ~/.config/tmux/tmux.conf 2>/dev/null || true
+        tmux source-file ${config.xdg.configHome}/tmux/tmux.conf 2>/dev/null || true
         
         echo "✅ Theme: $VARIANT"
       '')
@@ -167,7 +167,9 @@ EOF
       (pkgs.writeShellScriptBin "theme-info" ''
         #!/usr/bin/env bash
         
-        if [ ! -f ~/.config/theme/palette.json ]; then
+        THEME_FILE="${config.xdg.configHome}/theme/palette.json"
+        
+        if [ ! -f "$THEME_FILE" ]; then
           echo "Theme not initialized"
           exit 1
         fi
@@ -192,7 +194,7 @@ EOF
           "  Mono:        \(.font.mono)",
           "  Sans:        \(.font.sans)",
           "  Size:        \(.font.size.normal)px"
-        ' ~/.config/theme/palette.json
+        ' "$THEME_FILE"
       '')
     ];
   };
