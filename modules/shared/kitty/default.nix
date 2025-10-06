@@ -1,9 +1,4 @@
-{ lib, pkgs, ... }:
-
-let
-  theme = import ../theme/default.nix { inherit lib; };
-  colors = theme.theme;
-in
+{ lib, pkgs, config, palette, ... }:
 
 {
   programs.kitty = {

@@ -1,4 +1,4 @@
-{ lib }:
+{ pkgs, lib }:
 
 let
   # Helper functions
@@ -151,8 +151,8 @@ let
 
 in
 {
-  themes // {
+  
     inherit mkTheme available exists;
-  }
 }
+
 

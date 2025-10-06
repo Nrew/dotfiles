@@ -1,10 +1,10 @@
-{ config, lib, pkgs, ... }:
+{ pkgs, config, lib, ... }:
 
 let
   cfg = config.theme;
   
   # Import theme registry
-  registry = import ./registry.nix { inherit lib; };
+  registry = import ./registry.nix { inherit lib pkgs; };
   
   # Theme state file
   themeStateFile = ./theme-state.json;
@@ -20,24 +20,6 @@ let
     if themeState.custom != null
     then registry.mkTheme themeState.custom
     else registry.${themeState.variant};
-  
-  # Color extractor script
-  colorExtractor = pkgs.python3.pkgs.buildPythonApplication {
-    pname = "extract-colors";
-    version = "1.0.0";
-    format = "other";
-    
-    propagatedBuildInputs = with pkgs.python3.pkgs; [ pillow ];
-    
-    unpackPhase = "true";
-    
-    installPhase = ''
-      mkdir -p $out/bin
-      cp ${./extract-colors.py} $out/bin/extract-colors
-      chmod +x $out/bin/extract-colors
-    '';
-  };
-  
 in
 {
   options.theme = {
@@ -120,8 +102,6 @@ in
     };
     
     home.packages = [
-      colorExtractor
-      
       (pkgs.writeShellScriptBin "theme-switch" ''
         #!/usr/bin/env bash
         set -e
@@ -164,50 +144,7 @@ EOF
         
         echo "✅ Theme: $VARIANT"
       '')
-      
-      (pkgs.writeShellScriptBin "theme-from-wallpaper" ''
-        #!/usr/bin/env bash
-        set -e
-        
-        DOTFILES="$HOME/.config/dotfiles"
-        STATE_FILE="$DOTFILES/modules/shared/theme/theme-state.json"
-        WALLPAPER="$1"
-        
-        if [ -z "$WALLPAPER" ]; then
-          CURRENT_LINK="$HOME/.local/state/current-wallpaper"
-          if [ -L "$CURRENT_LINK" ]; then
-            WALLPAPER=$(readlink "$CURRENT_LINK")
-          else
-            echo "Usage: theme-from-wallpaper <image>"
-            exit 1
-          fi
-        fi
-        
-        if [ ! -f "$WALLPAPER" ]; then
-          echo "❌ Image not found: $WALLPAPER"
-          exit 1
-        fi
-        
-        echo "🎨 Extracting colors from: $(basename "$WALLPAPER")"
-        
-        THEME_DATA=$(extract-colors "$WALLPAPER" "wallpaper" 2>/dev/null) || {
-          echo "❌ Color extraction failed"
-          exit 1
-        }
-        
-        mkdir -p "$(dirname "$STATE_FILE")"
-        echo "{\"variant\": \"wallpaper\", \"custom\": $THEME_DATA}" > "$STATE_FILE"
-        
-        echo "📦 Rebuilding..."
-        cd "$DOTFILES"
-        darwin-rebuild switch --flake .#owl
-        
-        echo "🔄 Reloading..."
-        killall -SIGUSR1 kitty 2>/dev/null || true
-        
-        echo "✅ Theme generated from wallpaper!"
-      '')
-      
+       
       (pkgs.writeShellScriptBin "theme-list" ''
         #!/usr/bin/env bash
         
@@ -215,28 +152,7 @@ EOF
         echo "║       Available Themes                 ║"
         echo "╚════════════════════════════════════════╝"
         echo ""
-        echo "Beige Family:"
-        echo "  • beige"
-        echo "  • beige-dark"
-        echo ""
-        echo "Rose Pine Family:"
-        echo "  • rose-pine"
-        echo "  • rose-pine-moon"
-        echo "  • rose-pine-dawn"
-        echo ""
-        echo "Catppuccin Family:"
-        echo "  • catppuccin-latte"
-        echo "  • catppuccin-frappe"
-        echo "  • catppuccin-macchiato"
-        echo "  • catppuccin-mocha"
-        echo ""
-        echo "Minimal:"
-        echo "  • minimal-light"
-        echo "  • minimal-dark"
-        echo ""
-        echo "Accessibility:"
-        echo "  • high-contrast"
-        echo ""
+        ${lib.concatMapStrings (t: "echo \" * ${t}\"\n") registry.available}
         echo "Usage:"
         echo "  theme-switch <n>          # Switch theme"
         echo "  theme-from-wallpaper [img]   # From image"

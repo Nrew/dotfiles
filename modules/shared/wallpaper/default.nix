@@ -2,7 +2,7 @@
 let
   cfg = config.wallpaper;
   wallpaperDir = config.theme.wallpaperDir;
-  currentWallpaper = "${congig.xdg.stateHome}/current-wallpaper";
+  currentWallpaper = "${config.xdg.stateHome}/current-wallpaper";
 
   wallpaperSelector = pkgs.writeShellScriptBin "wallpaper" ''
     #!usr/bin/env bash
@@ -99,8 +99,8 @@ let
         pkgs.imagemagick
       ];
 
-      home.shellAliases = [
+      home.shellAliases = {
         wp = "wallpaper";
-      ]
-    }
+      };
+    };
   }
