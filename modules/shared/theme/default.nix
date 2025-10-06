@@ -1,92 +1,278 @@
-{ lib }:
+{ config, lib, pkgs, ... }:
 
 let
-  # Rose Pine base theme colors
-  roseTheme = {
-    # Base colors
-    base    = "#191724";
-    surface = "#1f1d2e";
-    overlay = "#26233a";
-    muted   = "#6e6a86";
-    subtle  = "#908caa";
-    text    = "#e0def4";
-    love    = "#eb6f92";
-    gold    = "#f6c177";
-    rose    = "#ebbcba";
-    pine    = "#31748f";
-    foam    = "#9ccfd8";
-    iris    = "#c4a7e7";
+  cfg = config.theme;
+  
+  # Import theme registry
+  registry = import ./registry.nix { inherit lib; };
+  
+  # Theme state file
+  themeStateFile = ./theme-state.json;
+  
+  # Read current theme selection
+  themeState = 
+    if builtins.pathExists themeStateFile
+    then builtins.fromJSON (builtins.readFile themeStateFile)
+    else { variant = "beige"; custom = null; };
+  
+  # Get the current palette
+  currentPalette = 
+    if themeState.custom != null
+    then registry.mkTheme themeState.custom
+    else registry.${themeState.variant};
+  
+  # Color extractor script
+  colorExtractor = pkgs.python3.pkgs.buildPythonApplication {
+    pname = "extract-colors";
+    version = "1.0.0";
+    format = "other";
     
-    # Semantic colors
-    background  = "#191724";
-    foreground  = "#e0def4";
-    surface1    = "#1f1d2e";
-    surface2    = "#26233a";
+    propagatedBuildInputs = with pkgs.python3.pkgs; [ pillow ];
     
-    # UI colors
-    red     = "#eb6f92";
-    orange  = "#ebbcba";
-    yellow  = "#f6c177";
-    green   = "#9ccfd8";
-    blue    = "#31748f";
-    magenta = "#c4a7e7";
-    cyan    = "#9ccfd8";
-    white   = "#e0def4";
+    unpackPhase = "true";
     
-    # Additional colors
-    accent  = "#c4a7e7";
-    error   = "#eb6f92";
-    warning = "#f6c177";
-    success = "#9ccfd8";
-    info    = "#31748f";
-    
-    # Transparency levels
-    alpha = {
-      "10" = "1a";
-      "20" = "33";
-      "30" = "4d";
-      "40" = "66";
-      "50" = "80";
-      "60" = "99";
-      "70" = "b3";
-      "80" = "cc";
-      "90" = "e6";
-    };
+    installPhase = ''
+      mkdir -p $out/bin
+      cp ${./extract-colors.py} $out/bin/extract-colors
+      chmod +x $out/bin/extract-colors
+    '';
   };
+  
 in
 {
-  theme = roseTheme;
+  options.theme = {
+    enable = lib.mkEnableOption "unified theme system";
+    
+    font = {
+      mono = lib.mkOption {
+        type = lib.types.str;
+        default = "JetBrainsMono Nerd Font";
+      };
+      sans = lib.mkOption {
+        type = lib.types.str;
+        default = "Inter";
+      };
+      size = {
+        small = lib.mkOption { type = lib.types.int; default = 12; };
+        normal = lib.mkOption { type = lib.types.int; default = 14; };
+        large = lib.mkOption { type = lib.types.int; default = 16; };
+      };
+    };
+    
+    borderRadius = lib.mkOption { type = lib.types.int; default = 8; };
+    gap = lib.mkOption { type = lib.types.int; default = 16; };
+    
+    wallpaperDir = lib.mkOption {
+      type = lib.types.str;
+      default = "${config.home.homeDirectory}/.config/dotfiles/images";
+    };
+  };
   
-  # Helper function to add transparency to hex colors
-  withAlpha = color: alpha: "${color}${alpha}";
-  
-  # Catppuccin-compatible exports
-  catppuccin = {
-    rosewater = roseTheme.rose;
-    flamingo = roseTheme.love;
-    pink = roseTheme.love;
-    mauve = roseTheme.iris;
-    red = roseTheme.love;
-    maroon = roseTheme.love;
-    peach = roseTheme.gold;
-    yellow = roseTheme.gold;
-    green = roseTheme.foam;
-    teal = roseTheme.foam;
-    sky = roseTheme.pine;
-    sapphire = roseTheme.pine;
-    blue = roseTheme.pine;
-    lavender = roseTheme.iris;
-    text = roseTheme.text;
-    subtext1 = roseTheme.subtle;
-    subtext0 = roseTheme.muted;
-    overlay2 = roseTheme.overlay;
-    overlay1 = roseTheme.surface;
-    overlay0 = roseTheme.surface;
-    surface2 = roseTheme.surface1;
-    surface1 = roseTheme.surface;
-    surface0 = roseTheme.surface;
-    base = roseTheme.base;
-    mantle = roseTheme.base;
-    crust = roseTheme.base;
+  config = lib.mkIf cfg.enable {
+    _module.args.palette = currentPalette;
+    
+    home.sessionVariables = {
+      THEME_VARIANT = themeState.variant;
+      THEME_IS_CUSTOM = if themeState.custom != null then "true" else "false";
+    };
+    
+    xdg.configFile = {
+      "theme/palette.json".text = builtins.toJSON {
+        variant = themeState.variant;
+        isCustom = themeState.custom != null;
+        colors = currentPalette;
+        font = cfg.font;
+        spacing = { borderRadius = cfg.borderRadius; gap = cfg.gap; };
+      };
+      
+      "theme/palette.sh".text = ''
+        export THEME_VARIANT="${themeState.variant}"
+        export THEME_BACKGROUND="${currentPalette.background}"
+        export THEME_SURFACE="${currentPalette.surface}"
+        export THEME_OVERLAY="${currentPalette.overlay}"
+        export THEME_TEXT="${currentPalette.text}"
+        export THEME_SUBTEXT="${currentPalette.subtext}"
+        export THEME_MUTED="${currentPalette.muted}"
+        export THEME_PRIMARY="${currentPalette.primary}"
+        export THEME_SECONDARY="${currentPalette.secondary}"
+        export THEME_SUCCESS="${currentPalette.success}"
+        export THEME_WARNING="${currentPalette.warning}"
+        export THEME_ERROR="${currentPalette.error}"
+        export THEME_INFO="${currentPalette.info}"
+      '';
+      
+      "theme/palette.css".text = ''
+        :root {
+          --bg: ${currentPalette.background};
+          --surface: ${currentPalette.surface};
+          --overlay: ${currentPalette.overlay};
+          --text: ${currentPalette.text};
+          --subtext: ${currentPalette.subtext};
+          --muted: ${currentPalette.muted};
+          --primary: ${currentPalette.primary};
+          --secondary: ${currentPalette.secondary};
+          --success: ${currentPalette.success};
+          --warning: ${currentPalette.warning};
+          --error: ${currentPalette.error};
+          --info: ${currentPalette.info};
+        }
+      '';
+    };
+    
+    home.packages = [
+      colorExtractor
+      
+      (pkgs.writeShellScriptBin "theme-switch" ''
+        #!/usr/bin/env bash
+        set -e
+        
+        DOTFILES="$HOME/.config/dotfiles"
+        STATE_FILE="$DOTFILES/modules/shared/theme/theme-state.json"
+        VARIANT="$1"
+        
+        if [ -z "$VARIANT" ]; then
+          echo "Usage: theme-switch <variant>"
+          echo ""
+          echo "Available themes:"
+          ${lib.concatMapStrings (t: "echo \"  ${t}\"\n") registry.available}
+          exit 1
+        fi
+        
+        VALID_THEMES=(${lib.concatStringsSep " " registry.available})
+        if [[ ! " ''${VALID_THEMES[@]} " =~ " ''${VARIANT} " ]]; then
+          echo "❌ Unknown theme: $VARIANT"
+          exit 1
+        fi
+        
+        echo "🎨 Switching to: $VARIANT"
+        
+        mkdir -p "$(dirname "$STATE_FILE")"
+        cat > "$STATE_FILE" <<EOF
+{
+  "variant": "$VARIANT",
+  "custom": null
+}
+EOF
+        
+        echo "📦 Rebuilding..."
+        cd "$DOTFILES"
+        darwin-rebuild switch --flake .#owl
+        
+        echo "🔄 Reloading..."
+        killall -SIGUSR1 kitty 2>/dev/null || true
+        tmux source-file ~/.config/tmux/tmux.conf 2>/dev/null || true
+        
+        echo "✅ Theme: $VARIANT"
+      '')
+      
+      (pkgs.writeShellScriptBin "theme-from-wallpaper" ''
+        #!/usr/bin/env bash
+        set -e
+        
+        DOTFILES="$HOME/.config/dotfiles"
+        STATE_FILE="$DOTFILES/modules/shared/theme/theme-state.json"
+        WALLPAPER="$1"
+        
+        if [ -z "$WALLPAPER" ]; then
+          CURRENT_LINK="$HOME/.local/state/current-wallpaper"
+          if [ -L "$CURRENT_LINK" ]; then
+            WALLPAPER=$(readlink "$CURRENT_LINK")
+          else
+            echo "Usage: theme-from-wallpaper <image>"
+            exit 1
+          fi
+        fi
+        
+        if [ ! -f "$WALLPAPER" ]; then
+          echo "❌ Image not found: $WALLPAPER"
+          exit 1
+        fi
+        
+        echo "🎨 Extracting colors from: $(basename "$WALLPAPER")"
+        
+        THEME_DATA=$(extract-colors "$WALLPAPER" "wallpaper" 2>/dev/null) || {
+          echo "❌ Color extraction failed"
+          exit 1
+        }
+        
+        mkdir -p "$(dirname "$STATE_FILE")"
+        echo "{\"variant\": \"wallpaper\", \"custom\": $THEME_DATA}" > "$STATE_FILE"
+        
+        echo "📦 Rebuilding..."
+        cd "$DOTFILES"
+        darwin-rebuild switch --flake .#owl
+        
+        echo "🔄 Reloading..."
+        killall -SIGUSR1 kitty 2>/dev/null || true
+        
+        echo "✅ Theme generated from wallpaper!"
+      '')
+      
+      (pkgs.writeShellScriptBin "theme-list" ''
+        #!/usr/bin/env bash
+        
+        echo "╔════════════════════════════════════════╗"
+        echo "║       Available Themes                 ║"
+        echo "╚════════════════════════════════════════╝"
+        echo ""
+        echo "Beige Family:"
+        echo "  • beige"
+        echo "  • beige-dark"
+        echo ""
+        echo "Rose Pine Family:"
+        echo "  • rose-pine"
+        echo "  • rose-pine-moon"
+        echo "  • rose-pine-dawn"
+        echo ""
+        echo "Catppuccin Family:"
+        echo "  • catppuccin-latte"
+        echo "  • catppuccin-frappe"
+        echo "  • catppuccin-macchiato"
+        echo "  • catppuccin-mocha"
+        echo ""
+        echo "Minimal:"
+        echo "  • minimal-light"
+        echo "  • minimal-dark"
+        echo ""
+        echo "Accessibility:"
+        echo "  • high-contrast"
+        echo ""
+        echo "Usage:"
+        echo "  theme-switch <n>          # Switch theme"
+        echo "  theme-from-wallpaper [img]   # From image"
+        echo "  theme-info                   # Current info"
+      '')
+      
+      (pkgs.writeShellScriptBin "theme-info" ''
+        #!/usr/bin/env bash
+        
+        if [ ! -f ~/.config/theme/palette.json ]; then
+          echo "Theme not initialized"
+          exit 1
+        fi
+        
+        echo "╔════════════════════════════════════════╗"
+        echo "║          Current Theme                 ║"
+        echo "╚════════════════════════════════════════╝"
+        echo ""
+        
+        ${pkgs.jq}/bin/jq -r '
+          "Variant:     \(.variant)",
+          "Custom:      \(if .isCustom then "Yes (from wallpaper)" else "No" end)",
+          "",
+          "Colors:",
+          "  Background:  \(.colors.background)",
+          "  Surface:     \(.colors.surface)",
+          "  Text:        \(.colors.text)",
+          "  Primary:     \(.colors.primary)",
+          "  Secondary:   \(.colors.secondary)",
+          "",
+          "Typography:",
+          "  Mono:        \(.font.mono)",
+          "  Sans:        \(.font.sans)",
+          "  Size:        \(.font.size.normal)px"
+        ' ~/.config/theme/palette.json
+      '')
+    ];
   };
 }

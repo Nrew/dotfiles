@@ -1,10 +1,4 @@
-{ config, lib, pkgs, ... }:
-
-let
-  theme = import ./theme/default.nix { inherit lib; };
-  colors = theme.theme;
-in
-
+{ config, lib, pkgs, palette, ... }:
 {
   programs.tmux = {
     enable = true;
@@ -18,58 +12,31 @@ in
     prefix = "C-space";
 
     extraConfig = ''
-      # Define color scheme
-      set -g @background "${colors.base}"
-      set -g @foreground "${colors.text}"
-      set -g @cursor "${colors.text}"
-      set -g @color0 "${colors.base}"
-      set -g @color1 "${colors.love}"
-      set -g @color2 "${colors.foam}"
-      set -g @color3 "${colors.gold}"
-      set -g @color4 "${colors.pine}"
-      set -g @color5 "${colors.iris}"
-      set -g @color6 "${colors.foam}"
-      set -g @color7 "${colors.text}"
-      set -g @color8 "${colors.overlay}"
-      set -g @color9 "${colors.love}"
-      set -g @color10 "${colors.foam}"
-      set -g @color11 "${colors.gold}"
-      set -g @color12 "${colors.pine}"
-      set -g @color13 "${colors.iris}"
-      set -g @color14 "${colors.foam}"
-      set -g @color15 "${colors.text}"
-
-      # True color support
-      set -as terminal-features ",xterm-256color:RGB"
-      set -g default-terminal "tmux-256color"
-      
-      # Focus events (for vim etc)
-      set -g focus-events on
-
-      # Window numbering
-      set -g renumber-windows on
-      setw -g automatic-rename on
-      
       # Status bar configuration
+      set -g status on
+      set -g status-justify left
+      set -g status-style "bg=${palette.surface},fg=${palette.text}"
       set -g status-position top
       set -g status-interval 2
-      set -g status-left-length 20
+      set -g status-left-length 100
       set -g status-right-length 100
       
-      set -g status-left "#{?client_prefix,#[bg=#{@color4}]#[fg=#{@background}],#[bg=#{@color8}]#[fg=#{@foreground}]} #S "
-      set -g status-right "#[fg=#{@foreground}] %H:%M #[bg=#{@color8}]#[fg=#{@foreground}] %d-%b-%y "
+      set -g status-left "#[fg=${palette.background},bg=${palette.primary},bold] #S #[fg=${palette.primary},bg=${palette.surface},nobold]"
+      set -g status-right "#[fg=${palette.overlay},bg=${palette.surface}]#[fg=${palette.text},bg=${palette.overlay}] %Y-%m-%d #[fg=${palette.primary},bg=${palette.overlay}]#[fg=${palette.background},bg=${palette.primary},bold] %H:%M "
       
       # Window status
-      setw -g window-status-format "#[fg=#{@color8}]#[bg=#{@background}] #I #[fg=#{@color8}]#[bg=#{@background}] #W "
-      setw -g window-status-current-format "#[fg=#{@background}]#[bg=#{@color4}] #I #[fg=#{@background}]#[bg=#{@color4}] #W "
+      set -g window-status-separator ""
+      set -g window-status-format "#[fg=${palette.surface},bg=${palette.overlay}]#[fg=${palette.text},bg=${palette.overlay}] #I #W #[fg=${palette.overlay},bg=${palette.surface}]"
+      set -g window-status-current-format "#[fg=${palette.surface},bg=${palette.success}]#[fg=${palette.background},bg=${palette.success},bold] #I #W #[fg=${palette.success},bg=${palette.surface},nobold]"
       
       # Pane borders
-      set -g pane-border-style "fg=#{@color8}"
-      set -g pane-active-border-style "fg=#{@color4}"
+      set -g pane-border-style "fg=${palette.border}"
+      set -g pane-active-border-style "fg=${palette.primary}"
       
       # Message text
-      set -g message-style "fg=#{@background},bg=#{@color4}"
-      
+      set -g message-style "fg=${palette.background},bg=${palette.primary}"
+      set -g mode-style "bg=${palette.primary},fg=${palette.background}"
+
       # Key bindings
       # Split panes
       bind | split-window -h -c "#{pane_current_path}"

@@ -14,72 +14,69 @@ in
     # ────────────────────────────────────────────────────────────────
     
     font = {
-      name = "JetBrainsMono Nerd Font";
-      size = if pkgs.stdenv.isDarwin then 14.0 else 13;
+      name = config.theme.font.mono;
+      size = if pkgs.stdenv.isDarwin then 14.0 else 13.0;
     };
 
     # ────────────────────────────────────────────────────────────────
     # Core Settings
     # ────────────────────────────────────────────────────────────────
     
-    extraConfig = ''
-      font_features JetBrainsMonoNerdFont-Regular +zero +ss01
-
-      disable_ligatures never
-
-      adjust_line_height 110%
-      adjust_column_width 0
-    '';
-
     settings = {
-      # Colors
-      background = colors.base;
-      foreground = colors.text;
+      background = palette.background;
+      foreground = palette.text;
+      selection_background = palette.selection;
+      selection_foreground = palette.text;
+      cursor = palette.cursor;
+      cursor_text_color = palette.background;
+      cursor_shape = "beam";
+      url_color = palette.link;
       
-      # Terminal colors
-      color0 = colors.base;
-      color1 = colors.love;
-      color2 = colors.foam;
-      color3 = colors.gold;
-      color4 = colors.pine;
-      color5 = colors.iris;
-      color6 = colors.foam;
-      color7 = colors.text;
-      color8 = colors.overlay;
-      color9 = colors.love;
-      color10 = colors.foam;
-      color11 = colors.gold;
-      color12 = colors.pine;
-      color13 = colors.iris;
-      color14 = colors.foam;
-      color15 = colors.text;
+      color0 = palette.overlay;
+      color8 = palette.muted;
+      color1 = palette.error;
+      color9 = palette.error;
+      color2 = palette.success;
+      color10 = palette.success;
+      color3 = palette.warning;
+      color11 = palette.warning;
+      color4 = palette.info;
+      color12 = palette.info;
+      color5 = palette.primary;
+      color13 = palette.primary;
+      color6 = palette.secondary;
+      color14 = palette.secondary;
+      color7 = palette.text;
+      color15 = palette.text;
       
-      # Cursor colors
-      cursor = colors.text;
-      cursor_text_color = colors.base;
-
-      # Window
-      window_padding_width = "16";
-      single_window_margin_width = "0";
-      confirm_os_window_close = 0;
-
-      # URLs
-      detect_urls = "yes";
+      tab_bar_edge = "top";
+      tab_bar_style = "powerline";
+      tab_powerline_style = "slanted";
+      active_tab_foreground = palette.background;
+      active_tab_background = palette.primary;
+      active_tab_font_style = "bold";
+      inactive_tab_foreground = palette.subtext;
+      inactive_tab_background = palette.surface;
+      tab_bar_background = palette.surface;
       
-      # Shell
+      window_padding_width = toString config.theme.gap;
+      window_border_width = "1pt";
+      active_border_color = palette.primary;
+      inactive_border_color = palette.border;
+      
+      background_opacity = "0.97";
+      background_blur = "24";
+      
       shell_integration = "enabled";
-      allow_hyperlinks = "yes";
       allow_remote_control = "yes";
-
-      # Bell
       enable_audio_bell = "no";
-      visual_bell_duration = "0.0";
-      window_alert_on_bell = "yes";
-      bell_on_tab = "󰂜 ";
-
-      # Theme settings
-      dynamic_background_opacity = "yes";
+      
+      macos_option_as_alt = "yes";
+      macos_quit_when_last_window_closed = "yes";
+      macos_show_window_title_in = "none";
     };
+
+    
 
     # ────────────────────────────────────────────────────────────────
     # Keybindings
@@ -115,6 +112,7 @@ in
       "cmd+v" = "paste_from_clipboard";
       "cmd+k" = "clear_terminal scrollback active";
       "cmd+l" = "clear_terminal scroll active";
+      "cmd+shift+r" = "load_config_file";
     };
   };
 }

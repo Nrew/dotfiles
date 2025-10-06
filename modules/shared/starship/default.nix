@@ -1,290 +1,278 @@
-{ config, lib, pkgs, ... }:
-let
-  theme = import ../theme/default.nix { inherit lib; };
-  colors = theme.theme;
-in
+{ config, pkgs, ... }:
+
 {
   programs.starship = {
     enable = true;
-
-    #───────────────────────────────────────────────────────────────────────────────
-    # Starship Configuration
-    #───────────────────────────────────────────────────────────────────────────────
-
-    enableZshIntegration = true;
-
     settings = {
-
-      #───────────────────────────────────────────────────────────────────────────────
-      # Schema Configuration
-      #───────────────────────────────────────────────────────────────────────────────
-
-      "$schema" = "https://starship.rs/config-schema.json";
-      
-      #───────────────────────────────────────────────────────────────────────────────
-      # Palette
-      #───────────────────────────────────────────────────────────────────────────────
-      palette = "rose-pine";
-
-      palettes.rose-pine = {
-        overlay = colors.overlay;
-        love    = colors.love;
-        gold    = colors.gold;
-        rose    = colors.rose;
-        pine    = colors.pine;
-        foam    = colors.foam;
-        iris    = colors.iris;
-      };
-
-      #───────────────────────────────────────────────────────────────────────────────
-      # Global Settings
-      #───────────────────────────────────────────────────────────────────────────────
       add_newline = false;
-      line_break.disabled = true; # Ensures single-line prompt
+      continuation_prompt = "[▸▹ ](dimmed white)";
 
-      #───────────────────────────────────────────────────────────────────────────────
-      # Prompt Character
-      #───────────────────────────────────────────────────────────────────────────────
-      character = {
-        success_symbol = "[❯](pine)"; # Using pine from Rosé Pine
-        error_symbol = "[❯](love)";   # Using love from Rosé Pine
-        vicmd_symbol = "[❮](iris)";   # Using iris from Rosé Pine
-      };
+      format = ''
+        ($nix_shell$container$fill$git_metrics\n)$cmd_duration$hostname$localip$shlvl$shell$env_var$jobs$sudo$username$character
+      '';
 
-      #───────────────────────────────────────────────────────────────────────────────
-      # Directory
-      #───────────────────────────────────────────────────────────────────────────────
+      right_format = ''
+        $singularity$kubernetes$directory$vcsh$fossil_branch$git_branch$git_commit$git_state$git_status$hg_branch$pijul_channel$docker_context$package$c$cmake$cobol$daml$dart$deno$dotnet$elixir$elm$erlang$fennel$golang$guix_shell$haskell$haxe$helm$java$julia$kotlin$gradle$lua$nim$nodejs$ocaml$opa$perl$php$pulumi$purescript$python$raku$rlang$red$ruby$rust$scala$solidity$swift$terraform$vlang$vagrant$zig$buf$conda$meson$spack$memory_usage$aws$gcloud$openstack$azure$crystal$custom$status$os$battery$time
+      '';
 
-      directory = {
-        format = "[](fg:overlay)[ $path ]($style)[](fg:overlay) ";
-        style = "bg:overlay fg:pine";
-        truncation_length = 3;
-        truncation_symbol = "…/";
-        substitutions = {
-          Documents = "󰈙";
-          Downloads = " ";
-          Music = " ";
-          Pictures = " ";
-        };
-      };
-
-      #───────────────────────────────────────────────────────────────────────────────
-      # Fill
-      #───────────────────────────────────────────────────────────────────────────────
       fill = {
-        style = "fg:overlay";
         symbol = " ";
       };
 
-      #───────────────────────────────────────────────────────────────────────────────
-      # Git Configuration
-      #───────────────────────────────────────────────────────────────────────────────
-      git_branch = {
-        format = "[](fg:overlay)[ $symbol $branch ]($style)[](fg:overlay) ";
-        style = "bg:overlay fg:foam";
-        symbol = "";
+      character = {
+        format = "$symbol ";
+        success_symbol = "[◎](bold italic bright-yellow)";
+        error_symbol = "[○](italic purple)";
+        vimcmd_symbol = "[■](italic dimmed green)";
+        vimcmd_replace_one_symbol = "◌";
+        vimcmd_replace_symbol = "□";
+        vimcmd_visual_symbol = "▼";
       };
 
-      git_status = {
+      env_var.VIMSHELL = {
+        format = "[$env_value]($style)";
+        style = "green italic";
+      };
+
+      sudo = {
+        format = "[$symbol]($style)";
+        style = "bold italic bright-purple";
+        symbol = "⋈┈";
         disabled = false;
-        style = "bg:overlay fg:love";
-        format = "[](fg:overlay)([$all_status$ahead_behind]($style))[](fg:overlay) ";
-        up_to_date = "[ ✓ ](bg:overlay fg:iris)";
-        untracked = "[?($count)](bg:overlay fg:gold)";
-        stashed = "[S](bg:overlay fg:iris)";
-        modified = "[!($count)](bg:overlay fg:gold)";
-        renamed = "[»($count)](bg:overlay fg:iris)";
-        deleted = "[✘($count)](style)";
-        staged = "[++($count)](bg:overlay fg:gold)";
-        ahead = "[⇡($count)](bg:overlay fg:foam)";
-        diverged = "⇕[[](bg:overlay fg:iris)[⇡($ahead_count)](bg:overlay fg:foam)[⇣($behind_count)](bg:overlay fg:rose)[]](bg:overlay fg:iris)";
-        behind = "[⇣($count)](bg:overlay fg:rose)";
       };
 
-      #───────────────────────────────────────────────────────────────────────────────
-      # Time
-      #───────────────────────────────────────────────────────────────────────────────
+      username = {
+        style_user = "bright-yellow bold italic";
+        style_root = "purple bold italic";
+        format = "[⭘ $user]($style) ";
+        disabled = false;
+        show_always = false;
+      };
+
+      directory = {
+        home_symbol = "⌂";
+        truncation_length = 2;
+        truncation_symbol = "□ ";
+        read_only = " ◈";
+        use_os_path_sep = true;
+        style = "italic blue";
+        format = "[$path]($style)[$read_only]($read_only_style)";
+        repo_root_style = "bold blue";
+        repo_root_format = "[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) [△](bold bright-blue)";
+      };
+
+      cmd_duration = {
+        min_time = 0;
+        format = "[◄ $duration ](italic white)";
+      };
+
+      jobs = {
+        format = "[$symbol$number]($style) ";
+        style = "white";
+        symbol = "[▶](blue italic)";
+      };
+
+      localip = {
+        ssh_only = true;
+        format = " ◯[$localipv4](bold magenta)";
+        disabled = false;
+      };
+
       time = {
         disabled = false;
-        format = " [](fg:overlay)[ $time 󰴈 ]($style)[](fg:overlay)";
-        style = "bg:overlay fg:rose";
-        time_format = "%I:%M%P";
-        use_12hr = true;
-      };
-
-      #───────────────────────────────────────────────────────────────────────────────
-      # Username
-      #───────────────────────────────────────────────────────────────────────────────
-      username = {
-        disabled = false;
-        format = "[](fg:overlay)[ 󰧱 $user ]($style)[](fg:overlay) ";
-        show_always = true;
-        style_root = "bg:overlay fg:iris";
-        style_user = "bg:overlay fg:iris";
-      };
-
-      #───────────────────────────────────────────────────────────────────────────────
-      # Programming Languages
-      #───────────────────────────────────────────────────────────────────────────────
-
-      c = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = " ";
-      };
-
-      elixir = { 
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = " ";
-      };
-
-      elm = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = " ";
-      };
-
-      golang = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = " ";
-      };
-
-      haskell = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = " ";
-      };
-
-      java = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = "󰈤 ";
-      };
-
-      julia = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = "󰌈 ";
-      };
-
-      nodejs = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = "󰋘 ";
-      };
-
-      nim = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = "󰈙 ";
-      };
-
-      rust = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = " ";
-      };
-
-      scala = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = "󰚧 ";
-      };
-
-      python = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = " ";
-      };
-
-      conda = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$environment ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = "🅒  ";
-      };
-
-      nix_shell = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = " ";
-      };
-
-      lua = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$version ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = " ";
-      };
-
-      #───────────────────────────────────────────────────────────────────────────────
-      # Cloud Platforms
-      #───────────────────────────────────────────────────────────────────────────────
-      gcloud = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$active ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = "󱇶 ";
-      };
-
-      aws = {
-        style = "bg:overlay fg:pine";
-        format = " [](fg:overlay)[ $symbol$active ]($style)[](fg:overlay)";
-        disabled = false;
-        symbol = "󰸏 ";
-      };
-
-      #───────────────────────────────────────────────────────────────────────────────
-      # System Information
-      #───────────────────────────────────────────────────────────────────────────────
-      cmd_duration = {
-        disabled = false;
-        format = "[](fg:overlay)[ $symbol$duration ]($style)[](fg:overlay) ";
-        style = "bg:overlay fg:rose";
-        min_time = 1000;
-        show_milliseconds = false;
+        format = "[ $time]($style)";
+        time_format = "%R";
+        utc_time_offset = "local";
+        style = "italic dimmed white";
       };
 
       battery = {
-        full_symbol = "󰁹 ";
-        charging_symbol = "󰂄 ";
-        discharging_symbol = "󰂃 ";
-        unknown_symbol = "󰂑 ";
-        empty_symbol = "󰂎 ";
-        disabled = false;
+        format = "[ $percentage $symbol]($style)";
+        full_symbol = "█";
+        charging_symbol = "[↑](italic bold green)";
+        discharging_symbol = "↓";
+        unknown_symbol = "░";
+        empty_symbol = "▃";
         display = [
-          { threshold = 10; style = "bold love"; } # Using love for critical
-          { threshold = 30; style = "bold gold"; } # Using gold for warning
-          { threshold = 100; style = "pine"; } # Using pine for normal/good
+          { threshold = 20; style = "italic bold red"; }
+          { threshold = 60; style = "italic dimmed bright-purple"; }
+          { threshold = 70; style = "italic dimmed yellow"; }
         ];
       };
 
-      hostname = {
-        disabled = false;
-        ssh_only = true;
-        format = "[@$hostname]($style)"; # Removed trailing space
-        style = "bold gold"; # Using gold for hostnames
+      git_branch = {
+        format = " [$branch(:$remote_branch)]($style)";
+        symbol = "[△](bold italic bright-blue)";
+        style = "italic bright-blue";
+        truncation_symbol = "⋯";
+        truncation_length = 11;
+        ignore_branches = [ "main" "master" ];
+        only_attached = true;
       };
 
-      #───────────────────────────────────────────────────────────────────────────────
-      # Prompt Format
-      #───────────────────────────────────────────────────────────────────────────────
-      format = "$username$hostname$directory$git_branch$git_status$fill$c$elixir$elm$golang$haskell$java$julia$nodejs$nim$rust$scala$python$conda$nix_shell$lua$gcloud$aws$cmd_duration$battery$time\n [󱞪](fg:iris) ";
+      git_metrics = {
+        format = "([▴$added]($added_style))([▿$deleted]($deleted_style))";
+        added_style = "italic dimmed green";
+        deleted_style = "italic dimmed red";
+        ignore_submodules = true;
+        disabled = false;
+      };
+
+      git_status = {
+        style = "bold italic bright-blue";
+        format = "([⎪$ahead_behind$staged$modified$untracked$renamed$deleted$conflicted$stashed⎥]($style))";
+        conflicted = "[◪◦](italic bright-magenta)";
+        ahead = "[▴│[${count}](bold white)│](italic green)";
+        behind = "[▿│[${count}](bold white)│](italic red)";
+        diverged = "[◇ ▴┤[${ahead_count}](regular white)│▿┤[${behind_count}](regular white)│](italic bright-magenta)";
+        untracked = "[◌◦](italic bright-yellow)";
+        stashed = "[◃◈](italic white)";
+        modified = "[●◦](italic yellow)";
+        staged = "[▪┤[$count](bold white)│](italic bright-cyan)";
+        renamed = "[◎◦](italic bright-blue)";
+        deleted = "[✕](italic red)";
+      };
+
+      deno = {
+        format = " [deno](italic) [∫ $version](green bold)";
+        version_format = "''${raw}";
+      };
+
+      lua = {
+        format = " [lua](italic) [${symbol}${version}]($style)";
+        version_format = "''${raw}";
+        symbol = "⨀ ";
+        style = "bold bright-yellow";
+      };
+
+      nodejs = {
+        format = " [node](italic) [◫ ($version)](bold bright-green)";
+        version_format = "''${raw}";
+        detect_files = [ "package-lock.json" "yarn.lock" ];
+        detect_folders = [ "node_modules" ];
+        detect_extensions = [ ];
+      };
+
+      python = {
+        format = " [py](italic) [${symbol}${version}]($style)";
+        symbol = "[⌉](bold bright-blue)⌊ ";
+        version_format = "''${raw}";
+        style = "bold bright-yellow";
+      };
+
+      ruby = {
+        format = " [rb](italic) [${symbol}${version}]($style)";
+        symbol = "◆ ";
+        version_format = "''${raw}";
+        style = "bold red";
+      };
+
+      rust = {
+        format = " [rs](italic) [$symbol$version]($style)";
+        symbol = "⊃ ";
+        version_format = "''${raw}";
+        style = "bold red";
+      };
+
+      package = {
+        format = " [pkg](italic dimmed) [$symbol$version]($style)";
+        version_format = "''${raw}";
+        symbol = "◨ ";
+        style = "dimmed yellow italic bold";
+      };
+
+      swift = {
+        format = " [sw](italic) [${symbol}${version}]($style)";
+        symbol = "◁ ";
+        style = "bold bright-red";
+        version_format = "''${raw}";
+      };
+
+      aws = {
+        disabled = true;
+        format = " [aws](italic) [$symbol $profile $region]($style)";
+        style = "bold blue";
+        symbol = "▲ ";
+      };
+
+      buf = {
+        symbol = "■ ";
+        format = " [buf](italic) [$symbol $version $buf_version]($style)";
+      };
+
+      c = {
+        symbol = "ℂ ";
+        format = " [$symbol($version(-$name))]($style)";
+      };
+
+      conda = {
+        symbol = "◯ ";
+        format = " conda [$symbol$environment]($style)";
+      };
+
+      dart = {
+        symbol = "◁◅ ";
+        format = " dart [$symbol($version )]($style)";
+      };
+
+      docker_context = {
+        symbol = "◧ ";
+        format = " docker [$symbol$context]($style)";
+      };
+
+      elixir = {
+        symbol = "△ ";
+        format = " exs [$symbol $version OTP $otp_version ]($style)";
+      };
+
+      elm = {
+        symbol = "◩ ";
+        format = " elm [$symbol($version )]($style)";
+      };
+
+      golang = {
+        symbol = "∩ ";
+        format = " go [$symbol($version )]($style)";
+      };
+
+      haskell = {
+        symbol = "❯λ ";
+        format = " hs [$symbol($version )]($style)";
+      };
+
+      java = {
+        symbol = "∪ ";
+        format = " java [${symbol}(${version} )]($style)";
+      };
+
+      julia = {
+        symbol = "◎ ";
+        format = " jl [$symbol($version )]($style)";
+      };
+
+      memory_usage = {
+        symbol = "▪▫▪ ";
+        format = " mem [${ram}( ${swap})]($style)";
+      };
+
+      nim = {
+        symbol = "▴▲▴ ";
+        format = " nim [$symbol($version )]($style)";
+      };
+
+      nix_shell = {
+        style = "bold italic dimmed blue";
+        symbol = "✶";
+        format = "[$symbol nix⎪$state⎪]($style) [$name](italic dimmed white)";
+        impure_msg = "[⌽](bold dimmed red)";
+        pure_msg = "[⌾](bold dimmed green)";
+        unknown_msg = "[◌](bold dimmed ellow)";
+      };
+
+      spack = {
+        symbol = "◇ ";
+        format = " spack [$symbol$environment]($style)";
+      };
     };
   };
 }

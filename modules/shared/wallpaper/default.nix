@@ -41,7 +41,9 @@ let
           --place=''${FZF_PREVIEW_COLUMNS}x''${FZF_PREVIEW_LINES}@0x0 \
           "$file" 2>/dev/null
       else
-        echo "Image Preview"
+        echo "╔════════════════════════════════════════╗"
+        echo "║           Image Preview                ║"
+        echo "╚════════════════════════════════════════╝"
         echo "$(basename "$file")"
         echo "$(du -h "$file" | cut -f1)"
 
@@ -53,8 +55,8 @@ let
     }
 
     export -f preview_image
-
-    SELECTED=$(find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.png" \) 2>/dev/null | \
+    
+    SELECTED=$(find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" -o -iname "*.webp" \) 2>/dev/null | \
       sed "s|$WALLPAPER_DIR/||" | \
       sort | \
       ${pkgs.fzf}/bin/fzf \
@@ -62,23 +64,23 @@ let
         --border=rounded \
         --margin=1 \
         --padding=1 \
-        --preview="preview_image \"$WALLPAPER_DIR/{}\""\
+        --preview="preview_image \"$WALLPAPER_DIR/{}\"" \
         --preview-window=right:60% \
-        --prompt= ""\
-        --header="$WALLPAPER_COUNT wallpapers$([ -n "$CURRENT_NAME" ] && echo " * Current: $CURRENT_NAME" || echo "")" \
+        --prompt="🖼️  " \
+        --header="$WALLPAPER_COUNT wallpapers$([ -n "$CURRENT_NAME" ] && echo " • Current: $CURRENT_NAME" || echo "")" \
         --color="fg:''${THEME_TEXT:-#2d2a25},bg:''${THEME_OVERLAY:-#e0dcd3}" \
-        --color="fg+:''${THEME_TEXT:-#2d2a25},bg+''${THEME_PRIMARY:-#7c8a9e}" \
+        --color="fg+:''${THEME_TEXT:-#2d2a25},bg+:''${THEME_PRIMARY:-#7c8a9e}" \
         --color="info:''${THEME_MUTED:-#8a857d},prompt:''${THEME_PRIMARY:-#7c8a9e},pointer:''${THEME_ERROR:-#b87d7d}" \
-        --pointer=">" \
-        --marker="x" \
+        --pointer="▶" \
+        --marker="✓" \
         --no-scrollbar \
-        --bind="ctrl-d:preview-page-down,ctril-u:preview-page-up")
-
+        --bind="ctrl-d:preview-page-down,ctrl-u:preview-page-up")
+    
     [ -z "$SELECTED" ] && exit 0
 
     WALLPAPER_PATH="$WALLPAPER_DIR/$SELECTED"
     mkdir -p "$(dirname "$CURRENT_LINK")"
-    ln -sf "$WALLPAPER_PATH "$CURRENT_LINK""
+    ln -sf "$WALLPAPER_PATH" "$CURRENT_LINK"
 
     echo "$SELECTED"
     osascript -e "tell application \"System Events\" to tell every desktop to set picture to \"$WALLPAPER_PATH\""

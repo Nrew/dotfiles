@@ -8,7 +8,7 @@
     source = "${self}/images/tvchany.png";
     recursive = true;
   };
-  
+
   #──────────────────────────────────────────────────────────────────
   # Fastfetch Program Configuration
   #──────────────────────────────────────────────────────────────────
@@ -21,9 +21,7 @@
       logo = {
         type = "kitty-icat";
         source = "${config.home.homeDirectory}/.config/fastfetch/logo/tvchany.png";
-        padding = {
-          top = 1;
-        };
+        padding.top = 1;
       };
 
       display = {
@@ -41,12 +39,12 @@
         # ───────────────────────────────────────────────────────────────────────────────
         {
           type = "title";
-          format = "${colors.love}{1}${colors.text}サン @ ${colors.iris}{2}${colors.text}";
+          format = "${palette.error}{1}${palette.text}サン @ ${palette.secondary}{2}${palette.text}";
         }
         {
           type = "separator";
           string = "▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼";
-          color = colors.pine;
+          color = palette.primary;
         }
         # ───────────────────────────────────────────────────────────────────────────────
         # システム情報 (System Information)
@@ -54,33 +52,33 @@
         {
           type = "os";
           key = "󰒋 オペレーティングシステム";
-          keyColor = colors.love;
+          keyColor = palette.error;
           format = "{2} {9}";
         }
         {
           type = "kernel";
           key = "❯ カーネル";
-          keyColor = colors.foam;
+          keyColor = palette.info;   
           format = "{1} {2}";
         }
         {
           type = "host";
           key = " ホスト";
-          keyColor = colors.rose;
+          keyColor = palette.secondary;
           format = "{1}";
         }
         {
           type = "uptime";
           key = " アップタイム";
-          keyColor = colors.iris;
+          keyColor = palette.secondary;
           format = "{?1}{1} 日{?} {?2}{2} 時間{?} {?3}{3} 分{?}";
         }
         {
           type = "separator";
           string = " ≫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━≪";
-          color = colors.subtle;
+          color = palette.muted;
         }
-        
+
         # ───────────────────────────────────────────────────────────────────────────────
         # 環境・リソース (Environment & Resources)
         # ───────────────────────────────────────────────────────────────────────────────
@@ -88,24 +86,24 @@
         {
           type = "packages";
           key = " パッケージ";
-          keyColor = colors.gold;
+          keyColor = palette.warning;
           format = "{} (nix)";
         }
         {
           type = "shell";
           key = " シェル";
-          keyColor = colors.pine;
+          keyColor = palette.primary;
         }
         {
           type = "memory";
           key = "メモリ";
-          keyColor = colors.love;
+          keyColor = palette.error;
           format = "{1} / {2} ({3})";
         }
         {
           type = "separator";
           string = " ≫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━≪";
-          color = colors.subtle;
+          color = palette.muted;
         }
 
         # ═══════════════════════════════════════════════════════════════
@@ -115,35 +113,35 @@
         {
           type = "display";
           key = "ディスプレイ";
-          keyColor = colors.iris;
+          keyColor = palette.secondary;
           format = "{1}x{2}@{5}Hz";
         }
         {
           type = "de";
           key = "デスクトップ環境";
-          keyColor = colors.iris; 
+          keyColor = palette.secondary;
         }
         {
           type = "wm";
           key = "ウィンドウマネージャ";
-          keyColor = colors.gold;
+          keyColor = palette.warning;
         }
         {
           type = "terminal";
           key = " ターミナル";
-          keyColor = colors.foam;
+          keyColor = palette.info;
         }
         {
           type = "separator";
           string = "▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼";
-          color = colors.pine;
+          color = palette.primary;
         }
         # ═══════════════════════════════════════════════════════════════
         # システム状態 (System Status)
         # ═══════════════════════════════════════════════════════════════
         {
           type = "text";
-          text = "${colors.subtle}╔══ ${colors.foam}システム状態${colors.subtle}: ${colors.love}動作中 ${colors.subtle}═══ ${colors.iris}AI ノード${colors.subtle}: ${colors.gold}アクティブ ${colors.subtle}══╗";
+          text = "${palette.muted}╔══ ${palette.info}システム状態${palette.muted}: ${palette.error}動作中 ${palette.muted}═══ ${palette.secondary}AI ノード${palette.muted}: ${palette.warning}アクティブ ${palette.muted}══╗";
         }
         {
           type = "break";
