@@ -21,14 +21,25 @@ local function setup_keymaps(_, bufnr)
 end
 
 function M.setup()
-  local lspconfig = require("lspconfig")
+  local lspconfig_ok, lspconfig = pcall(require, "lspconfig")
+  if not lspconfig_ok then
+    vim.notify("lspconfig not found", vim.log.levels.ERROR)
+    return
+  end
+
   local capabilities = vim.lsp.protocol.make_client_capabilities()
 
   -- Enhance capabilities with blink.cmp if available
-  local ok, blink = pcall(require, "blink.cmp")
-  if ok and blink.get_lsp_capabilities then
+  local blink_ok, blink = pcall(require, "blink.cmp")
+  if blink_ok and blink.get_lsp_capabilities then
     capabilities = blink.get_lsp_capabilities(capabilities)
   end
+
+  -- Enable snippet support
+  capabilities.textDocument.completion.completionItem.snippetSupport = true
+  capabilities.textDocument.completion.completionItem.resolveSupport = {
+    properties = { "documentation", "detail", "additionalTextEdits" }
+  }
 
   local servers = {
     lua_ls = {
@@ -42,6 +53,7 @@ function M.setup()
             checkThirdParty = false
           },
           telemetry = { enable = false },
+          format = { enable = false }, -- Use stylua instead
         },
       },
     },
@@ -78,26 +90,48 @@ function M.setup()
     },
     pyright = {
       condition = has_category("python"),
-      settings = { python = { analysis = { typeCheckingMode = "strict" } } },
+      settings = { 
+        python = { 
+          analysis = { 
+            typeCheckingMode = "basic",
+            autoSearchPaths = true,
+            useLibraryCodeForTypes = true,
+          } 
+        } 
+      },
     },
     rust_analyzer = {
       condition = has_category("rust"),
-      settings = { ["rust-analyzer"] = { cargo = { allFeatures = true } } },
+      settings = { 
+        ["rust-analyzer"] = { 
+          cargo = { allFeatures = true },
+          checkOnSave = { command = "clippy" },
+        } 
+      },
     },
     gopls = {
       condition = has_category("go"),
-      settings = { gopls = { analyses = { unusedparams = true }, staticcheck = true } },
+      settings = { 
+        gopls = { 
+          analyses = { unusedparams = true }, 
+          staticcheck = true,
+          gofumpt = true,
+        } 
+      },
     },
     clangd = {
       condition = has_category("c"),
-      cmd = { "clangd", "--background-index" },
+      cmd = { "clangd", "--background-index", "--clang-tidy" },
+      capabilities = vim.tbl_deep_extend("force", capabilities, {
+        offsetEncoding = { "utf-16" }
+      }),
     },
   }
 
   for server, config in pairs(servers) do
     if config.condition then
       lspconfig[server].setup({
-        capabilities = capabilities,
+        capabilities = config.capabilities or capabilities,
         on_attach = config.on_attach or setup_keymaps,
         settings = config.settings,
         cmd = config.cmd,
