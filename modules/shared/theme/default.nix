@@ -220,11 +220,6 @@ EOF
           btop-reload-theme &
         fi
         
-        # Reload raycast theme (macOS)
-        if command -v raycast-reload-theme &> /dev/null; then
-          raycast-reload-theme &
-        fi
-        
         # Reload kitty (fallback using signal)
         killall -SIGUSR1 kitty 2>/dev/null || true
         

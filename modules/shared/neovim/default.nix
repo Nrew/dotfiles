@@ -65,8 +65,6 @@ let
     c = [ pkgs.clang-tools pkgs.clang ];
   };
 
-  # Dynamic theme palette loader for neovim
-  # Instead of writing static colors, we create a loader that reads from the runtime theme
   themePalette = ''
     -- Dynamic theme palette loader - reads from runtime theme files
     local M = {}
@@ -143,8 +141,7 @@ in {
   imports = [ inputs.nixCats.homeModule ];
 
   config = {
-    # Write the theme palette directly to the neovim config directory
-    home.file.".config/nvim/lua/theme/palette.lua".text = themePalette;
+    home.file.".lua/theme/palette.lua".text = themePalette;
 
     nixCats = {
       enable = true;

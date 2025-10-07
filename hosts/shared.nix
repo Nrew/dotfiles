@@ -21,7 +21,7 @@ let user = "nrew"; in
         cmake
         cargo
         texinfo
-        
+
         (python3.withPackages (ps: with ps; [
             pip
             virtualenv
