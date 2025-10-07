@@ -3,7 +3,8 @@
 let
   cfg = config.theme;
   
-  # Import theme registry
+  # Import theme utilities and registry
+  utils = import ./utils.nix { inherit lib; };
   registry = import ./registry.nix { inherit lib; };
   
   # Default to beige theme if no runtime theme is set
@@ -31,10 +32,8 @@ let
     then registry.mkTheme runtimeTheme.custom
     else registry.${runtimeTheme.variant or defaultVariant};
 
-  paletteForJSON = lib.filterAttrs (
-    name: value:
-    lib.isString value || lib.isAttrs value
-  ) currentPalette;
+  # Use utility function for JSON-safe palette
+  paletteForJSON = utils.toJsonSafe currentPalette;
 in
 {
   options.theme = {

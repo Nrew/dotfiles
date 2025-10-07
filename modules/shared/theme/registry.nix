@@ -1,14 +1,11 @@
 { lib }:
 
 let
-  # Helper functions
-  withAlpha = color: alpha: "${color}${alpha}";
+  # Import DRY utilities
+  utils = import ./utils.nix { inherit lib; };
   
-  alpha = {
-    "0"   = "00"; "10"  = "1a"; "20"  = "33"; "30"  = "4d";
-    "40"  = "66"; "50"  = "80"; "60"  = "99"; "70"  = "b3";
-    "80"  = "cc"; "90"  = "e6"; "100" = "ff";
-  };
+  # Re-export utilities for backward compatibility
+  inherit (utils) withAlpha alpha;
   
   # Simplified 12-color theme constructor
   # Follows the Catppuccin/Rose Pine model with exactly 12 colors
