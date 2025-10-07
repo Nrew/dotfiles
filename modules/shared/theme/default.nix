@@ -210,7 +210,22 @@ EOF
         
         echo "🔄 Reloading applications..."
         
-        # Reload kitty
+        # Reload kitty with new theme
+        if command -v kitty-reload-theme &> /dev/null; then
+          kitty-reload-theme &
+        fi
+        
+        # Reload btop theme  
+        if command -v btop-reload-theme &> /dev/null; then
+          btop-reload-theme &
+        fi
+        
+        # Reload raycast theme (macOS)
+        if command -v raycast-reload-theme &> /dev/null; then
+          raycast-reload-theme &
+        fi
+        
+        # Reload kitty (fallback using signal)
         killall -SIGUSR1 kitty 2>/dev/null || true
         
         # Reload tmux
