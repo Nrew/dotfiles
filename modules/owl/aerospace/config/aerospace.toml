@@ -50,9 +50,9 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 non-empty-workspaces-root-containers-layout-on-startup = 'smart'
 
 # How the default creation of windows will look.
-# Using 'accordion' layout for automatic spiral-like tiling pattern
+# Using 'tiles' layout for proper spiral-like tiling pattern
 # This makes new windows alternate between horizontal and vertical splits
-default-root-container-layout = 'accordion'
+default-root-container-layout = 'tiles'
 
 # Possible values: horizontal|vertical|auto
 # 'auto' means: wide monitor (anything wider than high) gets horizontal orientation,

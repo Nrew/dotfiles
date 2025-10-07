@@ -72,6 +72,7 @@ let
       text = "#e0def4"; subtext = "#908caa"; muted = "#6e6a86";
       primary = "#c4a7e7"; secondary = "#ebbcba";
       success = "#9ccfd8"; warning = "#f6c177"; error = "#eb6f92"; info = "#31748f";
+      border = "#403d52"; selection = "#2a283e";
     };
 
     rose-pine-moon = mkTheme {

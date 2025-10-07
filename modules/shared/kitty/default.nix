@@ -49,7 +49,7 @@
       tab_fade = "0.25 0.5 0.75 1";
       tab_bar_margin_width = "0.0";
       tab_bar_margin_height = "10.0 0.0";
-      tab_bar_min_tabs = 1;
+      tab_bar_min_tabs = 2;
       active_tab_foreground = palette.text;
       active_tab_background = palette.primary;
       active_tab_font_style = "bold";

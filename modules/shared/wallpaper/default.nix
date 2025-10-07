@@ -55,13 +55,13 @@ let
 
       if [ -n "$SELECTED" ]; then
         echo -e "''${BLUE}Processing wallpaper: $SELECTED''${NC}"
-        ${pkgs.gowall}/bin/gowall "$SELECTED"
+        ${pkgs.gowall}/bin/gowall set "$SELECTED"
         echo -e "''${GREEN}✅ Wallpaper processed: $SELECTED''${NC}"
       fi
     else
-      # Pass arguments directly to gowall
+      # Pass arguments directly to gowall with 'set' subcommand
       cd "$WALLPAPER_DIR"
-      ${pkgs.gowall}/bin/gowall "$@"
+      ${pkgs.gowall}/bin/gowall set "$@"
     fi
   '';
 
