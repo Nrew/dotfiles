@@ -55,13 +55,13 @@ let
 
       if [ -n "$SELECTED" ]; then
         echo -e "''${BLUE}Processing wallpaper: $SELECTED''${NC}"
-        ${pkgs.gowall}/bin/gowall set "$SELECTED"
-        echo -e "''${GREEN}✅ Wallpaper processed: $SELECTED''${NC}"
+        ${pkgs.gowall}/bin/gowall "$SELECTED"
+        echo -e "''${GREEN}✅ Wallpaper and theme applied: $SELECTED''${NC}"
       fi
     else
-      # Pass arguments directly to gowall with 'set' subcommand
+      # Pass arguments directly to gowall for full theme generation
       cd "$WALLPAPER_DIR"
-      ${pkgs.gowall}/bin/gowall set "$@"
+      ${pkgs.gowall}/bin/gowall "$@"
     fi
   '';
 
