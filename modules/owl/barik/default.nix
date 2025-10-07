@@ -14,8 +14,8 @@
     accent = "${palette.primary}"
 
     [bar]
-    height = 32
-    padding = 8
+    height = 24
+    padding = 4
     position = "top"
     layer = "top"
     exclusive = true
