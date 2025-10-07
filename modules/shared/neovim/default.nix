@@ -62,14 +62,31 @@ let
   themePalette = ''
     -- Auto-generated theme palette from Nix
     return {
-      background = "${palette.background}",
+      -- Base colors (4)
+      base = "${palette.base}",
+      mantle = "${palette.mantle}",
       surface = "${palette.surface}",
       overlay = "${palette.overlay}",
+      
+      -- Text colors (4)
       text = "${palette.text}",
-      subtext = "${palette.subtext}",
+      subtext0 = "${palette.subtext0}",
+      subtext1 = "${palette.subtext1}",
       muted = "${palette.muted}",
+      
+      -- Accent colors (8)
       primary = "${palette.primary}",
       secondary = "${palette.secondary}",
+      red = "${palette.red}",
+      orange = "${palette.orange}",
+      yellow = "${palette.yellow}",
+      green = "${palette.green}",
+      cyan = "${palette.cyan}",
+      blue = "${palette.blue}",
+      
+      -- Backward compatibility aliases
+      background = "${palette.background}",
+      subtext = "${palette.subtext}",
       success = "${palette.success}",
       warning = "${palette.warning}",
       error = "${palette.error}",

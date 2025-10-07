@@ -3,7 +3,6 @@
 {
   imports = [
     ./theme
-    ./wallpaper
     ./kitty
     ./tmux
     ./zsh
