@@ -149,6 +149,7 @@ let user = "nrew"; in
         "homebrew/cask-fonts/font-sf-pro"
         "zen"
         "barik"
+        "aerospace"
       ];
       taps = [                                  # Add additional Homebrew taps
         "mocki-toki/formulae"

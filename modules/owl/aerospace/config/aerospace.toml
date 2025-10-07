@@ -36,12 +36,12 @@ exec-on-workspace-change = [
 # ─────────────────────────────────────────────────────────────────────
 
 # Flatten containers: When a container only has one child, remove the container.
-enable-normalization-flatten-containers = true
+enable-normalization-flatten-containers = false
 
 # Opposite orientation for nested containers: Ensures that children of a
 # split container have the opposite orientation, preventing long chains
 # of containers with the same orientation. This creates a spiral-like tiling pattern.
-enable-normalization-opposite-orientation-for-nested-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = false
 
 #─────────────────────────────────────────────────────────────────────
 # Default Layout & Behavior Settings
@@ -53,12 +53,14 @@ non-empty-workspaces-root-containers-layout-on-startup = 'smart'
 # Using 'accordion' layout for automatic spiral-like tiling pattern
 # The accordion layout combined with enable-normalization-opposite-orientation-for-nested-containers
 # creates the spiral tiling effect
-default-root-container-layout = 'accordion'
+default-root-container-layout = 'tiles'
 
 # Possible values: horizontal|vertical|auto
 # 'auto' means: wide monitor (anything wider than high) gets horizontal orientation,
 #               tall monitor (anything higher than wide) gets vertical orientation
 default-root-container-orientation = 'auto'
+
+accordion-padding = 30
 
 # Set the default key mapping preset (e.g., for different keyboard layouts).
 # Possible values: (qwerty|dvorak)
@@ -72,11 +74,11 @@ on-focus-changed = ['move-mouse window-lazy-center']
 # ─────────────────────────────────────────────────────────────────────
 
 [gaps]
-  inner.horizontal = 10
-  inner.vertical   = 10
-  outer.left       = 12
-  outer.bottom     = 12
-  outer.top        = [{ monitor."built-in.*" = 12 }, 12]
+  inner.horizontal = 40
+  inner.vertical   = 40
+  outer.left       = 40
+  outer.bottom     = 40
+  outer.top        = [{ monitor.'^built-in.*$' = 30 }, 82]
   outer.right      = 12
   # padding = [top, right, bottom, left] # Padding inside borders, outside gaps
 
