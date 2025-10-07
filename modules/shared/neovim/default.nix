@@ -81,22 +81,18 @@ let
     }
   '';
 
-  # Create the palette file in the lua directory
-  paletteFile = pkgs.writeTextFile {
-    name = "palette.lua";
-    text = themePalette;
-    destination = "/theme/palette.lua";
-  };
-
 in {
   imports = [ inputs.nixCats.homeModule ];
 
   config = {
+    # Write the theme palette directly to the neovim config directory
+    home.file.".config/nvim/lua/theme/palette.lua".text = themePalette;
+
     nixCats = {
       enable = true;
       addOverlays = [ (utils.standardPluginOverlay inputs) ];
       packageNames = [ "nvim" ];
-      luaPath = "${./.}:${paletteFile}";
+      luaPath = ./.;
 
       categoryDefinitions.replace = ({ pkgs, ... }: {
         lspsAndRuntimeDep = {

@@ -5,6 +5,7 @@ function M.setup()
   local ok, palette = pcall(require, "theme.palette")
   if not ok then
     vim.notify("Theme palette not found, using fallback", vim.log.levels.WARN)
+    -- Fallback Rose Pine theme colors with better contrast
     palette = {
       background = "#191724",
       surface = "#1f1d2e",
@@ -13,16 +14,21 @@ function M.setup()
       subtext = "#908caa",
       muted = "#6e6a86",
       primary = "#c4a7e7",
-      secondary = "#ea9a97",
+      secondary = "#ebbcba",
       success = "#9ccfd8",
       warning = "#f6c177",
       error = "#eb6f92",
       info = "#31748f",
+      border = "#403d52",
+      selection = "#2a283e",
+      cursor = "#e0def4",
+      link = "#c4a7e7",
     }
   end
 
   local rose_pine_ok, rose_pine = pcall(require, "rose-pine")
   if not rose_pine_ok then
+    vim.notify("Rose Pine theme not found, using fallback colorscheme", vim.log.levels.WARN)
     vim.cmd.colorscheme("habamax")
     return
   end
@@ -38,7 +44,7 @@ function M.setup()
     groups = {
       background = palette.background,
       panel = palette.surface,
-      border = palette.overlay,
+      border = palette.border,
       comment = palette.muted,
       error = palette.error,
       hint = palette.primary,
@@ -47,23 +53,49 @@ function M.setup()
     },
 
     highlight_groups = {
-      TelescopeBorder = { fg = palette.overlay, bg = palette.background },
+      -- Better contrast for borders and backgrounds
+      TelescopeBorder = { fg = palette.border, bg = palette.background },
+      TelescopeNormal = { bg = palette.surface },
       NormalFloat = { bg = palette.surface },
-      FloatBorder = { fg = palette.overlay, bg = palette.surface },
-      DiagnosticVirtualTextError = { fg = palette.error, bg = palette.surface },
-      DiagnosticVirtualTextWarn = { fg = palette.warning, bg = palette.surface },
-      DiagnosticVirtualTextInfo = { fg = palette.info, bg = palette.surface },
-      DiagnosticVirtualTextHint = { fg = palette.primary, bg = palette.surface },
+      FloatBorder = { fg = palette.border, bg = palette.surface },
+      
+      -- Improved diagnostic virtual text with backgrounds for better visibility
+      DiagnosticVirtualTextError = { fg = palette.error, bg = palette.overlay },
+      DiagnosticVirtualTextWarn = { fg = palette.warning, bg = palette.overlay },
+      DiagnosticVirtualTextInfo = { fg = palette.info, bg = palette.overlay },
+      DiagnosticVirtualTextHint = { fg = palette.primary, bg = palette.overlay },
+      
+      -- Better selection and search visibility
+      Visual = { bg = palette.selection },
+      Search = { fg = palette.background, bg = palette.warning, bold = true },
+      IncSearch = { fg = palette.background, bg = palette.secondary, bold = true },
     },
   })
 
   vim.cmd.colorscheme("rose-pine")
 
-  -- Additional custom highlights using centralized palette
+  -- Additional custom highlights using centralized palette for better contrast
   local custom_highlights = {
-    CursorLineNr = { fg = palette.text, bold = true },
-    Folded = { fg = palette.subtext, bg = palette.overlay },
-    Search = { fg = palette.background, bg = palette.warning },
+    -- Line numbers and cursor
+    CursorLineNr = { fg = palette.primary, bold = true },
+    LineNr = { fg = palette.muted },
+    
+    -- Folding with better contrast
+    Folded = { fg = palette.text, bg = palette.overlay },
+    FoldColumn = { fg = palette.muted, bg = palette.background },
+    
+    -- Status and tab lines
+    StatusLine = { fg = palette.text, bg = palette.surface },
+    StatusLineNC = { fg = palette.muted, bg = palette.surface },
+    TabLine = { fg = palette.subtext, bg = palette.surface },
+    TabLineFill = { bg = palette.background },
+    TabLineSel = { fg = palette.text, bg = palette.overlay, bold = true },
+    
+    -- Better popup menu contrast
+    Pmenu = { fg = palette.text, bg = palette.surface },
+    PmenuSel = { fg = palette.background, bg = palette.primary, bold = true },
+    PmenuSbar = { bg = palette.overlay },
+    PmenuThumb = { bg = palette.primary },
   }
 
   for group, opts in pairs(custom_highlights) do
