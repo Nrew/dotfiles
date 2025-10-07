@@ -15,6 +15,3 @@ result-*
 # Temporary files
 *.tmp
 .tmp/
-
-# Theme runtime state (generated at runtime, not committed)
-.config/theme/current.json

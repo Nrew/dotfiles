@@ -12,30 +12,19 @@
     prefix = "C-space";
 
     extraConfig = ''
+      # Source dynamic theme file (symlinked to current theme)
+      source-file ${config.xdg.configHome}/current-theme/tmux.conf
+      
       # Status bar configuration
       set -g status on
       set -g status-justify left
-      set -g status-style "bg=${palette.surface},fg=${palette.text}"
       set -g status-position top
       set -g status-interval 2
       set -g status-left-length 100
       set -g status-right-length 100
       
-      set -g status-left "#[fg=${palette.background},bg=${palette.primary},bold] #S #[fg=${palette.primary},bg=${palette.surface},nobold]"
-      set -g status-right "#[fg=${palette.overlay},bg=${palette.surface}]#[fg=${palette.text},bg=${palette.overlay}] %Y-%m-%d #[fg=${palette.primary},bg=${palette.overlay}]#[fg=${palette.background},bg=${palette.primary},bold] %H:%M "
-      
-      # Window status
+      # Window status separator
       set -g window-status-separator ""
-      set -g window-status-format "#[fg=${palette.surface},bg=${palette.overlay}]#[fg=${palette.text},bg=${palette.overlay}] #I #W #[fg=${palette.overlay},bg=${palette.surface}]"
-      set -g window-status-current-format "#[fg=${palette.surface},bg=${palette.success}]#[fg=${palette.background},bg=${palette.success},bold] #I #W #[fg=${palette.success},bg=${palette.surface},nobold]"
-      
-      # Pane borders
-      set -g pane-border-style "fg=${palette.border}"
-      set -g pane-active-border-style "fg=${palette.primary}"
-      
-      # Message text
-      set -g message-style "fg=${palette.background},bg=${palette.primary}"
-      set -g mode-style "bg=${palette.primary},fg=${palette.background}"
 
       # Key bindings
       # Split panes

@@ -73,6 +73,112 @@ in
     };
     
     xdg.configFile = {
+      # Generate static theme files for ALL themes
+      # Each theme gets its own directory with app-specific configs
+    } // (
+      # For each theme in registry, generate app config files
+      lib.listToAttrs (lib.flatten (map (themeName:
+        let
+          themeColors = registry.${themeName};
+        in [
+          # Kitty theme file
+          {
+            name = "themes/${themeName}/kitty.conf";
+            value.text = ''
+              # ${themeName} theme for Kitty
+              background ${themeColors.base}
+              foreground ${themeColors.text}
+              selection_background ${themeColors.overlay}
+              selection_foreground ${themeColors.text}
+              cursor ${themeColors.text}
+              cursor_text_color ${themeColors.base}
+              url_color ${themeColors.primary}
+              
+              color0 ${themeColors.overlay}
+              color8 ${themeColors.muted}
+              color1 ${themeColors.red}
+              color9 ${themeColors.red}
+              color2 ${themeColors.green}
+              color10 ${themeColors.green}
+              color3 ${themeColors.orange}
+              color11 ${themeColors.orange}
+              color4 ${themeColors.cyan}
+              color12 ${themeColors.cyan}
+              color5 ${themeColors.primary}
+              color13 ${themeColors.primary}
+              color6 ${themeColors.secondary}
+              color14 ${themeColors.secondary}
+              color7 ${themeColors.text}
+              color15 ${themeColors.text}
+              
+              active_tab_foreground ${themeColors.text}
+              active_tab_background ${themeColors.primary}
+              inactive_tab_foreground ${themeColors.subtext0}
+              inactive_tab_background ${themeColors.surface}
+              tab_bar_background ${themeColors.base}
+              
+              active_border_color ${themeColors.primary}
+              inactive_border_color ${themeColors.overlay}
+            '';
+          }
+          
+          # Tmux theme file
+          {
+            name = "themes/${themeName}/tmux.conf";
+            value.text = ''
+              # ${themeName} theme for Tmux
+              set -g status-style "bg=${themeColors.surface},fg=${themeColors.text}"
+              set -g status-left "#[fg=${themeColors.base},bg=${themeColors.primary},bold] #S #[fg=${themeColors.primary},bg=${themeColors.surface},nobold]"
+              set -g status-right "#[fg=${themeColors.overlay},bg=${themeColors.surface}]#[fg=${themeColors.text},bg=${themeColors.overlay}] %Y-%m-%d #[fg=${themeColors.primary},bg=${themeColors.overlay}]#[fg=${themeColors.base},bg=${themeColors.primary},bold] %H:%M "
+              
+              set -g window-status-format "#[fg=${themeColors.surface},bg=${themeColors.overlay}]#[fg=${themeColors.text},bg=${themeColors.overlay}] #I #W #[fg=${themeColors.overlay},bg=${themeColors.surface}]"
+              set -g window-status-current-format "#[fg=${themeColors.surface},bg=${themeColors.green}]#[fg=${themeColors.base},bg=${themeColors.green},bold] #I #W #[fg=${themeColors.green},bg=${themeColors.surface},nobold]"
+              
+              set -g pane-border-style "fg=${themeColors.overlay}"
+              set -g pane-active-border-style "fg=${themeColors.primary}"
+              
+              set -g message-style "fg=${themeColors.base},bg=${themeColors.primary}"
+              set -g mode-style "bg=${themeColors.primary},fg=${themeColors.base}"
+            '';
+          }
+          
+          # Neovim palette file
+          {
+            name = "themes/${themeName}/nvim-palette.lua";
+            value.text = ''
+              -- ${themeName} theme palette for Neovim
+              return {
+                base = "${themeColors.base}",
+                mantle = "${themeColors.mantle}",
+                surface = "${themeColors.surface}",
+                overlay = "${themeColors.overlay}",
+                text = "${themeColors.text}",
+                subtext0 = "${themeColors.subtext0}",
+                subtext1 = "${themeColors.subtext1}",
+                muted = "${themeColors.muted}",
+                primary = "${themeColors.primary}",
+                secondary = "${themeColors.secondary}",
+                red = "${themeColors.red}",
+                orange = "${themeColors.orange}",
+                yellow = "${themeColors.yellow}",
+                green = "${themeColors.green}",
+                cyan = "${themeColors.cyan}",
+                blue = "${themeColors.blue}",
+              }
+            '';
+          }
+        ]
+      ) registry.available))
+    ) // {
+      # Create symlinks to current theme (initial setup)
+      "current-theme/kitty.conf".source = 
+        config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/themes/${defaultVariant}/kitty.conf";
+      "current-theme/tmux.conf".source = 
+        config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/themes/${defaultVariant}/tmux.conf";
+      "current-theme/nvim-palette.lua".source = 
+        config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/themes/${defaultVariant}/nvim-palette.lua";
+      
+      # Legacy palette.json for compatibility
       "theme/palette.json".text = builtins.toJSON {
         variant = getRuntimeTheme.variant or defaultVariant;
         isCustom = (getRuntimeTheme.custom or null) != null;
@@ -80,16 +186,6 @@ in
         font = cfg.font;
         spacing = { borderRadius = cfg.borderRadius; gap = cfg.gap; };
       };
-      
-      # Pre-generate all themes as JSON for runtime switching
-      "theme/themes.json".text = builtins.toJSON (
-        builtins.listToAttrs (map (name: {
-          name = name;
-          value = utils.toJsonSafe registry.${name};
-        }) registry.available)
-      );
-      
-      "theme/palette.sh".text = ''
         export THEME_VARIANT="${getRuntimeTheme.variant or defaultVariant}"
         # Base colors (4)
         export THEME_BASE="${currentPalette.base}"
@@ -160,15 +256,13 @@ in
     };
     
     home.packages = [
-      # Live theme switching - no rebuild required
+      # Minimal, efficient theme switching via symlinks
       (pkgs.writeShellScriptBin "theme-switch" ''
         #!/usr/bin/env bash
         set -e
         
-        CONFIG_DIR="${config.xdg.configHome}"
-        THEME_DIR="$CONFIG_DIR/theme"
-        THEME_FILE="$THEME_DIR/current.json"
-        PALETTE_FILE="$THEME_DIR/palette.json"
+        THEME_DIR="${config.xdg.configHome}/themes"
+        CURRENT_DIR="${config.xdg.configHome}/current-theme"
         VARIANT="$1"
         
         if [ -z "$VARIANT" ]; then
@@ -179,58 +273,40 @@ in
           exit 1
         fi
         
-        VALID_THEMES=(${lib.concatStringsSep " " registry.available})
-        if [[ ! " ''${VALID_THEMES[@]} " =~ " ''${VARIANT} " ]]; then
+        # Validate theme exists
+        if [ ! -d "$THEME_DIR/$VARIANT" ]; then
           echo "❌ Unknown theme: $VARIANT"
+          echo "Theme directory not found: $THEME_DIR/$VARIANT"
           exit 1
         fi
         
         echo "🎨 Switching to: $VARIANT"
         
-        mkdir -p "$THEME_DIR"
+        # Atomic symlink updates - instant, zero overhead
+        ln -sf "$THEME_DIR/$VARIANT/kitty.conf" "$CURRENT_DIR/kitty.conf"
+        ln -sf "$THEME_DIR/$VARIANT/tmux.conf" "$CURRENT_DIR/tmux.conf"
+        ln -sf "$THEME_DIR/$VARIANT/nvim-palette.lua" "$CURRENT_DIR/nvim-palette.lua"
         
-        # Update current.json
-        cat > "$THEME_FILE" <<EOF
-{
-  "variant": "$VARIANT",
-  "custom": null
-}
-EOF
-
-        # Update palette.json with the selected theme's colors
-        # Read from the pre-generated themes map
-        THEMES_FILE="$THEME_DIR/themes.json"
-        if [ -f "$THEMES_FILE" ]; then
-          ${pkgs.jq}/bin/jq --arg variant "$VARIANT" \
-            '{variant: $variant, isCustom: false, colors: .[$variant], font: ${builtins.toJSON cfg.font}, spacing: {borderRadius: ${toString cfg.borderRadius}, gap: ${toString cfg.gap}}}' \
-            "$THEMES_FILE" > "$PALETTE_FILE"
-        else
-          echo "⚠️  Warning: themes.json not found, palette may not update properly"
+        # Update state file
+        mkdir -p "${config.xdg.configHome}/theme"
+        echo "$VARIANT" > "${config.xdg.configHome}/theme/current"
+        
+        # Reload applications (minimal overhead)
+        if command -v kitty &> /dev/null; then
+          kitty @ --to unix:/tmp/kitty set-colors -a "$CURRENT_DIR/kitty.conf" 2>/dev/null || \
+          killall -SIGUSR1 kitty 2>/dev/null || true
         fi
         
-        echo "🔄 Reloading applications..."
-        
-        # Reload kitty with new theme
-        if command -v kitty-reload-theme &> /dev/null; then
-          kitty-reload-theme &
+        if command -v tmux &> /dev/null; then
+          tmux source-file "${config.xdg.configHome}/tmux/tmux.conf" 2>/dev/null || true
         fi
         
-        # Reload btop theme  
-        if command -v btop-reload-theme &> /dev/null; then
-          btop-reload-theme &
-        fi
-        
-        # Reload kitty (fallback using signal)
-        killall -SIGUSR1 kitty 2>/dev/null || true
-        
-        # Reload tmux
-        tmux source-file "$CONFIG_DIR/tmux/tmux.conf" 2>/dev/null || true
-        
-        # Reload aerospace/barik if on macOS
+        # macOS window manager reload
         pkill -SIGUSR1 barik 2>/dev/null || true
+        pkill -SIGUSR1 sketchybar 2>/dev/null || true
         
         echo "✅ Theme switched to: $VARIANT"
-        echo "💡 All applications will reload theme live!"
+        echo "💡 Neovim will reload automatically"
       '')
        # Live wallpaper-based theme generation
       (pkgs.writeShellScriptBin "theme-from-wallpaper" ''
@@ -324,34 +400,80 @@ EOF
       (pkgs.writeShellScriptBin "theme-info" ''
         #!/usr/bin/env bash
         
-        THEME_FILE="${config.xdg.configHome}/theme/palette.json"
+        CURRENT_FILE="${config.xdg.configHome}/theme/current"
+        CURRENT_THEME_DIR="${config.xdg.configHome}/current-theme"
         
-        if [ ! -f "$THEME_FILE" ]; then
+        if [ ! -f "$CURRENT_FILE" ]; then
           echo "Theme not initialized"
           exit 1
         fi
         
-        echo "╔════════════════════════════════════════╗"
-        echo "║          Current Theme                 ║"
-        echo "╚════════════════════════════════════════╝"
+        VARIANT=$(cat "$CURRENT_FILE")
+        
+        # Function to convert hex to RGB
+        hex_to_rgb() {
+          local hex=$1
+          hex=''${hex#\#}
+          printf "%d;%d;%d" 0x''${hex:0:2} 0x''${hex:2:2} 0x''${hex:4:2}
+        }
+        
+        # Function to extract color from kitty config
+        get_color() {
+          local key=$1
+          grep "^$key " "$CURRENT_THEME_DIR/kitty.conf" | awk '{print $2}'
+        }
+        
+        # Function to display a color block with text
+        show_color() {
+          local name=$1
+          local hex=$2
+          local rgb=$(hex_to_rgb "$hex")
+          
+          # Print color name with proper spacing
+          printf "  %-12s" "$name:"
+          
+          # Print color block with the actual color as background
+          printf "\033[48;2;''${rgb}m          \033[0m  "
+          
+          # Print hex value
+          printf "%s\n" "$hex"
+        }
+        
+        echo "╔════════════════════════════════════════════════════════════╗"
+        echo "║                     Current Theme                          ║"
+        echo "╚════════════════════════════════════════════════════════════╝"
         echo ""
         
-        ${pkgs.jq}/bin/jq -r '
-          "Variant:     \(.variant)",
-          "Custom:      \(if .isCustom then "Yes (from wallpaper)" else "No" end)",
-          "",
-          "Colors:",
-          "  Background:  \(.colors.background)",
-          "  Surface:     \(.colors.surface)",
-          "  Text:        \(.colors.text)",
-          "  Primary:     \(.colors.primary)",
-          "  Secondary:   \(.colors.secondary)",
-          "",
-          "Typography:",
-          "  Mono:        \(.font.mono)",
-          "  Sans:        \(.font.sans)",
-          "  Size:        \(.font.size.normal)px"
-        ' "$THEME_FILE"
+        echo "Variant:     $VARIANT"
+        echo "Location:    ~/.config/themes/$VARIANT/"
+        echo ""
+        
+        echo "═══════════════════ Base Colors ═══════════════════"
+        show_color "Base" "$(get_color 'background')"
+        show_color "Surface" "$(get_color 'inactive_tab_background')"
+        show_color "Overlay" "$(get_color 'color0')"
+        
+        echo ""
+        echo "═══════════════════ Text Colors ═══════════════════"
+        show_color "Text" "$(get_color 'foreground')"
+        show_color "Subtext" "$(get_color 'inactive_tab_foreground')"
+        show_color "Muted" "$(get_color 'color8')"
+        
+        echo ""
+        echo "═══════════════════ Accent Colors ═════════════════"
+        show_color "Primary" "$(get_color 'color5')"
+        show_color "Secondary" "$(get_color 'color6')"
+        show_color "Red" "$(get_color 'color1')"
+        show_color "Orange" "$(get_color 'color3')"
+        show_color "Green" "$(get_color 'color2')"
+        show_color "Cyan" "$(get_color 'color4')"
+        
+        echo ""
+        echo "═══════════════════ Files ═════════════════════════"
+        echo "  Kitty:       $CURRENT_THEME_DIR/kitty.conf"
+        echo "  Tmux:        $CURRENT_THEME_DIR/tmux.conf"
+        echo "  Neovim:      $CURRENT_THEME_DIR/nvim-palette.lua"
+        echo ""
       '')
     ];
     

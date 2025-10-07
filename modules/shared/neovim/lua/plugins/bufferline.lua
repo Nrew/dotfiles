@@ -4,6 +4,19 @@ function M.setup()
   local ok, bufferline = pcall(require, "bufferline")
   if not ok then return end
 
+  -- Load dynamic palette
+  local palette_ok, palette_loader = pcall(require, "theme.palette")
+  local palette = palette_ok and palette_loader.get() or {
+    base = "#191724",
+    mantle = "#1f1d2e",
+    surface = "#26233a",
+    overlay = "#403d52",
+    text = "#e0def4",
+    subtext0 = "#908caa",
+    muted = "#6e6a86",
+    primary = "#c4a7e7",
+  }
+
   bufferline.setup({
     options = {
       mode = "buffers",
@@ -37,11 +50,20 @@ function M.setup()
       sort_by = "insert_after_current",
     },
     highlights = {
-      separator = { fg = "#073642", bg = "#002b36" },
-      separator_selected = { fg = "#073642" },
-      background = { fg = "#657b83", bg = "#002b36" },
-      buffer_selected = { fg = "#fdf6e3", bold = true },
-      fill = { bg = "#073642" },
+      fill = { bg = palette.base },
+      background = { fg = palette.muted, bg = palette.mantle },
+      buffer_visible = { fg = palette.subtext0, bg = palette.mantle },
+      buffer_selected = { fg = palette.text, bg = palette.surface, bold = true },
+      indicator_selected = { fg = palette.primary, bg = palette.surface },
+      separator = { fg = palette.base, bg = palette.mantle },
+      separator_selected = { fg = palette.base, bg = palette.surface },
+      separator_visible = { fg = palette.base, bg = palette.mantle },
+      modified = { fg = palette.primary, bg = palette.mantle },
+      modified_selected = { fg = palette.primary, bg = palette.surface },
+      modified_visible = { fg = palette.primary, bg = palette.mantle },
+      close_button = { fg = palette.muted, bg = palette.mantle },
+      close_button_selected = { fg = palette.text, bg = palette.surface },
+      close_button_visible = { fg = palette.subtext0, bg = palette.mantle },
     },
   })
 

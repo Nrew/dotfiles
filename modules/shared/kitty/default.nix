@@ -95,45 +95,17 @@ in
     # ────────────────────────────────────────────────────────────────
 
     settings = {
-      background = palette.background;
-      foreground = palette.text;
-      selection_background = palette.selection;
-      selection_foreground = palette.text;
-      cursor = palette.cursor;
-      cursor_text_color = palette.background;
+      # Include the dynamic theme file (symlinked to current theme)
+      include = "${config.xdg.configHome}/current-theme/kitty.conf";
+      
+      # Non-color settings
       cursor_shape = "beam";
-      url_color = palette.link;
-
-      color0 = palette.overlay;
-      color8 = palette.muted;
-      color1 = palette.error;
-      color9 = palette.error;
-      color2 = palette.success;
-      color10 = palette.success;
-      color3 = palette.warning;
-      color11 = palette.warning;
-      color4 = palette.info;
-      color12 = palette.info;
-      color5 = palette.primary;
-      color13 = palette.primary;
-      color6 = palette.secondary;
-      color14 = palette.secondary;
-      color7 = palette.text;
-      color15 = palette.text;
 
       tab_bar_edge = "top";
       tab_bar_style = "hidden";
-      active_tab_foreground = palette.text;
-      active_tab_background = palette.primary;
-      active_tab_font_style = "bold";
-      inactive_tab_foreground = palette.subtext;
-      inactive_tab_background = palette.surface;
-      tab_bar_background = palette.background;
 
       window_padding_width = toString config.theme.gap;
       window_border_width = "1pt";
-      active_border_color = palette.primary;
-      inactive_border_color = palette.border;
 
       background_opacity = "0.97";
 
