@@ -81,6 +81,14 @@ in
         spacing = { borderRadius = cfg.borderRadius; gap = cfg.gap; };
       };
       
+      # Pre-generate all themes as JSON for runtime switching
+      "theme/themes.json".text = builtins.toJSON (
+        builtins.listToAttrs (map (name: {
+          name = name;
+          value = utils.toJsonSafe registry.${name};
+        }) registry.available)
+      );
+      
       "theme/palette.sh".text = ''
         export THEME_VARIANT="${getRuntimeTheme.variant or defaultVariant}"
         # Base colors (4)
@@ -160,6 +168,7 @@ in
         CONFIG_DIR="${config.xdg.configHome}"
         THEME_DIR="$CONFIG_DIR/theme"
         THEME_FILE="$THEME_DIR/current.json"
+        PALETTE_FILE="$THEME_DIR/palette.json"
         VARIANT="$1"
         
         if [ -z "$VARIANT" ]; then
@@ -179,12 +188,25 @@ in
         echo "🎨 Switching to: $VARIANT"
         
         mkdir -p "$THEME_DIR"
+        
+        # Update current.json
         cat > "$THEME_FILE" <<EOF
 {
   "variant": "$VARIANT",
   "custom": null
 }
 EOF
+
+        # Update palette.json with the selected theme's colors
+        # Read from the pre-generated themes map
+        THEMES_FILE="$THEME_DIR/themes.json"
+        if [ -f "$THEMES_FILE" ]; then
+          ${pkgs.jq}/bin/jq --arg variant "$VARIANT" \
+            '{variant: $variant, isCustom: false, colors: .[$variant], font: ${builtins.toJSON cfg.font}, spacing: {borderRadius: ${toString cfg.borderRadius}, gap: ${toString cfg.gap}}}' \
+            "$THEMES_FILE" > "$PALETTE_FILE"
+        else
+          echo "⚠️  Warning: themes.json not found, palette may not update properly"
+        fi
         
         echo "🔄 Reloading applications..."
         
@@ -198,7 +220,7 @@ EOF
         pkill -SIGUSR1 barik 2>/dev/null || true
         
         echo "✅ Theme switched to: $VARIANT"
-        echo "💡 Neovim will auto-reload theme on next focus. Use <leader>uC in nvim to force reload"
+        echo "💡 All applications will reload theme live!"
       '')
        # Live wallpaper-based theme generation
       (pkgs.writeShellScriptBin "theme-from-wallpaper" ''

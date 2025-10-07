@@ -122,23 +122,40 @@ function M.setup()
   local config_home = vim.fn.expand(os.getenv("XDG_CONFIG_HOME") or "~/.config")
   local theme_file = config_home .. "/theme/palette.json"
   
-  -- Create autocmd to watch for theme file changes
+  -- Initialize tracking
+  M._initialized = true
+  local stat = vim.loop.fs_stat(theme_file)
+  if stat then
+    M._last_theme_mtime = stat.mtime.sec
+  end
+  
+  -- Create a timer that checks for theme file changes every second
+  local timer = vim.loop.new_timer()
+  timer:start(1000, 1000, vim.schedule_wrap(function()
+    local current_stat = vim.loop.fs_stat(theme_file)
+    if current_stat then
+      local current_mtime = current_stat.mtime.sec
+      if M._last_theme_mtime and M._last_theme_mtime < current_mtime then
+        M._last_theme_mtime = current_mtime
+        -- Reload theme immediately without user interaction
+        palette_loader = nil
+        apply_theme()
+        vim.notify("Theme updated live!", vim.log.levels.INFO)
+      end
+    end
+  end))
+  
+  -- Also check on focus/buffer enter as a backup
   vim.api.nvim_create_autocmd({"FocusGained", "BufEnter"}, {
     group = vim.api.nvim_create_augroup("ThemeReload", { clear = true }),
     callback = function()
-      -- Check if theme file was modified
-      local stat = vim.loop.fs_stat(theme_file)
-      if stat then
-        local last_modified = stat.mtime.sec
-        if not M._last_theme_mtime or M._last_theme_mtime < last_modified then
-          M._last_theme_mtime = last_modified
-          if M._initialized then
-            vim.notify("Theme file changed, reloading...", vim.log.levels.INFO)
-            palette_loader = nil
-            apply_theme()
-          else
-            M._initialized = true
-          end
+      local stat_now = vim.loop.fs_stat(theme_file)
+      if stat_now then
+        local mtime = stat_now.mtime.sec
+        if M._last_theme_mtime and M._last_theme_mtime < mtime then
+          M._last_theme_mtime = mtime
+          palette_loader = nil
+          apply_theme()
         end
       end
     end,
