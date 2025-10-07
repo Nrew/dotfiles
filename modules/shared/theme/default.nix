@@ -83,25 +83,37 @@ in
       
       "theme/palette.sh".text = ''
         export THEME_VARIANT="${getRuntimeTheme.variant or defaultVariant}"
+        # Base colors (4)
         export THEME_BASE="${currentPalette.base}"
+        export THEME_MANTLE="${currentPalette.mantle}"
         export THEME_SURFACE="${currentPalette.surface}"
         export THEME_OVERLAY="${currentPalette.overlay}"
+        # Text colors (4)
         export THEME_TEXT="${currentPalette.text}"
-        export THEME_SUBTEXT="${currentPalette.subtext}"
+        export THEME_SUBTEXT0="${currentPalette.subtext0}"
+        export THEME_SUBTEXT1="${currentPalette.subtext1}"
         export THEME_MUTED="${currentPalette.muted}"
+        # Accent colors (8)
         export THEME_PRIMARY="${currentPalette.primary}"
         export THEME_SECONDARY="${currentPalette.secondary}"
-        export THEME_LOVE="${currentPalette.love}"
-        export THEME_GOLD="${currentPalette.gold}"
-        export THEME_FOAM="${currentPalette.foam}"
-        export THEME_PINE="${currentPalette.pine}"
+        export THEME_RED="${currentPalette.red}"
+        export THEME_ORANGE="${currentPalette.orange}"
+        export THEME_YELLOW="${currentPalette.yellow}"
+        export THEME_GREEN="${currentPalette.green}"
+        export THEME_CYAN="${currentPalette.cyan}"
+        export THEME_BLUE="${currentPalette.blue}"
         
-        # Backward compatibility
+        # Backward compatibility aliases
+        export THEME_SUBTEXT="${currentPalette.subtext}"
         export THEME_BACKGROUND="${currentPalette.background}"
         export THEME_SUCCESS="${currentPalette.success}"
         export THEME_WARNING="${currentPalette.warning}"
         export THEME_ERROR="${currentPalette.error}"
         export THEME_INFO="${currentPalette.info}"
+        export THEME_LOVE="${currentPalette.love}"
+        export THEME_GOLD="${currentPalette.gold}"
+        export THEME_FOAM="${currentPalette.foam}"
+        export THEME_PINE="${currentPalette.pine}"
       '';
       
       "theme/palette.css".text = ''
