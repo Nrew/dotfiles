@@ -40,7 +40,7 @@ enable-normalization-flatten-containers = true
 
 # Opposite orientation for nested containers: Ensures that children of a
 # split container have the opposite orientation, preventing long chains
-# of containers with the same orientation.
+# of containers with the same orientation. This creates a spiral-like tiling pattern.
 enable-normalization-opposite-orientation-for-nested-containers = true
 
 #─────────────────────────────────────────────────────────────────────
@@ -55,6 +55,7 @@ default-root-container-layout = 'tiles'
 # Possible values: horizontal|vertical|auto
 # 'auto' means: wide monitor (anything wider than high) gets horizontal orientation,
 #               tall monitor (anything higher than wide) gets vertical orientation
+# Using 'auto' for better spiral-like tiling similar to Hyprland
 default-root-container-orientation = 'auto'
 
 # Set the default key mapping preset (e.g., for different keyboard layouts).
@@ -157,7 +158,7 @@ on-focus-changed = ['move-mouse window-lazy-center']
   enter = 'mode main'
   # Resize the focused window using H/J/K/L.
   # 'smart' adjusts size based on the container's orientation.
-  h = 'resize height -50' 
+  h = 'resize height -50'
   l = 'resize height +50'
   k = 'resize width -50'
   j = 'resize width +50'

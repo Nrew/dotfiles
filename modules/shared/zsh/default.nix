@@ -19,6 +19,11 @@
 
     # Initialize plugins
     initContent = ''
+      # Run fastfetch on shell start (only in kitty terminal)
+      if [[ -n "$KITTY_WINDOW_ID" ]] && command -v fastfetch &> /dev/null; then
+        fastfetch
+      fi
+
       # Better history search
       autoload -U up-line-or-beginning-search
       autoload -U down-line-or-beginning-search
@@ -32,19 +37,19 @@
 
       # Better word navigation
       export WORDCHARS=''${WORDCHARS/\//}
-      
+
       # Directory stack
       setopt AUTO_PUSHD           # Push directories automatically
       setopt PUSHD_IGNORE_DUPS    # Don't push duplicates
       setopt PUSHD_SILENT         # Don't print directory stack
-      
+
       # Completion improvements
       setopt COMPLETE_IN_WORD     # Complete from both ends of a word
       setopt ALWAYS_TO_END        # Move cursor to end after completion
       setopt PATH_DIRS            # Perform path search even on commands with slashes
       setopt AUTO_MENU            # Show completion menu on tab press
       setopt COMPLETE_ALIASES     # Complete aliases
-      
+
       # History improvements
       setopt EXTENDED_HISTORY          # Write timestamps to history
       setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first
@@ -52,18 +57,18 @@
       setopt HIST_FIND_NO_DUPS         # Don't show duplicates when searching
       setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks
       setopt HIST_VERIFY               # Don't execute immediately upon history expansion
-      
+
       # Job control
       setopt LONG_LIST_JOBS        # List jobs in long format
       setopt AUTO_RESUME          # Resume existing jobs instead of creating new ones
       setopt NOTIFY              # Report status of background jobs immediately
-      
+
       # Input/Output
       setopt CORRECT              # Command correction
       setopt INTERACTIVE_COMMENTS # Allow comments in interactive shell
-      setopt RC_QUOTES            # 
+      setopt RC_QUOTES            #
       unsetopt FLOW_CONTROL       # Disable start/stop characters in shell editor
-      
+
       # Load custom functions
       #for func in ${config.home.homeDirectory}/zsh/functions/*; do
       #  source $func
@@ -77,7 +82,7 @@
       "..." = "cd ../..";
       "...." = "cd ../../..";
       "....." = "cd ../../../..";
-      
+
       # Git
       g = "git";
       ga = "git add";
@@ -88,19 +93,19 @@
       gpl = "git pull";
       gs = "git status";
       gst = "git status";
-      
+
       # Vim
       v = "nvim";
       vi = "nvim";
       vim = "nvim";
-      
+
       # System
       grep = "rg";
       rm = "rm -i";
       cp = "cp -i";
       mv = "mv -i";
       mkdir = "mkdir -p";
-      
+
       # Utils
       h = "history";
       j = "jobs -l";
