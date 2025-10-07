@@ -50,12 +50,13 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 non-empty-workspaces-root-containers-layout-on-startup = 'smart'
 
 # How the default creation of windows will look.
-default-root-container-layout = 'tiles'
+# Using 'accordion' layout for automatic spiral-like tiling pattern
+# This makes new windows alternate between horizontal and vertical splits
+default-root-container-layout = 'accordion'
 
 # Possible values: horizontal|vertical|auto
 # 'auto' means: wide monitor (anything wider than high) gets horizontal orientation,
 #               tall monitor (anything higher than wide) gets vertical orientation
-# Using 'auto' for better spiral-like tiling similar to Hyprland
 default-root-container-orientation = 'auto'
 
 # Set the default key mapping preset (e.g., for different keyboard layouts).
