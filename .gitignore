@@ -1,0 +1,17 @@
+# Nix build artifacts
+result
+result-*
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+.tmp/

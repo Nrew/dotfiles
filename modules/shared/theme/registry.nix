@@ -47,20 +47,20 @@ let
     # ════════════════════════════════════════════════════════════════════════
     beige = mkTheme {
       name = "beige";
-      background = "#f5f1e8"; surface = "#ede9e0"; overlay = "#e0dcd3";
-      text = "#2d2a25"; subtext = "#5a5650"; muted = "#8a857d";
-      primary = "#7c8a9e"; secondary = "#9d8b7c";
-      success = "#8a9a7b"; warning = "#c9a66b"; error = "#b87d7d"; info = "#7c8a9e";
-      border = "#d4cfbf"; selection = "#e8e4d8";
+      background = "#efead8"; surface = "#cbc2b3"; overlay = "#a69e93";
+      text = "#2d2b28"; subtext = "#45413b"; muted = "#655f59";
+      primary = "#857a71"; secondary = "#8f857a";
+      success = "#a69e93"; warning = "#cbc2b3"; error = "#857a71"; info = "#655f59";
+      border = "#a69e93"; selection = "#cbc2b3";
     };
 
     beige-dark = mkTheme {
       name = "beige-dark";
-      background = "#2d2a25"; surface = "#3a3630"; overlay = "#4a453e";
-      text = "#f5f1e8"; subtext = "#c4bfb3"; muted = "#8a857d";
-      primary = "#a3b4c9"; secondary = "#c9b5a3";
-      success = "#a8bc95"; warning = "#dbc08a"; error = "#d19999"; info = "#a3b4c9";
-      border = "#5a5650"; selection = "#4a453e";
+      background = "#2d2b28"; surface = "#45413b"; overlay = "#655f59";
+      text = "#efead8"; subtext = "#cbc2b3"; muted = "#a69e93";
+      primary = "#a69e93"; secondary = "#8f857a";
+      success = "#a69e93"; warning = "#cbc2b3"; error = "#857a71"; info = "#655f59";
+      border = "#655f59"; selection = "#45413b";
     };
 
     # ════════════════════════════════════════════════════════════════════════

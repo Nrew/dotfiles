@@ -51,7 +51,8 @@ non-empty-workspaces-root-containers-layout-on-startup = 'smart'
 
 # How the default creation of windows will look.
 # Using 'accordion' layout for automatic spiral-like tiling pattern
-# This makes new windows alternate between horizontal and vertical splits
+# The accordion layout combined with enable-normalization-opposite-orientation-for-nested-containers
+# creates the spiral tiling effect
 default-root-container-layout = 'accordion'
 
 # Possible values: horizontal|vertical|auto
@@ -196,11 +197,6 @@ on-focus-changed = ['move-mouse window-lazy-center']
 [[on-window-detected]]
   if.app-id = 'com.microsoft.VSCode'
   run = 'move-node-to-workspace 3'
-
-[[on-window-detected]]
-  if.app-id = 'com.github.delocalized.Kitty'
-  check-further-callbacks = true
-  run = 'move-node-to-workspace 1'
 
 [[on-window-detected]]
   if.app-id = 'app.zen-browser.zen'

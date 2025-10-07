@@ -39,7 +39,7 @@
         # ───────────────────────────────────────────────────────────────────────────────
         {
           type = "title";
-          format = "${palette.error}{1}${palette.text}サン @ ${palette.secondary}{2}${palette.text}";
+          keyColor = palette.primary;
         }
         {
           type = "separator";
@@ -139,10 +139,6 @@
         # ═══════════════════════════════════════════════════════════════
         # システム状態 (System Status)
         # ═══════════════════════════════════════════════════════════════
-        {
-          type = "text";
-          text = "${palette.muted}╔══ ${palette.info}システム状態${palette.muted}: ${palette.error}動作中 ${palette.muted}═══ ${palette.secondary}AI ノード${palette.muted}: ${palette.warning}アクティブ ${palette.muted}══╗";
-        }
         {
           type = "break";
         }

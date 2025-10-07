@@ -85,7 +85,7 @@ in {
   imports = [ inputs.nixCats.homeModule ];
 
   config = {
-    # Write theme palette to Lua file
+    # Write the theme palette directly to the neovim config directory
     home.file.".config/nvim/lua/theme/palette.lua".text = themePalette;
 
     nixCats = {
