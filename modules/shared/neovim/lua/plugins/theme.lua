@@ -49,6 +49,12 @@ local function apply_theme()
   
   -- Additional plugin-specific highlights that might not be in the colorscheme
   local plugin_highlights = {
+    -- Bufferline
+    BufferLineFill = { bg = palette.base },
+    BufferLineBackground = { fg = palette.muted, bg = palette.mantle },
+    BufferLineBufferSelected = { fg = palette.text, bg = palette.surface, bold = true },
+    BufferLineIndicatorSelected = { fg = palette.primary, bg = palette.surface },
+    
     -- WhichKey
     WhichKey = { fg = palette.primary },
     WhichKeyGroup = { fg = palette.cyan },
@@ -56,6 +62,46 @@ local function apply_theme()
     WhichKeySeparator = { fg = palette.muted },
     WhichKeyFloat = { bg = palette.surface },
     WhichKeyBorder = { fg = palette.overlay, bg = palette.surface },
+    
+    -- Noice
+    NoiceCmdlinePopup = { fg = palette.text, bg = palette.surface },
+    NoiceCmdlinePopupBorder = { fg = palette.overlay, bg = palette.surface },
+    NoiceCmdlineIcon = { fg = palette.primary },
+    NoiceConfirm = { fg = palette.text, bg = palette.surface },
+    NoiceConfirmBorder = { fg = palette.overlay, bg = palette.surface },
+    
+    -- Flash
+    FlashLabel = { fg = palette.base, bg = palette.primary, bold = true },
+    FlashMatch = { fg = palette.yellow, bold = true },
+    FlashCurrent = { fg = palette.orange, bold = true },
+    
+    -- Trouble
+    TroubleNormal = { fg = palette.text, bg = palette.base },
+    TroubleText = { fg = palette.text },
+    TroubleCount = { fg = palette.primary, bold = true },
+    TroubleCode = { fg = palette.subtext0 },
+    
+    -- Indent Blankline
+    IblIndent = { fg = palette.overlay },
+    IblScope = { fg = palette.primary },
+    
+    -- Todo Comments
+    TodoBgFix = { fg = palette.base, bg = palette.red, bold = true },
+    TodoBgHack = { fg = palette.base, bg = palette.orange, bold = true },
+    TodoBgNote = { fg = palette.base, bg = palette.cyan, bold = true },
+    TodoBgPerf = { fg = palette.base, bg = palette.blue, bold = true },
+    TodoBgTest = { fg = palette.base, bg = palette.green, bold = true },
+    TodoBgTodo = { fg = palette.base, bg = palette.yellow, bold = true },
+    TodoBgWarn = { fg = palette.base, bg = palette.orange, bold = true },
+    
+    -- Lazy
+    LazyNormal = { fg = palette.text, bg = palette.base },
+    LazyButton = { fg = palette.text, bg = palette.surface },
+    LazyButtonActive = { fg = palette.base, bg = palette.primary, bold = true },
+    LazyH1 = { fg = palette.base, bg = palette.primary, bold = true },
+    LazyH2 = { fg = palette.primary, bold = true },
+    LazyProp = { fg = palette.cyan },
+    LazyValue = { fg = palette.green },
   }
 
   for group, opts in pairs(plugin_highlights) do

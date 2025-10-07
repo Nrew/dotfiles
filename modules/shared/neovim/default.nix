@@ -9,29 +9,49 @@ let
     lazygit prettierd stylua nixfmt-rfc-style
   ];
 
-  # Minimal essential plugins for a clean experience
+  # Essential plugins with preserved functionality
   corePlugins = with pkgs.vimPlugins; [
-    # Theme & UI - Minimal
-    lualine-nvim nvim-web-devicons
-    
-    # File management & navigation - Essential only
+    # Theme & UI
     telescope-nvim telescope-fzf-native-nvim
-    which-key-nvim
+    lualine-nvim nvim-web-devicons bufferline-nvim
     
-    # LSP & completion - Core functionality
-    nvim-lspconfig blink-cmp
+    # File management & navigation
+    neo-tree-nvim nvim-window-picker which-key-nvim
     
-    # Treesitter - Only essential parsers
+    # LSP & completion
+    nvim-lspconfig blink-cmp trouble-nvim
+    
+    # Treesitter with comprehensive parsers
     (nvim-treesitter.withPlugins (p: with p; [
-      lua vim vimdoc nix bash
-      json yaml toml markdown
+      lua vim vimdoc query bash comment
+      html css javascript typescript tsx
+      python rust go nix c cpp make
+      json json5 yaml toml markdown markdown_inline
+      gitattributes gitignore
     ]))
+    nvim-treesitter-context nvim-ts-autotag nvim-treesitter-textobjects
     
-    # Editing enhancements - Minimal
-    comment-nvim nvim-surround mini-pairs
+    # Editing enhancements
+    comment-nvim nvim-surround flash-nvim mini-pairs
+    yanky-nvim # Yank ring
     
-    # Git integration - Essential
+    # Visual improvements
+    indent-blankline-nvim noice-nvim nvim-notify dressing-nvim
+    
+    # Git integration
     gitsigns-nvim lazygit-nvim
+    
+    # Development tools
+    todo-comments-nvim
+    
+    # Session & project management
+    persistence-nvim project-nvim
+    
+    # File manager
+    yazi-nvim
+    
+    # Additional useful plugins from your original config
+    mini-icons stabilize-nvim vim-bbye
   ];
 
   # Language servers organized by category
@@ -121,14 +141,14 @@ in {
       vim.api.nvim_set_hl(0, 'FloatBorder', { fg = palette.overlay, bg = palette.surface })
       vim.api.nvim_set_hl(0, 'FloatTitle', { fg = palette.primary, bg = palette.surface, bold = true })
       
-      vim.api.nvim_set_hl(0, 'Cursor', { fg = palette.base, bg = palette.text })
+      vim.api.nvim_set_hl(0, 'Cursor', { fg = palette.base, bg = palette.cursor })
       vim.api.nvim_set_hl(0, 'CursorLine', { bg = palette.mantle })
       vim.api.nvim_set_hl(0, 'CursorLineNr', { fg = palette.primary, bold = true })
       vim.api.nvim_set_hl(0, 'LineNr', { fg = palette.muted })
       vim.api.nvim_set_hl(0, 'SignColumn', { fg = palette.text, bg = palette.base })
       
-      vim.api.nvim_set_hl(0, 'Visual', { bg = palette.overlay })
-      vim.api.nvim_set_hl(0, 'VisualNOS', { bg = palette.overlay })
+      vim.api.nvim_set_hl(0, 'Visual', { bg = palette.selection })
+      vim.api.nvim_set_hl(0, 'VisualNOS', { bg = palette.selection })
       
       vim.api.nvim_set_hl(0, 'Search', { fg = palette.base, bg = palette.yellow, bold = true })
       vim.api.nvim_set_hl(0, 'IncSearch', { fg = palette.base, bg = palette.orange, bold = true })
@@ -292,7 +312,7 @@ in {
       vim.api.nvim_set_hl(0, 'TelescopeNormal', { fg = palette.text, bg = palette.base })
       vim.api.nvim_set_hl(0, 'TelescopePromptBorder', { fg = palette.overlay, bg = palette.surface })
       vim.api.nvim_set_hl(0, 'TelescopePromptNormal', { fg = palette.text, bg = palette.surface })
-      vim.api.nvim_set_hl(0, 'TelescopeSelection', { fg = palette.text, bg = palette.overlay, bold = true })
+      vim.api.nvim_set_hl(0, 'TelescopeSelection', { fg = palette.text, bg = palette.selection, bold = true })
       vim.api.nvim_set_hl(0, 'TelescopeMatching', { fg = palette.primary, bold = true })
       
       -- Neo-tree

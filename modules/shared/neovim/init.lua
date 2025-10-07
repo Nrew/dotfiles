@@ -62,9 +62,10 @@ vim.api.nvim_create_autocmd("User", {
   callback = function()
     -- Load plugins
     local plugins = {
-      "treesitter", "lsp", "completion", "telescope",
-      "lualine", "which-key",
-      "mini-pairs", "comment", "surround", "gitsigns", "lazygit"
+      "treesitter", "lsp", "completion", "telescope", "neo-tree",
+      "lualine", "bufferline", "which-key", "noice", "indent-blankline", 
+      "mini-pairs", "comment", "flash", "surround", "yanky", "trouble",
+      "todo-comments", "gitsigns", "lazygit", "project", "persistence", "yazi"
     }
 
     for _, plugin in ipairs(plugins) do
