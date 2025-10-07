@@ -186,6 +186,9 @@ in
         font = cfg.font;
         spacing = { borderRadius = cfg.borderRadius; gap = cfg.gap; };
       };
+      
+      # Shell environment variables for theme
+      "theme/palette.sh".text = ''
         export THEME_VARIANT="${getRuntimeTheme.variant or defaultVariant}"
         # Base colors (4)
         export THEME_BASE="${currentPalette.base}"
@@ -266,10 +269,13 @@ in
         VARIANT="$1"
         
         if [ -z "$VARIANT" ]; then
-          echo "Usage: theme-switch <variant>"
+          echo "╔════════════════════════════════════════╗"
+          echo "║       Available Themes                 ║"
+          echo "╚════════════════════════════════════════╝"
           echo ""
-          echo "Available themes:"
           ${lib.concatMapStrings (t: "echo \"  ${t}\"\n") registry.available}
+          echo ""
+          echo "Usage: theme-switch <name>"
           exit 1
         fi
         
@@ -380,21 +386,6 @@ in
         killall -SIGUSR1 kitty 2>/dev/null || true
         tmux source-file "$CONFIG_DIR/tmux/tmux.conf" 2>/dev/null || true
         pkill -SIGUSR1 barik 2>/dev/null || true
-      '')
-      
-      (pkgs.writeShellScriptBin "theme-list" ''
-        #!/usr/bin/env bash
-        
-        echo "╔════════════════════════════════════════╗"
-        echo "║       Available Themes                 ║"
-        echo "╚════════════════════════════════════════╝"
-        echo ""
-        ${lib.concatMapStrings (t: "echo \" * ${t}\"\n") registry.available}
-        echo ""
-        echo "Usage:"
-        echo "  theme-switch <name>          # Switch theme"
-        echo "  theme-from-wallpaper [img]   # Generate from wallpaper"
-        echo "  theme-info                   # Show current theme"
       '')
       
       (pkgs.writeShellScriptBin "theme-info" ''
