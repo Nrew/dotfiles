@@ -7,6 +7,39 @@
 
 This repository contains my personal NixOS and macOS (via nix-darwin) configurations, managed with Nix and Home Manager.
 
+## ✨ Features
+
+- **🎨 Live Theming**: Change themes instantly without rebuilding (see [Theme System](modules/shared/theme/README.md))
+- **🖼️ Wallpaper Integration**: Generate themes from wallpapers using gowall
+- **⚡ Minimal Animations**: Smooth, clean, non-distracting visual transitions
+- **🪟 Hyprland-like WM**: Aerospace configured with Hyprland-inspired keybindings and workflow
+- **📝 NixCats Neovim**: Modern Neovim setup with LSP, Treesitter, and more
+- **🔄 Live Reload**: Applications auto-reload when theme changes
+
+## 🎨 Theme System
+
+The live theming system supports:
+
+- **12-color palette** (Catppuccin/Rose Pine model)
+- **Runtime switching** - no rebuilds required
+- **Wallpaper-based themes** - extract colors from images
+- **Multiple presets** - Beige, Rose Pine, Catppuccin, Minimal
+
+### Quick Start
+
+```bash
+# Switch theme
+theme-switch rose-pine
+
+# Generate from wallpaper
+theme-from-wallpaper ~/Pictures/wallpaper.png
+
+# List themes
+theme-list
+```
+
+See [Theme Documentation](modules/shared/theme/README.md) for details.
+
 ## Screenshots
 
 ## Supported Systems
