@@ -186,6 +186,9 @@ in
         font = cfg.font;
         spacing = { borderRadius = cfg.borderRadius; gap = cfg.gap; };
       };
+      
+      # Shell environment variables for theme
+      "theme/palette.sh".text = ''
         export THEME_VARIANT="${getRuntimeTheme.variant or defaultVariant}"
         # Base colors (4)
         export THEME_BASE="${currentPalette.base}"
@@ -266,10 +269,13 @@ in
         VARIANT="$1"
         
         if [ -z "$VARIANT" ]; then
-          echo "Usage: theme-switch <variant>"
+          echo "╔════════════════════════════════════════╗"
+          echo "║       Available Themes                 ║"
+          echo "╚════════════════════════════════════════╝"
           echo ""
-          echo "Available themes:"
           ${lib.concatMapStrings (t: "echo \"  ${t}\"\n") registry.available}
+          echo ""
+          echo "Usage: theme-switch <name>"
           exit 1
         fi
         
@@ -291,6 +297,31 @@ in
         mkdir -p "${config.xdg.configHome}/theme"
         echo "$VARIANT" > "${config.xdg.configHome}/theme/current"
         
+        # Generate palette.json from current theme
+        # Extract colors from kitty.conf to create palette.json
+        KITTY_CONF="$THEME_DIR/$VARIANT/kitty.conf"
+        if [ -f "$KITTY_CONF" ]; then
+          cat > "${config.xdg.configHome}/theme/palette.json" <<EOF
+{
+  "variant": "$VARIANT",
+  "isCustom": false,
+  "colors": {
+    "base": "$(grep '^background ' "$KITTY_CONF" | awk '{print $2}')",
+    "text": "$(grep '^foreground ' "$KITTY_CONF" | awk '{print $2}')",
+    "primary": "$(grep '^color5 ' "$KITTY_CONF" | awk '{print $2}')",
+    "secondary": "$(grep '^color6 ' "$KITTY_CONF" | awk '{print $2}')",
+    "red": "$(grep '^color1 ' "$KITTY_CONF" | awk '{print $2}')",
+    "orange": "$(grep '^color3 ' "$KITTY_CONF" | awk '{print $2}')",
+    "green": "$(grep '^color2 ' "$KITTY_CONF" | awk '{print $2}')",
+    "cyan": "$(grep '^color4 ' "$KITTY_CONF" | awk '{print $2}')",
+    "overlay": "$(grep '^color0 ' "$KITTY_CONF" | awk '{print $2}')",
+    "muted": "$(grep '^color8 ' "$KITTY_CONF" | awk '{print $2}')",
+    "subtext0": "$(grep '^inactive_tab_foreground ' "$KITTY_CONF" | awk '{print $2}')"
+  }
+}
+EOF
+        fi
+        
         # Reload applications (minimal overhead)
         if command -v kitty &> /dev/null; then
           kitty @ --to unix:/tmp/kitty set-colors -a "$CURRENT_DIR/kitty.conf" 2>/dev/null || \
@@ -299,6 +330,11 @@ in
         
         if command -v tmux &> /dev/null; then
           tmux source-file "${config.xdg.configHome}/tmux/tmux.conf" 2>/dev/null || true
+        fi
+        
+        # Reload btop theme
+        if command -v btop-reload-theme &> /dev/null; then
+          btop-reload-theme 2>/dev/null || true
         fi
         
         # macOS window manager reload
@@ -381,20 +417,39 @@ in
         tmux source-file "$CONFIG_DIR/tmux/tmux.conf" 2>/dev/null || true
         pkill -SIGUSR1 barik 2>/dev/null || true
       '')
-      
-      (pkgs.writeShellScriptBin "theme-list" ''
+      (pkgs.writeShellScriptBin "theme-cycle" ''
         #!/usr/bin/env bash
         
-        echo "╔════════════════════════════════════════╗"
-        echo "║       Available Themes                 ║"
-        echo "╚════════════════════════════════════════╝"
-        echo ""
-        ${lib.concatMapStrings (t: "echo \" * ${t}\"\n") registry.available}
-        echo ""
-        echo "Usage:"
-        echo "  theme-switch <name>          # Switch theme"
-        echo "  theme-from-wallpaper [img]   # Generate from wallpaper"
-        echo "  theme-info                   # Show current theme"
+        THEMES=(${lib.concatStringsSep " " registry.available})
+        CURRENT_FILE="${config.xdg.configHome}/theme/current"
+        
+        # Get current theme
+        if [ -f "$CURRENT_FILE" ]; then
+          CURRENT=$(cat "$CURRENT_FILE")
+        else
+          CURRENT="${defaultVariant}"
+        fi
+        
+        # Find next theme
+        FOUND=0
+        NEXT=""
+        for theme in "''${THEMES[@]}"; do
+          if [ "$FOUND" = "1" ]; then
+            NEXT="$theme"
+            break
+          fi
+          if [ "$theme" = "$CURRENT" ]; then
+            FOUND=1
+          fi
+        done
+        
+        # If we didn't find a next theme, loop back to first
+        if [ -z "$NEXT" ]; then
+          NEXT="''${THEMES[0]}"
+        fi
+        
+        # Switch to next theme
+        theme-switch "$NEXT"
       '')
       
       (pkgs.writeShellScriptBin "theme-info" ''
@@ -433,10 +488,10 @@ in
           printf "  %-12s" "$name:"
           
           # Print color block with the actual color as background
-          printf "\033[48;2;''${rgb}m          \033[0m  "
+          printf "\033[48;2;''${rgb}m    \033[0m "
           
-          # Print hex value
-          printf "%s\n" "$hex"
+          # Print hex value in muted color
+          printf "\033[2m%s\033[0m\n" "$hex"
         }
         
         echo "╔════════════════════════════════════════════════════════════╗"

@@ -35,6 +35,10 @@ let
     green,     # Success, positive states
     cyan,      # Info, links
     blue,      # Info, focus states
+    
+    # Optional theme metadata
+    wallpaper ? null,  # Path to default wallpaper for this theme
+    font ? "JetBrainsMono Nerd Font",  # Default font for this theme
   }: 
   let
     # Derive semantic aliases for backward compatibility
@@ -58,6 +62,9 @@ let
     inherit name base mantle surface overlay 
             text subtext0 subtext1 muted
             primary secondary red orange yellow green cyan blue;
+    
+    # Theme metadata
+    inherit wallpaper font;
     
     # Derived semantic colors
     inherit background success warning error info
@@ -95,6 +102,7 @@ let
       primary = "#857a71"; secondary = "#8f857a";
       red = "#a67070"; orange = "#b8905e"; yellow = "#cbb470"; 
       green = "#8fa670"; cyan = "#70a6a6"; blue = "#7a92a6";
+      wallpaper = "~/.config/dotfiles/images/wallpapers/BeigeInk.png";
     };
 
     beige-dark = mkTheme {
