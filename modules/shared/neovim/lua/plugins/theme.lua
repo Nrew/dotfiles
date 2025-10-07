@@ -151,6 +151,14 @@ function M.setup()
     apply_theme()
     vim.notify("Theme reloaded!", vim.log.levels.INFO)
   end, { desc = "Reload colorscheme" })
+  
+  -- User command for theme reload
+  vim.api.nvim_create_user_command("ThemeReload", function()
+    vim.notify("Reloading theme...", vim.log.levels.INFO)
+    palette_loader = nil
+    apply_theme()
+    vim.notify("Theme reloaded!", vim.log.levels.INFO)
+  end, { desc = "Reload the current theme" })
 end
 
 return M
