@@ -424,10 +424,10 @@ in
           printf "  %-12s" "$name:"
           
           # Print color block with the actual color as background
-          printf "\033[48;2;''${rgb}m          \033[0m  "
+          printf "\033[48;2;''${rgb}m    \033[0m "
           
-          # Print hex value
-          printf "%s\n" "$hex"
+          # Print hex value in muted color
+          printf "\033[2m%s\033[0m\n" "$hex"
         }
         
         echo "╔════════════════════════════════════════════════════════════╗"
