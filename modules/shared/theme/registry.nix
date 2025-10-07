@@ -48,19 +48,19 @@ let
     beige = mkTheme {
       name = "beige";
       background = "#f5f1e8"; surface = "#ede9e0"; overlay = "#e0dcd3";
-      text = "#2d2a25"; subtext = "#5a5650"; muted = "#8a857d";
-      primary = "#7c8a9e"; secondary = "#9d8b7c";
-      success = "#8a9a7b"; warning = "#c9a66b"; error = "#b87d7d"; info = "#7c8a9e";
-      border = "#d4cfbf"; selection = "#e8e4d8";
+      text = "#1a1816"; subtext = "#4a4642"; muted = "#7a766d";
+      primary = "#6b798e"; secondary = "#8d7b6c";
+      success = "#7a8a6b"; warning = "#b9965b"; error = "#a86d6d"; info = "#6b798e";
+      border = "#c4bfaf"; selection = "#d8d4c8";
     };
 
     beige-dark = mkTheme {
       name = "beige-dark";
       background = "#2d2a25"; surface = "#3a3630"; overlay = "#4a453e";
-      text = "#f5f1e8"; subtext = "#c4bfb3"; muted = "#8a857d";
-      primary = "#a3b4c9"; secondary = "#c9b5a3";
-      success = "#a8bc95"; warning = "#dbc08a"; error = "#d19999"; info = "#a3b4c9";
-      border = "#5a5650"; selection = "#4a453e";
+      text = "#f5f1e8"; subtext = "#d4cfbf"; muted = "#9a958d";
+      primary = "#b3c4d9"; secondary = "#d9c5b3";
+      success = "#b8cc9f"; warning = "#ebd0a0"; error = "#e1a9a9"; info = "#b3c4d9";
+      border = "#6a6550"; selection = "#5a5540";
     };
 
     # ════════════════════════════════════════════════════════════════════════
@@ -72,7 +72,6 @@ let
       text = "#e0def4"; subtext = "#908caa"; muted = "#6e6a86";
       primary = "#c4a7e7"; secondary = "#ebbcba";
       success = "#9ccfd8"; warning = "#f6c177"; error = "#eb6f92"; info = "#31748f";
-      border = "#403d52"; selection = "#2a283e";
     };
 
     rose-pine-moon = mkTheme {
