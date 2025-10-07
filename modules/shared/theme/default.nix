@@ -68,8 +68,8 @@ in
     _module.args.palette = currentPalette;
     
     home.sessionVariables = {
-      THEME_VARIANT = themeState.variant;
-      THEME_IS_CUSTOM = if themeState.custom != null then "true" else "false";
+      THEME_VARIANT = getRuntimeTheme.variant or defaultVariant;
+      THEME_IS_CUSTOM = if (getRuntimeTheme.custom or null) != null then "true" else "false";
     };
     
     xdg.configFile = {
@@ -118,14 +118,31 @@ in
       
       "theme/palette.css".text = ''
         :root {
-          --bg: ${currentPalette.background};
+          /* Base colors (4) */
+          --base: ${currentPalette.base};
+          --mantle: ${currentPalette.mantle};
           --surface: ${currentPalette.surface};
           --overlay: ${currentPalette.overlay};
+          
+          /* Text colors (4) */
           --text: ${currentPalette.text};
-          --subtext: ${currentPalette.subtext};
+          --subtext0: ${currentPalette.subtext0};
+          --subtext1: ${currentPalette.subtext1};
           --muted: ${currentPalette.muted};
+          
+          /* Accent colors (8) */
           --primary: ${currentPalette.primary};
           --secondary: ${currentPalette.secondary};
+          --red: ${currentPalette.red};
+          --orange: ${currentPalette.orange};
+          --yellow: ${currentPalette.yellow};
+          --green: ${currentPalette.green};
+          --cyan: ${currentPalette.cyan};
+          --blue: ${currentPalette.blue};
+          
+          /* Backward compatibility aliases */
+          --bg: ${currentPalette.background};
+          --subtext: ${currentPalette.subtext};
           --success: ${currentPalette.success};
           --warning: ${currentPalette.warning};
           --error: ${currentPalette.error};
