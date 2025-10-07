@@ -1,5 +1,82 @@
 { lib, pkgs, config, palette, ... }:
 
+let
+  # Script to generate kitty theme from runtime palette
+  kittyThemeReloader = pkgs.writeShellScript "kitty-theme-reload" ''
+    #!/usr/bin/env bash
+    
+    PALETTE_FILE="${config.xdg.configHome}/theme/palette.json"
+    KITTY_THEME="${config.xdg.configHome}/kitty/current-theme.conf"
+    
+    if [ ! -f "$PALETTE_FILE" ]; then
+      exit 0
+    fi
+    
+    # Extract colors from palette.json
+    BG=$(${pkgs.jq}/bin/jq -r '.colors.background' "$PALETTE_FILE")
+    FG=$(${pkgs.jq}/bin/jq -r '.colors.text' "$PALETTE_FILE")
+    SEL_BG=$(${pkgs.jq}/bin/jq -r '.colors.selection' "$PALETTE_FILE")
+    CURSOR=$(${pkgs.jq}/bin/jq -r '.colors.cursor' "$PALETTE_FILE")
+    LINK=$(${pkgs.jq}/bin/jq -r '.colors.link' "$PALETTE_FILE")
+    
+    # ANSI colors
+    C0=$(${pkgs.jq}/bin/jq -r '.colors.overlay' "$PALETTE_FILE")
+    C8=$(${pkgs.jq}/bin/jq -r '.colors.muted' "$PALETTE_FILE")
+    C1=$(${pkgs.jq}/bin/jq -r '.colors.error // .colors.red' "$PALETTE_FILE")
+    C2=$(${pkgs.jq}/bin/jq -r '.colors.success // .colors.green' "$PALETTE_FILE")
+    C3=$(${pkgs.jq}/bin/jq -r '.colors.warning // .colors.orange' "$PALETTE_FILE")
+    C4=$(${pkgs.jq}/bin/jq -r '.colors.info // .colors.cyan' "$PALETTE_FILE")
+    C5=$(${pkgs.jq}/bin/jq -r '.colors.primary' "$PALETTE_FILE")
+    C6=$(${pkgs.jq}/bin/jq -r '.colors.secondary' "$PALETTE_FILE")
+    C7=$(${pkgs.jq}/bin/jq -r '.colors.text' "$PALETTE_FILE")
+    
+    SUBTEXT=$(${pkgs.jq}/bin/jq -r '.colors.subtext0 // .colors.subtext' "$PALETTE_FILE")
+    SURFACE=$(${pkgs.jq}/bin/jq -r '.colors.surface' "$PALETTE_FILE")
+    BORDER=$(${pkgs.jq}/bin/jq -r '.colors.border // .colors.overlay' "$PALETTE_FILE")
+    
+    # Generate kitty theme
+    cat > "$KITTY_THEME" <<EOF
+background $BG
+foreground $FG
+selection_background $SEL_BG
+selection_foreground $FG
+cursor $CURSOR
+cursor_text_color $BG
+url_color $LINK
+
+color0 $C0
+color8 $C8
+color1 $C1
+color9 $C1
+color2 $C2
+color10 $C2
+color3 $C3
+color11 $C3
+color4 $C4
+color12 $C4
+color5 $C5
+color13 $C5
+color6 $C6
+color14 $C6
+color7 $C7
+color15 $C7
+
+active_tab_foreground $FG
+active_tab_background $C5
+inactive_tab_foreground $SUBTEXT
+inactive_tab_background $SURFACE
+tab_bar_background $BG
+
+active_border_color $C5
+inactive_border_color $BORDER
+EOF
+
+    # Reload kitty if running
+    if command -v kitty &> /dev/null; then
+      kitty @ --to unix:/tmp/kitty set-colors -a "$KITTY_THEME" 2>/dev/null || true
+    fi
+  '';
+in
 {
   programs.kitty = {
     enable = true;
@@ -113,4 +190,12 @@
       "cmd+shift+r" = "load_config_file";
     };
   };
+
+  # Add the theme reloader script to home packages
+  home.packages = [ (pkgs.writeShellScriptBin "kitty-reload-theme" ''
+    ${kittyThemeReloader}
+  '') ];
+
+  # Create a systemd service or launchd agent to watch for theme changes
+  # For now, we'll integrate with the theme-switch script
 }
