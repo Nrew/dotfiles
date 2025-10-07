@@ -58,44 +58,78 @@ let
     c = [ pkgs.clang-tools pkgs.clang ];
   };
 
-  # Generate theme palette for neovim
+  # Dynamic theme palette loader for neovim
+  # Instead of writing static colors, we create a loader that reads from the runtime theme
   themePalette = ''
-    -- Auto-generated theme palette from Nix
-    return {
-      -- Base colors (4)
-      base = "${palette.base}",
-      mantle = "${palette.mantle}",
-      surface = "${palette.surface}",
-      overlay = "${palette.overlay}",
+    -- Dynamic theme palette loader - reads from runtime theme files
+    local M = {}
+    
+    -- Try to load theme from runtime config first (updated by theme-switch)
+    local function load_from_json()
+      local config_home = os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")
+      local theme_file = config_home .. "/theme/palette.json"
       
-      -- Text colors (4)
-      text = "${palette.text}",
-      subtext0 = "${palette.subtext0}",
-      subtext1 = "${palette.subtext1}",
-      muted = "${palette.muted}",
+      local file = io.open(theme_file, "r")
+      if not file then
+        return nil
+      end
       
-      -- Accent colors (8)
-      primary = "${palette.primary}",
-      secondary = "${palette.secondary}",
-      red = "${palette.red}",
-      orange = "${palette.orange}",
-      yellow = "${palette.yellow}",
-      green = "${palette.green}",
-      cyan = "${palette.cyan}",
-      blue = "${palette.blue}",
+      local content = file:read("*all")
+      file:close()
       
-      -- Backward compatibility aliases
-      background = "${palette.background}",
-      subtext = "${palette.subtext}",
-      success = "${palette.success}",
-      warning = "${palette.warning}",
-      error = "${palette.error}",
-      info = "${palette.info}",
-      border = "${palette.border}",
-      selection = "${palette.selection}",
-      cursor = "${palette.cursor}",
-      link = "${palette.link}",
-    }
+      local ok, decoded = pcall(vim.json.decode, content)
+      if not ok or not decoded or not decoded.colors then
+        return nil
+      end
+      
+      return decoded.colors
+    end
+    
+    -- Fallback to build-time palette
+    local function get_fallback()
+      return {
+        -- Base colors (4)
+        base = "${palette.base}",
+        mantle = "${palette.mantle}",
+        surface = "${palette.surface}",
+        overlay = "${palette.overlay}",
+        
+        -- Text colors (4)
+        text = "${palette.text}",
+        subtext0 = "${palette.subtext0}",
+        subtext1 = "${palette.subtext1}",
+        muted = "${palette.muted}",
+        
+        -- Accent colors (8)
+        primary = "${palette.primary}",
+        secondary = "${palette.secondary}",
+        red = "${palette.red}",
+        orange = "${palette.orange}",
+        yellow = "${palette.yellow}",
+        green = "${palette.green}",
+        cyan = "${palette.cyan}",
+        blue = "${palette.blue}",
+        
+        -- Backward compatibility aliases
+        background = "${palette.background}",
+        subtext = "${palette.subtext}",
+        success = "${palette.success}",
+        warning = "${palette.warning}",
+        error = "${palette.error}",
+        info = "${palette.info}",
+        border = "${palette.border}",
+        selection = "${palette.selection}",
+        cursor = "${palette.cursor}",
+        link = "${palette.link}",
+      }
+    end
+    
+    -- Get the current palette (runtime or fallback)
+    function M.get()
+      return load_from_json() or get_fallback()
+    end
+    
+    return M
   '';
 
 in {

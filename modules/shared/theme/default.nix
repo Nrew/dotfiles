@@ -198,7 +198,7 @@ EOF
         pkill -SIGUSR1 barik 2>/dev/null || true
         
         echo "✅ Theme switched to: $VARIANT"
-        echo "💡 Some applications may require a restart to fully apply the theme"
+        echo "💡 Neovim will auto-reload theme on next focus. Use <leader>uC in nvim to force reload"
       '')
        # Live wallpaper-based theme generation
       (pkgs.writeShellScriptBin "theme-from-wallpaper" ''
