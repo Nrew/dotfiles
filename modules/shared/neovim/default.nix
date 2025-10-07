@@ -33,6 +33,7 @@ let
     
     # Editing enhancements
     comment-nvim nvim-surround flash-nvim mini-pairs
+    yanky-nvim # Yank ring
     
     # Visual improvements
     indent-blankline-nvim noice-nvim nvim-notify dressing-nvim
@@ -42,6 +43,12 @@ let
     
     # Development tools
     todo-comments-nvim
+    
+    # Session & project management
+    persistence-nvim project-nvim
+    
+    # File manager
+    yazi-nvim
     
     # Additional useful plugins from your original config
     mini-icons stabilize-nvim vim-bbye
