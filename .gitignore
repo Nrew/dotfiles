@@ -2,9 +2,6 @@
 result
 result-*
 
-# Generated files
-modules/shared/neovim/lua/theme/palette.lua
-
 # macOS
 .DS_Store
 
