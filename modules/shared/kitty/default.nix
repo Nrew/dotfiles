@@ -59,11 +59,11 @@
       inactive_border_color = palette.border;
 
       background_opacity = "0.97";
-      background_blur = "24";
 
-      # Animation settings for smooth visual transitions
-      animation_duration = "0.15";
-      animation_curve = "ease-in-out";
+      # Smooth animations for clean minimal aesthetics
+      repaint_delay = "10";
+      input_delay = "3";
+      sync_to_monitor = "yes";
 
       shell_integration = "enabled";
       allow_remote_control = "yes";

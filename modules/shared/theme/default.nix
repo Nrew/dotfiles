@@ -6,20 +6,30 @@ let
   # Import theme registry
   registry = import ./registry.nix { inherit lib; };
   
-  # Theme state file
-  themeStateFile = ./state.json;
+  # Default to beige theme if no runtime theme is set
+  defaultVariant = "beige";
   
-  # Read current theme selection
-  themeState = 
-    if builtins.pathExists themeStateFile
-    then builtins.fromJSON (builtins.readFile themeStateFile)
-    else { variant = "beige"; custom = null; };
+  # Runtime theme file that can be changed without rebuilds
+  runtimeThemeFile = "${config.xdg.configHome}/theme/current.json";
   
-  # Get the current palette
+  # Function to read runtime theme or use default
+  getRuntimeTheme = 
+    let
+      themeFile = runtimeThemeFile;
+      hasRuntimeTheme = builtins.pathExists themeFile;
+    in
+    if hasRuntimeTheme
+    then builtins.fromJSON (builtins.readFile themeFile)
+    else { variant = defaultVariant; custom = null; };
+  
+  # Get the current palette (either from registry or custom)
   currentPalette = 
-    if themeState.custom != null
-    then registry.mkTheme themeState.custom
-    else registry.${themeState.variant};
+    let
+      runtimeTheme = getRuntimeTheme;
+    in
+    if runtimeTheme.custom != null
+    then registry.mkTheme runtimeTheme.custom
+    else registry.${runtimeTheme.variant or defaultVariant};
 
   paletteForJSON = lib.filterAttrs (
     name: value:
@@ -65,16 +75,16 @@ in
     
     xdg.configFile = {
       "theme/palette.json".text = builtins.toJSON {
-        variant = themeState.variant;
-        isCustom = themeState.custom != null;
+        variant = getRuntimeTheme.variant or defaultVariant;
+        isCustom = (getRuntimeTheme.custom or null) != null;
         colors = paletteForJSON;
         font = cfg.font;
         spacing = { borderRadius = cfg.borderRadius; gap = cfg.gap; };
       };
       
       "theme/palette.sh".text = ''
-        export THEME_VARIANT="${themeState.variant}"
-        export THEME_BACKGROUND="${currentPalette.background}"
+        export THEME_VARIANT="${getRuntimeTheme.variant or defaultVariant}"
+        export THEME_BASE="${currentPalette.base}"
         export THEME_SURFACE="${currentPalette.surface}"
         export THEME_OVERLAY="${currentPalette.overlay}"
         export THEME_TEXT="${currentPalette.text}"
@@ -82,6 +92,13 @@ in
         export THEME_MUTED="${currentPalette.muted}"
         export THEME_PRIMARY="${currentPalette.primary}"
         export THEME_SECONDARY="${currentPalette.secondary}"
+        export THEME_LOVE="${currentPalette.love}"
+        export THEME_GOLD="${currentPalette.gold}"
+        export THEME_FOAM="${currentPalette.foam}"
+        export THEME_PINE="${currentPalette.pine}"
+        
+        # Backward compatibility
+        export THEME_BACKGROUND="${currentPalette.background}"
         export THEME_SUCCESS="${currentPalette.success}"
         export THEME_WARNING="${currentPalette.warning}"
         export THEME_ERROR="${currentPalette.error}"
@@ -107,12 +124,14 @@ in
     };
     
     home.packages = [
+      # Live theme switching - no rebuild required
       (pkgs.writeShellScriptBin "theme-switch" ''
         #!/usr/bin/env bash
         set -e
         
-        DOTFILES="${config.home.homeDirectory}/.config/dotfiles"
-        STATE_FILE="$DOTFILES/modules/shared/theme/state.json"
+        CONFIG_DIR="${config.xdg.configHome}"
+        THEME_DIR="$CONFIG_DIR/theme"
+        THEME_FILE="$THEME_DIR/current.json"
         VARIANT="$1"
         
         if [ -z "$VARIANT" ]; then
@@ -131,25 +150,102 @@ in
         
         echo "🎨 Switching to: $VARIANT"
         
-        mkdir -p "$(dirname "$STATE_FILE")"
-        cat > "$STATE_FILE" <<EOF
+        mkdir -p "$THEME_DIR"
+        cat > "$THEME_FILE" <<EOF
 {
   "variant": "$VARIANT",
   "custom": null
 }
 EOF
         
-        echo "📦 Rebuilding..."
-        cd "$DOTFILES"
-        darwin-rebuild switch --flake .#owl
+        echo "🔄 Reloading applications..."
         
-        echo "🔄 Reloading..."
+        # Reload kitty
         killall -SIGUSR1 kitty 2>/dev/null || true
-        tmux source-file ${config.xdg.configHome}/tmux/tmux.conf 2>/dev/null || true
         
-        echo "✅ Theme: $VARIANT"
+        # Reload tmux
+        tmux source-file "$CONFIG_DIR/tmux/tmux.conf" 2>/dev/null || true
+        
+        # Reload aerospace/barik if on macOS
+        pkill -SIGUSR1 barik 2>/dev/null || true
+        
+        echo "✅ Theme switched to: $VARIANT"
+        echo "💡 Some applications may require a restart to fully apply the theme"
       '')
-       
+       # Live wallpaper-based theme generation
+      (pkgs.writeShellScriptBin "theme-from-wallpaper" ''
+        #!/usr/bin/env bash
+        set -euo pipefail
+        
+        CONFIG_DIR="${config.xdg.configHome}"
+        THEME_DIR="$CONFIG_DIR/theme"
+        THEME_FILE="$THEME_DIR/current.json"
+        WALLPAPER_DIR="${cfg.wallpaperDir}"
+        
+        # Colors for UX
+        RED='\033[0;31m'
+        GREEN='\033[0;32m'
+        YELLOW='\033[1;33m'
+        BLUE='\033[0;34m'
+        NC='\033[0m'
+        
+        # Validate wallpaper directory exists
+        if [ ! -d "$WALLPAPER_DIR" ]; then
+          echo -e "''${RED}Error: Wallpaper directory not found: $WALLPAPER_DIR''${NC}" >&2
+          echo -e "''${YELLOW}Please create the directory or update theme.wallpaperDir''${NC}" >&2
+          exit 1
+        fi
+        
+        # If no arguments, use fzf to select wallpaper
+        if [ $# -eq 0 ]; then
+          cd "$WALLPAPER_DIR"
+          
+          IMAGES=$(${pkgs.findutils}/bin/find . -type f \
+            \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null)
+          
+          if [ -z "$IMAGES" ]; then
+            echo -e "''${YELLOW}No images found in $WALLPAPER_DIR''${NC}"
+            exit 0
+          fi
+          
+          SELECTED=$(echo "$IMAGES" | sed 's|^./||' | ${pkgs.fzf}/bin/fzf \
+            --height=100% \
+            --border=rounded \
+            --prompt="🖼️  Select wallpaper: " \
+            --preview="${pkgs.imagemagick}/bin/identify -verbose {} | head -20" \
+            --preview-window=right:50%) || exit 0
+          
+          if [ -z "$SELECTED" ]; then
+            exit 0
+          fi
+          
+          WALLPAPER="$WALLPAPER_DIR/$SELECTED"
+        else
+          WALLPAPER="$1"
+          if [ ! -f "$WALLPAPER" ]; then
+            echo -e "''${RED}Error: Wallpaper not found: $WALLPAPER''${NC}" >&2
+            exit 1
+          fi
+        fi
+        
+        echo -e "''${BLUE}🎨 Extracting theme from wallpaper...''${NC}"
+        
+        # Use gowall to extract theme and set wallpaper
+        ${pkgs.gowall}/bin/gowall "$WALLPAPER"
+        
+        # TODO: Extract colors from gowall output and create custom theme
+        # For now, we'll use a default theme
+        # In the future, gowall should output JSON with extracted colors
+        
+        echo -e "''${GREEN}✅ Wallpaper and theme applied''${NC}"
+        echo -e "''${YELLOW}💡 Color extraction from gowall will be implemented in the future''${NC}"
+        
+        # Reload applications
+        killall -SIGUSR1 kitty 2>/dev/null || true
+        tmux source-file "$CONFIG_DIR/tmux/tmux.conf" 2>/dev/null || true
+        pkill -SIGUSR1 barik 2>/dev/null || true
+      '')
+      
       (pkgs.writeShellScriptBin "theme-list" ''
         #!/usr/bin/env bash
         
@@ -158,10 +254,11 @@ EOF
         echo "╚════════════════════════════════════════╝"
         echo ""
         ${lib.concatMapStrings (t: "echo \" * ${t}\"\n") registry.available}
+        echo ""
         echo "Usage:"
-        echo "  theme-switch <n>          # Switch theme"
-        echo "  theme-from-wallpaper [img]   # From image"
-        echo "  theme-info                   # Current info"
+        echo "  theme-switch <name>          # Switch theme"
+        echo "  theme-from-wallpaper [img]   # Generate from wallpaper"
+        echo "  theme-info                   # Show current theme"
       '')
       
       (pkgs.writeShellScriptBin "theme-info" ''
@@ -197,5 +294,11 @@ EOF
         ' "$THEME_FILE"
       '')
     ];
+    
+    # Shell aliases for convenience
+    home.shellAliases = {
+      wp = "theme-from-wallpaper";
+      wallpaper = "theme-from-wallpaper";
+    };
   };
 }

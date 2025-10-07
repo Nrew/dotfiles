@@ -27,8 +27,6 @@ in
       gap = 16;
     };
 
-    wallpaper.enable = true;
-
     # Enable home-manager
     programs.home-manager.enable = true;
 
