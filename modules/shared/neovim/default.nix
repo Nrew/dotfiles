@@ -72,35 +72,44 @@ let
     -- Dynamic theme palette loader - reads from symlinked theme file
     local M = {}
     
-    -- Load palette from the current theme symlink
+    -- Fallback palette built into the config
+    local fallback_palette = {
+      base = "${palette.base}",
+      mantle = "${palette.mantle}",
+      surface = "${palette.surface}",
+      overlay = "${palette.overlay}",
+      text = "${palette.text}",
+      subtext0 = "${palette.subtext0}",
+      subtext1 = "${palette.subtext1}",
+      muted = "${palette.muted}",
+      primary = "${palette.primary}",
+      secondary = "${palette.secondary}",
+      red = "${palette.red}",
+      orange = "${palette.orange}",
+      yellow = "${palette.yellow}",
+      green = "${palette.green}",
+      cyan = "${palette.cyan}",
+      blue = "${palette.blue}",
+    }
+    
+    -- Load palette from the current theme symlink or fallback
     function M.get()
       local config_home = os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")
       local palette_file = config_home .. "/current-theme/nvim-palette.lua"
+      
+      -- Check if file exists before trying to load it
+      local file = io.open(palette_file, "r")
+      if not file then
+        return fallback_palette
+      end
+      file:close()
       
       -- Clear any cached version
       package.loaded[palette_file] = nil
       
       local ok, palette = pcall(dofile, palette_file)
       if not ok or not palette then
-        -- Fallback palette
-        return {
-          base = "${palette.base}",
-          mantle = "${palette.mantle}",
-          surface = "${palette.surface}",
-          overlay = "${palette.overlay}",
-          text = "${palette.text}",
-          subtext0 = "${palette.subtext0}",
-          subtext1 = "${palette.subtext1}",
-          muted = "${palette.muted}",
-          primary = "${palette.primary}",
-          secondary = "${palette.secondary}",
-          red = "${palette.red}",
-          orange = "${palette.orange}",
-          yellow = "${palette.yellow}",
-          green = "${palette.green}",
-          cyan = "${palette.cyan}",
-          blue = "${palette.blue}",
-        }
+        return fallback_palette
       end
       
       return palette
