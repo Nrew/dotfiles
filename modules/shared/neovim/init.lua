@@ -152,6 +152,10 @@ require("lazy").setup({
     -- Don't install plugins, they're managed by Nix
     missing = false,
   },
+  checker = {
+    -- Don't check for updates, Nix manages versions
+    enabled = false,
+  },
   ui = {
     border = "rounded",
   },
