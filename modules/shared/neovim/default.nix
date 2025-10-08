@@ -142,14 +142,14 @@ in {
       vim.api.nvim_set_hl(0, 'FloatBorder', { fg = palette.overlay, bg = palette.surface })
       vim.api.nvim_set_hl(0, 'FloatTitle', { fg = palette.primary, bg = palette.surface, bold = true })
       
-      vim.api.nvim_set_hl(0, 'Cursor', { fg = palette.base, bg = palette.cursor })
+      vim.api.nvim_set_hl(0, 'Cursor', { fg = palette.base, bg = palette.text })
       vim.api.nvim_set_hl(0, 'CursorLine', { bg = palette.mantle })
       vim.api.nvim_set_hl(0, 'CursorLineNr', { fg = palette.primary, bold = true })
       vim.api.nvim_set_hl(0, 'LineNr', { fg = palette.muted })
       vim.api.nvim_set_hl(0, 'SignColumn', { fg = palette.text, bg = palette.base })
       
-      vim.api.nvim_set_hl(0, 'Visual', { bg = palette.selection })
-      vim.api.nvim_set_hl(0, 'VisualNOS', { bg = palette.selection })
+      vim.api.nvim_set_hl(0, 'Visual', { bg = palette.overlay })
+      vim.api.nvim_set_hl(0, 'VisualNOS', { bg = palette.overlay })
       
       vim.api.nvim_set_hl(0, 'Search', { fg = palette.base, bg = palette.yellow, bold = true })
       vim.api.nvim_set_hl(0, 'IncSearch', { fg = palette.base, bg = palette.orange, bold = true })
@@ -313,7 +313,7 @@ in {
       vim.api.nvim_set_hl(0, 'TelescopeNormal', { fg = palette.text, bg = palette.base })
       vim.api.nvim_set_hl(0, 'TelescopePromptBorder', { fg = palette.overlay, bg = palette.surface })
       vim.api.nvim_set_hl(0, 'TelescopePromptNormal', { fg = palette.text, bg = palette.surface })
-      vim.api.nvim_set_hl(0, 'TelescopeSelection', { fg = palette.text, bg = palette.selection, bold = true })
+      vim.api.nvim_set_hl(0, 'TelescopeSelection', { fg = palette.text, bg = palette.overlay, bold = true })
       vim.api.nvim_set_hl(0, 'TelescopeMatching', { fg = palette.primary, bold = true })
       
       -- Neo-tree
