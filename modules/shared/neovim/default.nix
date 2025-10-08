@@ -1,8 +1,6 @@
-{ config, lib, pkgs, inputs, palette, ... }:
+{ config, lib, pkgs, palette, ... }:
 
 let
-  utils = inputs.nixCats.utils;
-
   # Core tools needed for all languages
   coreTools = with pkgs; [
     ripgrep fd curl unzip git tree-sitter
@@ -119,9 +117,68 @@ let
   '';
 
 in {
-  imports = [ inputs.nixCats.homeModule ];
-
   config = {
+    # Install Neovim with lazy.nvim support
+    programs.neovim = {
+      enable = true;
+      defaultEditor = true;
+      viAlias = true;
+      vimAlias = true;
+      
+      extraPackages = coreTools ++ 
+        (lib.flatten (lib.attrValues languageServers));
+      
+      plugins = with pkgs.vimPlugins; [
+        # Install lazy.nvim
+        lazy-nvim
+        
+        # Install all plugins via Nix (lazy.nvim will manage loading)
+        # Theme & UI
+        telescope-nvim telescope-fzf-native-nvim
+        lualine-nvim nvim-web-devicons bufferline-nvim
+        
+        # File management & navigation
+        neo-tree-nvim nvim-window-picker which-key-nvim
+        
+        # LSP & completion
+        nvim-lspconfig blink-cmp trouble-nvim
+        luasnip
+        friendly-snippets
+
+        # Treesitter with comprehensive parsers
+        (nvim-treesitter.withPlugins (p: with p; [
+          lua vim vimdoc query bash comment regex
+          html css javascript typescript tsx
+          python rust go nix c cpp make
+          json json5 yaml toml markdown markdown_inline
+          gitattributes gitignore
+        ]))
+        nvim-treesitter-context nvim-ts-autotag nvim-treesitter-textobjects
+        
+        # Editing enhancements
+        comment-nvim nvim-surround flash-nvim mini-pairs
+        yanky-nvim
+        
+        # Visual improvements
+        indent-blankline-nvim noice-nvim nvim-notify dressing-nvim
+        
+        # Git integration
+        gitsigns-nvim lazygit-nvim
+        
+        # Development tools
+        todo-comments-nvim
+        
+        # Session & project management
+        persistence-nvim project-nvim
+        
+        # File browser
+        yazi-nvim
+        
+        # Utils
+        plenary-nvim nui-nvim mini-icons
+        stabilize-nvim
+      ];
+    };
     # Write the theme palette to the correct Neovim config location
     xdg.configFile."nvim/lua/theme/palette.lua".text = themePalette;
     
@@ -336,57 +393,14 @@ in {
       vim.api.nvim_set_hl(0, 'NeoTreeGitAdded', { fg = palette.green })
       vim.api.nvim_set_hl(0, 'NeoTreeGitDeleted', { fg = palette.red })
     '';
-
-    nixCats = {
-      enable = true;
-      addOverlays = [ (utils.standardPluginOverlay inputs) ];
-      packageNames = [ "nvim" ];
-      luaPath = ./.;
-
-      categoryDefinitions.replace = ({ pkgs, ... }: {
-        lspsAndRuntimeDep = {
-          general = coreTools;
-        } // languageServers;
-
-        startupPlugins = {
-          general = corePlugins;
-        };
-
-        optionalPlugins = {};
-        sharedLibraries = {};
-        environmentVariables = {};
-        python3.libraries = {};
-        extraWrapperArgs = {};
-      });
-
-      packageDefinitions.replace = {
-        nvim = { pkgs, ... }: {
-          settings = {
-            suffix-path = true;
-            suffix-LD = true;
-            wrapRc = true;
-            aliases = [ "vim" ];
-            hosts.python3.enable = true;
-            hosts.node.enable = true;
-          };
-
-          categories = {
-            general = true;
-            lua = true;
-            nix = true;
-            typescript = true;
-            python = true;
-            rust = true;
-            go = true;
-            c = true;
-          };
-
-          extra = {
-            # Provide nixpkgs path for nixd LSP
-            nixdExtras.nixpkgs = ''import ${pkgs.path} { }'';
-          };
-        };
-      };
+    
+    # Copy the Lua configuration to Neovim config directory
+    xdg.configFile."nvim/lua" = {
+      source = ./lua;
+      recursive = true;
     };
+    
+    # Copy init.lua
+    xdg.configFile."nvim/init.lua".source = ./init.lua;
   };
 }

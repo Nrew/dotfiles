@@ -1,8 +1,169 @@
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+-- Load core configuration
 require("core.options")
 require("core.keymaps")
 require("core.autocmds")
 
--- Load theme first (it sets up the colorscheme)
+-- Setup lazy.nvim
+require("lazy").setup({
+  -- Theme & UI
+  {
+    "nvim-telescope/telescope.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope-fzf-native.nvim" },
+    config = function() require("plugins.telescope").setup() end,
+    cmd = "Telescope",
+    keys = {
+      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find Files" },
+      { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
+      { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
+    },
+  },
+  
+  {
+    "nvim-lualine/lualine.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function() require("plugins.lualine").setup() end,
+    event = "VeryLazy",
+  },
+  
+  {
+    "akinsho/bufferline.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function() require("plugins.bufferline").setup() end,
+    event = "VeryLazy",
+  },
+  
+  -- File management & navigation
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+      "s1n7ax/nvim-window-picker",
+    },
+    config = function() require("plugins.neo-tree").setup() end,
+    cmd = "Neotree",
+    keys = {
+      { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "Toggle Neotree" },
+    },
+  },
+  
+  {
+    "folke/which-key.nvim",
+    config = function() require("plugins.which-key").setup() end,
+    event = "VeryLazy",
+  },
+  
+  -- LSP & completion
+  {
+    "neovim/nvim-lspconfig",
+    dependencies = { "saghen/blink.cmp" },
+    config = function() require("plugins.lsp").setup() end,
+    event = { "BufReadPre", "BufNewFile" },
+  },
+  
+  {
+    "saghen/blink.cmp",
+    dependencies = { "L3MON4D3/LuaSnip", "rafamadriz/friendly-snippets" },
+    config = function() require("plugins.completion").setup() end,
+    event = "InsertEnter",
+  },
+  
+  {
+    "folke/trouble.nvim",
+    config = function() require("plugins.trouble").setup() end,
+    cmd = "Trouble",
+  },
+  
+  { "L3MON4D3/LuaSnip", config = function() require("plugins.luasnip").setup() end },
+  { "rafamadriz/friendly-snippets" },
+  
+  -- Treesitter
+  {
+    "nvim-treesitter/nvim-treesitter",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter-context",
+      "windwp/nvim-ts-autotag",
+      "nvim-treesitter/nvim-treesitter-textobjects",
+    },
+    config = function() require("plugins.treesitter").setup() end,
+    event = { "BufReadPost", "BufNewFile" },
+  },
+  
+  -- Editing enhancements
+  { "numToStr/Comment.nvim", config = function() require("plugins.comment").setup() end, event = "VeryLazy" },
+  { "kylechui/nvim-surround", config = function() require("plugins.surround").setup() end, event = "VeryLazy" },
+  { "folke/flash.nvim", config = function() require("plugins.flash").setup() end, event = "VeryLazy" },
+  { "echasnovski/mini.pairs", config = function() require("plugins.mini-pairs").setup() end, event = "InsertEnter" },
+  { "gbprod/yanky.nvim", config = function() require("plugins.yanky").setup() end, event = "VeryLazy" },
+  
+  -- Visual improvements
+  { "lukas-reineke/indent-blankline.nvim", config = function() require("plugins.indent-blankline").setup() end, event = "BufReadPost" },
+  {
+    "folke/noice.nvim",
+    dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
+    config = function() require("plugins.noice").setup() end,
+    event = "VeryLazy",
+  },
+  { "stevearc/dressing.nvim", event = "VeryLazy" },
+  
+  -- Git integration
+  { "lewis6991/gitsigns.nvim", config = function() require("plugins.gitsigns").setup() end, event = "BufReadPre" },
+  { "kdheepak/lazygit.nvim", config = function() require("plugins.lazygit").setup() end, cmd = "LazyGit" },
+  
+  -- Development tools
+  { "folke/todo-comments.nvim", config = function() require("plugins.todo-comments").setup() end, event = "BufReadPost" },
+  
+  -- Session & project management
+  { "folke/persistence.nvim", config = function() require("plugins.persistence").setup() end, event = "VimEnter" },
+  { "ahmedkhalf/project.nvim", config = function() require("plugins.project").setup() end, event = "VeryLazy" },
+  
+  -- File browser
+  {
+    "mikavilpas/yazi.nvim",
+    config = function() require("plugins.yazi").setup() end,
+    keys = {
+      { "<leader>-", "<cmd>Yazi<cr>", desc = "Open Yazi" },
+    },
+  },
+  
+  -- Utils
+  { "nvim-lua/plenary.nvim" },
+  { "MunifTanjim/nui.nvim" },
+  { "echasnovski/mini.icons", config = function() require("plugins.mini-icons").setup() end, event = "VeryLazy" },
+  { "luukvbaal/stabilize.nvim", config = function() require("plugins.stabilize").setup() end, event = "VeryLazy" },
+}, {
+  ui = {
+    border = "rounded",
+  },
+  performance = {
+    rtp = {
+      disabled_plugins = {
+        "gzip",
+        "tarPlugin",
+        "tohtml",
+        "tutor",
+        "zipPlugin",
+      },
+    },
+  },
+})
+
+-- Load theme after lazy.nvim setup
 local theme_ok, theme = pcall(require, "plugins.theme")
 if theme_ok and type(theme.setup) == "function" then
   local setup_ok, setup_err = pcall(theme.setup)
@@ -13,110 +174,4 @@ else
   vim.notify("Theme module not found or invalid", vim.log.levels.WARN)
 end
 
--- Plugin loading with better error handling
-local loaded = {}
-local failed = {}
-
-local function load_plugin(name)
-  local module_path = "plugins." .. name
-  local status, module = pcall(require, module_path)
-
-  if not status then
-    failed[name] = "module not found: " .. tostring(module)
-    return false
-  end
-
-  if type(module.setup) ~= "function" then
-    failed[name] = "no setup function"
-    return false
-  end
-
-  local setup_ok, setup_err = pcall(module.setup)
-  if not setup_ok then
-    failed[name] = "setup failed: " .. tostring(setup_err)
-    return false
-  end
-
-  loaded[name] = true
-  return true
-end
-
-local function show_results()
-  local loaded_list = {}
-  local failed_list = {}
-
-  for name in pairs(loaded) do
-    table.insert(loaded_list, name)
-  end
-
-  for name, reason in pairs(failed) do
-    table.insert(failed_list, name .. " (" .. reason .. ")")
-  end
-
-  table.sort(loaded_list)
-  table.sort(failed_list)
-
-  if #failed_list > 0 then
-    local message = string.format(
-      "Plugin Loading Complete\n\n✔ Loaded %d plugins\n✘ Failed %d plugins:\n  %s",
-      #loaded_list,
-      #failed_list,
-      table.concat(failed_list, "\n  ")
-    )
-    vim.notify(message, vim.log.levels.WARN, { title = "NixCats Neovim" })
-  else
-    vim.notify(
-      string.format("✔ Successfully loaded %d plugins", #loaded_list),
-      vim.log.levels.INFO,
-      { title = "NixCats Neovim" }
-    )
-  end
-end
-
--- Defer plugin loading to improve startup time
-vim.api.nvim_create_autocmd("User", {
-  pattern = "DeferredUIEnter",
-  callback = function()
-    -- Load plugins in order of dependency
-    local plugins = {
-      "luasnip",           -- Snippets first (completion depends on it)
-      "treesitter",        -- Syntax highlighting
-      "lsp",               -- LSP configuration
-      "completion",        -- Completion (depends on LSP and snippets)
-      "telescope",         -- Fuzzy finder
-      "neo-tree",          -- File explorer
-      "lualine",           -- Status line
-      "bufferline",        -- Buffer line
-      "which-key",         -- Key hints
-      "noice",             -- UI enhancements
-      "indent-blankline",  -- Indent guides
-      "mini-pairs",        -- Auto pairs
-      "comment",           -- Comment plugin
-      "flash",             -- Jump plugin
-      "surround",          -- Surround plugin
-      "yanky",             -- Yank ring
-      "trouble",           -- Diagnostics list
-      "todo-comments",     -- TODO comments
-      "gitsigns",          -- Git signs
-      "lazygit",           -- LazyGit integration
-      "project",           -- Project management
-      "persistence",       -- Session persistence
-      "yazi",              -- Yazi file manager
-      "mini-icons",        -- Icons
-      "stabilize",         -- Stabilize windows
-    }
-
-    for _, plugin in ipairs(plugins) do
-      load_plugin(plugin)
-    end
-
-    vim.schedule(show_results)
-  end,
-})
-
--- Trigger deferred loading
-vim.defer_fn(function()
-  vim.api.nvim_exec_autocmds("User", { pattern = "DeferredUIEnter" })
-end, 50)
-
-vim.notify("NixCats Neovim initializing...", vim.log.levels.INFO)
+vim.notify("Lazy.nvim Neovim initialized", vim.log.levels.INFO)
