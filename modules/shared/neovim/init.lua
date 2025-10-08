@@ -147,6 +147,11 @@ require("lazy").setup({
   { "echasnovski/mini.icons", config = function() require("plugins.mini-icons").setup() end, event = "VeryLazy" },
   { "luukvbaal/stabilize.nvim", config = function() require("plugins.stabilize").setup() end, event = "VeryLazy" },
 }, {
+  -- Lazy.nvim configuration
+  install = {
+    -- Don't install plugins, they're managed by Nix
+    missing = false,
+  },
   ui = {
     border = "rounded",
   },
