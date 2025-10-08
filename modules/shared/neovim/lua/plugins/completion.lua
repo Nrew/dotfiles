@@ -63,7 +63,7 @@ function M.setup()
     completion = {
       accept = { auto_brackets = { enabled = true } },
       list = {
-        selection = "auto_insert",
+        selection = { behavior = "auto_insert" },
       },
       documentation = {
         auto_show = true,
@@ -81,6 +81,13 @@ function M.setup()
     signature = {
       enabled = true,
       window = { border = "rounded" },
+    },
+
+    snippets = {
+      keymap = {
+        expand_or_next = "<C-l>",
+        prev = "<C-h>",
+      },
     },
   })
 end

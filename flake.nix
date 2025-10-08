@@ -130,7 +130,7 @@
                   useUserPackages = true;
                   extraSpecialArgs = specialArgs;
                   users.${user} = import ./home;
-                
+
                   backupFileExtension = "backup";
                 };
               } 

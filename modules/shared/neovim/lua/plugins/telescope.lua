@@ -6,6 +6,8 @@ function M.setup()
 
   local actions = require("telescope.actions")
 
+  pcall(telescope.load_extension, "fzf")
+
   telescope.setup({
     defaults = {
       prompt_prefix = " ",
@@ -25,7 +27,7 @@ function M.setup()
           ["<esc>"] = actions.close,
           ["<C-j>"] = actions.move_selection_next,
           ["<C-k>"] = actions.move_selection_previous,
-          ["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
+          ["<C-q>"] = actions.send_to_qflist, actions.open_qflist,
         },
       },
     },
@@ -39,12 +41,22 @@ function M.setup()
         fuzzy = true,
         override_generic_sorter = true,
         override_file_sorter = true,
+        case_mode = "smart_case",
       },
     },
   })
 
   -- Load fzf extension if available
   pcall(telescope.load_extension, "fzf")
+
+  local sorter_ok, sorters = pcall(require, "telescope.sorters")
+  if sorter_ok and sorters.get_fzf_sorter then
+    telescope_config.defaults.sorter = sorters.get_fzf_sorter()
+  else
+    vim.notify("Telescope: FZF native sorter not available.", vim.log.level.WARN)
+  end
+
+  telescope.setup(telescope_config)
 end
 
 return M

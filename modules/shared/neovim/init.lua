@@ -62,6 +62,7 @@ vim.api.nvim_create_autocmd("User", {
   callback = function()
     -- Load plugins
     local plugins = {
+      "luasnip",
       "treesitter", "lsp", "completion", "telescope", "neo-tree",
       "lualine", "bufferline", "which-key", "noice", "indent-blankline", 
       "mini-pairs", "comment", "flash", "surround", "yanky", "trouble",

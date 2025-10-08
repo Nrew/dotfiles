@@ -21,7 +21,9 @@ let
     
     # LSP & completion
     nvim-lspconfig blink-cmp trouble-nvim
-    
+    luasnip
+    friendly-snippets
+
     # Treesitter with comprehensive parsers
     (nvim-treesitter.withPlugins (p: with p; [
       lua vim vimdoc query bash comment
