@@ -24,9 +24,6 @@
     # Catppuccin
     catppuccin.url = "github:catppuccin/nix";
 
-    # NixCats
-    nixCats.url = "github:BirdeeHub/nixCats-nvim";
-
     # Textfox
     textfox.url = "github:adriankarlen/textfox";
     

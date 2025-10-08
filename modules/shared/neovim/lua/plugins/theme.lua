@@ -31,7 +31,7 @@ local function get_palette()
     palette_loader = loader
   end
   
-  -- Get current palette (will read from JSON if available)
+  -- Get current palette (will read from file if available, fallback otherwise)
   return palette_loader.get()
 end
 
@@ -116,28 +116,32 @@ function M.setup()
   local config_home = vim.fn.expand(os.getenv("XDG_CONFIG_HOME") or "~/.config")
   local palette_file = config_home .. "/current-theme/nvim-palette.lua"
   
-  -- Initialize tracking
+  -- Initialize tracking with file check
   M._initialized = true
   local stat = vim.loop.fs_stat(palette_file)
   if stat then
     M._last_theme_mtime = stat.mtime.sec
+  else
+    M._last_theme_mtime = 0
   end
   
   -- Create a timer that checks for theme file changes
   local timer = vim.loop.new_timer()
-  timer:start(1000, 1000, vim.schedule_wrap(function()
-    local current_stat = vim.loop.fs_stat(palette_file)
-    if current_stat then
-      local current_mtime = current_stat.mtime.sec
-      if M._last_theme_mtime and M._last_theme_mtime < current_mtime then
-        M._last_theme_mtime = current_mtime
-        -- Reload theme immediately
-        palette_loader = nil
-        apply_theme()
-        vim.notify("Theme updated!", vim.log.levels.INFO)
+  if timer then
+    timer:start(1000, 1000, vim.schedule_wrap(function()
+      local current_stat = vim.loop.fs_stat(palette_file)
+      if current_stat then
+        local current_mtime = current_stat.mtime.sec
+        if M._last_theme_mtime and M._last_theme_mtime < current_mtime then
+          M._last_theme_mtime = current_mtime
+          -- Reload theme immediately
+          palette_loader = nil
+          apply_theme()
+          vim.notify("Theme updated!", vim.log.levels.INFO)
+        end
       end
-    end
-  end))
+    end))
+  end
   
   -- Also check on focus/buffer enter as backup
   vim.api.nvim_create_autocmd({"FocusGained", "BufEnter"}, {

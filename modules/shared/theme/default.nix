@@ -170,13 +170,8 @@ in
         ]
       ) registry.available))
     ) // {
-      # Create symlinks to current theme (initial setup)
-      "current-theme/kitty.conf".source = 
-        config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/themes/${defaultVariant}/kitty.conf";
-      "current-theme/tmux.conf".source = 
-        config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/themes/${defaultVariant}/tmux.conf";
-      "current-theme/nvim-palette.lua".source = 
-        config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/themes/${defaultVariant}/nvim-palette.lua";
+      # Note: current-theme symlinks are managed by theme-switch script, not home-manager
+      # This avoids conflicts with mkOutOfStoreSymlink and home-manager's backup mechanism
       
       # Legacy palette.json for compatibility
       "theme/palette.json".text = builtins.toJSON {
@@ -268,6 +263,9 @@ in
         CURRENT_DIR="${config.xdg.configHome}/current-theme"
         VARIANT="$1"
         
+        # Ensure current-theme directory exists
+        mkdir -p "$CURRENT_DIR"
+        
         if [ -z "$VARIANT" ]; then
           echo "╔════════════════════════════════════════╗"
           echo "║       Available Themes                 ║"
@@ -339,83 +337,9 @@ EOF
         
         # macOS window manager reload
         pkill -SIGUSR1 barik 2>/dev/null || true
-        pkill -SIGUSR1 sketchybar 2>/dev/null || true
         
         echo "✅ Theme switched to: $VARIANT"
         echo "💡 Neovim will reload automatically"
-      '')
-       # Live wallpaper-based theme generation
-      (pkgs.writeShellScriptBin "theme-from-wallpaper" ''
-        #!/usr/bin/env bash
-        set -euo pipefail
-        
-        CONFIG_DIR="${config.xdg.configHome}"
-        THEME_DIR="$CONFIG_DIR/theme"
-        THEME_FILE="$THEME_DIR/current.json"
-        WALLPAPER_DIR="${cfg.wallpaperDir}"
-        
-        # Colors for UX
-        RED='\033[0;31m'
-        GREEN='\033[0;32m'
-        YELLOW='\033[1;33m'
-        BLUE='\033[0;34m'
-        NC='\033[0m'
-        
-        # Validate wallpaper directory exists
-        if [ ! -d "$WALLPAPER_DIR" ]; then
-          echo -e "''${RED}Error: Wallpaper directory not found: $WALLPAPER_DIR''${NC}" >&2
-          echo -e "''${YELLOW}Please create the directory or update theme.wallpaperDir''${NC}" >&2
-          exit 1
-        fi
-        
-        # If no arguments, use fzf to select wallpaper
-        if [ $# -eq 0 ]; then
-          cd "$WALLPAPER_DIR"
-          
-          IMAGES=$(${pkgs.findutils}/bin/find . -type f \
-            \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null)
-          
-          if [ -z "$IMAGES" ]; then
-            echo -e "''${YELLOW}No images found in $WALLPAPER_DIR''${NC}"
-            exit 0
-          fi
-          
-          SELECTED=$(echo "$IMAGES" | sed 's|^./||' | ${pkgs.fzf}/bin/fzf \
-            --height=100% \
-            --border=rounded \
-            --prompt="🖼️  Select wallpaper: " \
-            --preview="${pkgs.imagemagick}/bin/identify -verbose {} | head -20" \
-            --preview-window=right:50%) || exit 0
-          
-          if [ -z "$SELECTED" ]; then
-            exit 0
-          fi
-          
-          WALLPAPER="$WALLPAPER_DIR/$SELECTED"
-        else
-          WALLPAPER="$1"
-          if [ ! -f "$WALLPAPER" ]; then
-            echo -e "''${RED}Error: Wallpaper not found: $WALLPAPER''${NC}" >&2
-            exit 1
-          fi
-        fi
-        
-        echo -e "''${BLUE}🎨 Extracting theme from wallpaper...''${NC}"
-        
-        # Use gowall to extract theme and set wallpaper
-        ${pkgs.gowall}/bin/gowall "$WALLPAPER"
-        
-        # TODO: Extract colors from gowall output and create custom theme
-        # For now, we'll use a default theme
-        # In the future, gowall should output JSON with extracted colors
-        
-        echo -e "''${GREEN}✅ Wallpaper and theme applied''${NC}"
-        echo -e "''${YELLOW}💡 Color extraction from gowall will be implemented in the future''${NC}"
-        
-        # Reload applications
-        killall -SIGUSR1 kitty 2>/dev/null || true
-        tmux source-file "$CONFIG_DIR/tmux/tmux.conf" 2>/dev/null || true
-        pkill -SIGUSR1 barik 2>/dev/null || true
       '')
       (pkgs.writeShellScriptBin "theme-cycle" ''
         #!/usr/bin/env bash
@@ -532,10 +456,61 @@ EOF
       '')
     ];
     
+    # Initialize theme on first activation or if missing
+    home.activation.initializeTheme = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      THEME_DIR="${config.xdg.configHome}/themes"
+      CURRENT_DIR="${config.xdg.configHome}/current-theme"
+      THEME_STATE="${config.xdg.configHome}/theme"
+      DEFAULT_VARIANT="${defaultVariant}"
+      
+      # Ensure directories exist
+      $DRY_RUN_CMD mkdir -p "$CURRENT_DIR"
+      $DRY_RUN_CMD mkdir -p "$THEME_STATE"
+      
+      # Function to create or fix symlink
+      ensure_symlink() {
+        local target="$1"
+        local link="$2"
+        local name="$3"
+        
+        if [ ! -e "$target" ]; then
+          $VERBOSE_ECHO "Warning: Theme file not found: $target"
+          return 1
+        fi
+        
+        # Remove broken symlink or regular file
+        if [ -L "$link" ] && [ ! -e "$link" ]; then
+          $VERBOSE_ECHO "Removing broken symlink: $link"
+          $DRY_RUN_CMD rm "$link"
+        elif [ -f "$link" ] && [ ! -L "$link" ]; then
+          $VERBOSE_ECHO "Backing up regular file: $link → $link.backup"
+          $DRY_RUN_CMD mv "$link" "$link.backup"
+        fi
+        
+        # Create symlink if it doesn't exist or points to wrong target
+        if [ ! -L "$link" ] || [ "$(readlink "$link")" != "$target" ]; then
+          $VERBOSE_ECHO "Creating symlink: $link → $target"
+          $DRY_RUN_CMD ln -sf "$target" "$link"
+        fi
+      }
+      
+      # Initialize theme symlinks
+      ensure_symlink "$THEME_DIR/$DEFAULT_VARIANT/kitty.conf" "$CURRENT_DIR/kitty.conf" "Kitty"
+      ensure_symlink "$THEME_DIR/$DEFAULT_VARIANT/tmux.conf" "$CURRENT_DIR/tmux.conf" "Tmux"
+      ensure_symlink "$THEME_DIR/$DEFAULT_VARIANT/nvim-palette.lua" "$CURRENT_DIR/nvim-palette.lua" "Neovim"
+      
+      # Initialize theme state file with current theme name
+      if [ ! -f "$THEME_STATE/current" ]; then
+        $VERBOSE_ECHO "Initializing theme state: $DEFAULT_VARIANT"
+        $DRY_RUN_CMD echo "$DEFAULT_VARIANT" > "$THEME_STATE/current"
+      fi
+      
+      $VERBOSE_ECHO "Theme initialization complete (default: $DEFAULT_VARIANT)"
+    '';
+    
     # Shell aliases for convenience
     home.shellAliases = {
-      wp = "theme-from-wallpaper";
-      wallpaper = "theme-from-wallpaper";
+      # Theme switching aliases removed - use 'theme-switch <name>' or 'theme-cycle' directly
     };
   };
 }
