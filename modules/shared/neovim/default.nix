@@ -26,7 +26,7 @@ let
 
     # Treesitter with comprehensive parsers
     (nvim-treesitter.withPlugins (p: with p; [
-      lua vim vimdoc query bash comment
+      lua vim vimdoc query bash comment regex
       html css javascript typescript tsx
       python rust go nix c cpp make
       json json5 yaml toml markdown markdown_inline
