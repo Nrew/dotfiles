@@ -337,7 +337,6 @@ EOF
         
         # macOS window manager reload
         pkill -SIGUSR1 barik 2>/dev/null || true
-        pkill -SIGUSR1 sketchybar 2>/dev/null || true
         
         echo "✅ Theme switched to: $VARIANT"
         echo "💡 Neovim will reload automatically"

@@ -105,7 +105,6 @@ let user = "nrew"; in
 
     fonts = {
         packages = with pkgs; [
-            sketchybar-app-font
             source-code-pro
         ];
     };
