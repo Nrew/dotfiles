@@ -170,13 +170,8 @@ in
         ]
       ) registry.available))
     ) // {
-      # Create symlinks to current theme (initial setup)
-      "current-theme/kitty.conf".source = 
-        config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/themes/${defaultVariant}/kitty.conf";
-      "current-theme/tmux.conf".source = 
-        config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/themes/${defaultVariant}/tmux.conf";
-      "current-theme/nvim-palette.lua".source = 
-        config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/themes/${defaultVariant}/nvim-palette.lua";
+      # Note: current-theme symlinks are managed by theme-switch script, not home-manager
+      # This avoids conflicts with mkOutOfStoreSymlink and home-manager's backup mechanism
       
       # Legacy palette.json for compatibility
       "theme/palette.json".text = builtins.toJSON {
@@ -267,6 +262,9 @@ in
         THEME_DIR="${config.xdg.configHome}/themes"
         CURRENT_DIR="${config.xdg.configHome}/current-theme"
         VARIANT="$1"
+        
+        # Ensure current-theme directory exists
+        mkdir -p "$CURRENT_DIR"
         
         if [ -z "$VARIANT" ]; then
           echo "╔════════════════════════════════════════╗"
@@ -531,6 +529,35 @@ EOF
         echo ""
       '')
     ];
+    
+    # Initialize theme on first activation or if missing
+    home.activation.initializeTheme = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      THEME_DIR="${config.xdg.configHome}/themes"
+      CURRENT_DIR="${config.xdg.configHome}/current-theme"
+      DEFAULT_VARIANT="${defaultVariant}"
+      
+      # Create current-theme directory if it doesn't exist
+      $DRY_RUN_CMD mkdir -p "$CURRENT_DIR"
+      
+      # Initialize symlinks if they don't exist
+      if [ ! -L "$CURRENT_DIR/kitty.conf" ] || [ ! -e "$CURRENT_DIR/kitty.conf" ]; then
+        $DRY_RUN_CMD ln -sf "$THEME_DIR/$DEFAULT_VARIANT/kitty.conf" "$CURRENT_DIR/kitty.conf"
+      fi
+      
+      if [ ! -L "$CURRENT_DIR/tmux.conf" ] || [ ! -e "$CURRENT_DIR/tmux.conf" ]; then
+        $DRY_RUN_CMD ln -sf "$THEME_DIR/$DEFAULT_VARIANT/tmux.conf" "$CURRENT_DIR/tmux.conf"
+      fi
+      
+      if [ ! -L "$CURRENT_DIR/nvim-palette.lua" ] || [ ! -e "$CURRENT_DIR/nvim-palette.lua" ]; then
+        $DRY_RUN_CMD ln -sf "$THEME_DIR/$DEFAULT_VARIANT/nvim-palette.lua" "$CURRENT_DIR/nvim-palette.lua"
+      fi
+      
+      # Initialize theme state file if it doesn't exist
+      if [ ! -f "${config.xdg.configHome}/theme/current" ]; then
+        $DRY_RUN_CMD mkdir -p "${config.xdg.configHome}/theme"
+        $DRY_RUN_CMD echo "$DEFAULT_VARIANT" > "${config.xdg.configHome}/theme/current"
+      fi
+    '';
     
     # Shell aliases for convenience
     home.shellAliases = {
