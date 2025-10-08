@@ -2,6 +2,15 @@ require("core.options")
 require("core.keymaps")
 require("core.autocmds")
 
+-- Load theme first (it sets up the colorscheme)
+local theme_ok, theme_err = pcall(require, "plugins.theme")
+if theme_ok and theme.setup then
+  theme.setup()
+else
+  vim.notify("Failed to load theme: " .. tostring(theme_err), vim.log.levels.WARN)
+end
+
+-- Plugin loading with better error handling
 local loaded = {}
 local failed = {}
 
@@ -44,30 +53,54 @@ local function show_results()
   table.sort(loaded_list)
   table.sort(failed_list)
 
-  local message = string.format(
-    "Plugin Loading Results:\n\nLoaded (%d): \n%s\n\nFailed (%d): \n%s",
-    #loaded_list,
-    #loaded_list > 0 and "✔ " .. table.concat(loaded_list, "\n✔ ") or "None",
-    #failed_list,
-    #failed_list > 0 and "✘ " .. table.concat(failed_list, "\n✘ ") or "None"
-  )
-
-  vim.notify(message, vim.log.levels.INFO, { title = "Plugin Loader" })
+  if #failed_list > 0 then
+    local message = string.format(
+      "Plugin Loading Complete\n\n✔ Loaded %d plugins\n✘ Failed %d plugins:\n  %s",
+      #loaded_list,
+      #failed_list,
+      table.concat(failed_list, "\n  ")
+    )
+    vim.notify(message, vim.log.levels.WARN, { title = "NixCats Neovim" })
+  else
+    vim.notify(
+      string.format("✔ Successfully loaded %d plugins", #loaded_list),
+      vim.log.levels.INFO,
+      { title = "NixCats Neovim" }
+    )
+  end
 end
 
-load_plugin("theme")
-
+-- Defer plugin loading to improve startup time
 vim.api.nvim_create_autocmd("User", {
   pattern = "DeferredUIEnter",
   callback = function()
-    -- Load plugins
+    -- Load plugins in order of dependency
     local plugins = {
-      "luasnip",
-      "treesitter", "lsp", "completion", "telescope", "neo-tree",
-      "lualine", "bufferline", "which-key", "noice", "indent-blankline", 
-      "mini-pairs", "comment", "flash", "surround", "yanky", "trouble",
-      "todo-comments", "gitsigns", "lazygit", "project", "persistence", "yazi",
-      "mini-icons", "stabilize"
+      "luasnip",           -- Snippets first (completion depends on it)
+      "treesitter",        -- Syntax highlighting
+      "lsp",               -- LSP configuration
+      "completion",        -- Completion (depends on LSP and snippets)
+      "telescope",         -- Fuzzy finder
+      "neo-tree",          -- File explorer
+      "lualine",           -- Status line
+      "bufferline",        -- Buffer line
+      "which-key",         -- Key hints
+      "noice",             -- UI enhancements
+      "indent-blankline",  -- Indent guides
+      "mini-pairs",        -- Auto pairs
+      "comment",           -- Comment plugin
+      "flash",             -- Jump plugin
+      "surround",          -- Surround plugin
+      "yanky",             -- Yank ring
+      "trouble",           -- Diagnostics list
+      "todo-comments",     -- TODO comments
+      "gitsigns",          -- Git signs
+      "lazygit",           -- LazyGit integration
+      "project",           -- Project management
+      "persistence",       -- Session persistence
+      "yazi",              -- Yazi file manager
+      "mini-icons",        -- Icons
+      "stabilize",         -- Stabilize windows
     }
 
     for _, plugin in ipairs(plugins) do
@@ -78,8 +111,9 @@ vim.api.nvim_create_autocmd("User", {
   end,
 })
 
+-- Trigger deferred loading
 vim.defer_fn(function()
   vim.api.nvim_exec_autocmds("User", { pattern = "DeferredUIEnter" })
 end, 50)
 
-vim.notify("NixCats Neovim ready", vim.log.levels.INFO)
+vim.notify("NixCats Neovim initializing...", vim.log.levels.INFO)
