@@ -65,7 +65,8 @@ vim.api.nvim_create_autocmd("User", {
       "treesitter", "lsp", "completion", "telescope", "neo-tree",
       "lualine", "bufferline", "which-key", "noice", "indent-blankline", 
       "mini-pairs", "comment", "flash", "surround", "yanky", "trouble",
-      "todo-comments", "gitsigns", "lazygit", "project", "persistence", "yazi"
+      "todo-comments", "gitsigns", "lazygit", "project", "persistence", "yazi",
+      "mini-icons", "stabilize"
     }
 
     for _, plugin in ipairs(plugins) do

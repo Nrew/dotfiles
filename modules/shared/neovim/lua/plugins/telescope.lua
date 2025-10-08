@@ -19,6 +19,7 @@ function M.setup()
         height = 0.8,
       },
       file_ignore_patterns = { "%.git/", "node_modules/", "__pycache__/" },
+      sorter = require("telescope.sorters").get_fzf_sorter(),
       mappings = {
         i = {
           ["<esc>"] = actions.close,

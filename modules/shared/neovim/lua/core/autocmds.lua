@@ -76,3 +76,31 @@ autocmd("BufWritePre", {
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
   end,
 })
+
+local format_augroup = vim.api.nvim_create_augroup("FormatOnSave", { clear = true })
+autocmd("BufWritePre", {
+  group = format_augroup,
+  pattern = "*",
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+
+    if client and client.server_capabilities.documentFormattingProvider then
+      vim.lsp.buf.format({
+        bufnr = args.buf,
+        async = false,
+      })
+    end
+  end,
+})
+
+local lsp_attach_augroup = vim.api.nvim_create_augroup("LspAttachEnhancements", { clear = true })
+autocmd("LspAttach", {
+  group = lsp_attach_augroup,
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+
+    if client and client.server_capabilities.inlayHintProvider then
+      vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
+    end
+  end,
+})

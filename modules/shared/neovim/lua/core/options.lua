@@ -58,8 +58,6 @@ opt.completeopt = { "menuone", "noselect" }
 opt.pumblend = 10  -- Pseudo-transparency for popup menu
 
 -- Folding
-opt.foldmethod = "expr"
-opt.foldexpr = "nvim_treesitter#foldexpr()"
 opt.foldlevel = 99
 opt.foldenable = true
 

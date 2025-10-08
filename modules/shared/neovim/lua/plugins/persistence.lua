@@ -9,7 +9,13 @@ function M.setup()
     options = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp" },
     pre_save = nil,
     save_empty = false,
+    autosave = {
+      current = true,
+      on_quit = true,
+    },
+    autoload = true,
   })
+
 
   -- Keymaps
   vim.keymap.set("n", "<leader>qs", function() persistence.load() end, { desc = "Restore Session" })

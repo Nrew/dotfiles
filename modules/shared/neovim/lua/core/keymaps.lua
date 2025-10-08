@@ -42,8 +42,6 @@ map("n", "<leader>-", "<C-W>s", { desc = "Split below" })
 map("n", "<leader>|", "<C-W>v", { desc = "Split right" })
 
 -- Buffers
-map("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
-map("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
 map("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to other buffer" })
 
 -- Diagnostics
@@ -56,6 +54,7 @@ map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 
 -- File explorer
 map("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle file explorer" })
+map("n", "<leader>E", "<cmd>Neotree focus<cr>", { desc = "Reveal file in explorer" })
 
 -- Telescope
 map("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "Find files" })

@@ -7,6 +7,7 @@ let
   coreTools = with pkgs; [
     ripgrep fd curl unzip git tree-sitter
     lazygit prettierd stylua nixfmt-rfc-style
+    yazi
   ];
 
   # Essential plugins with preserved functionality

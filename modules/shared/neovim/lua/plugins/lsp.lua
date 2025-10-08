@@ -4,7 +4,7 @@ local function has_category(cat)
   return type(_G.nixCats) == "function" and _G.nixCats(cat) or false
 end
 
-local function setup_keymaps(_, bufnr)
+local function on_attach(client, bufnr)
   local map = vim.keymap.set
   local opts = { buffer = bufnr, silent = true }
 
@@ -18,6 +18,10 @@ local function setup_keymaps(_, bufnr)
   map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
   map("n", "gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "References" }))
   map("n", "<leader>cf", function() vim.lsp.buf.format({ async = true }) end, vim.tbl_extend("force", opts, { desc = "Format code" }))
+
+  if client.server_capabilities.inlayHintProvider then
+    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+  end
 end
 
 function M.setup()
@@ -29,13 +33,11 @@ function M.setup()
 
   local capabilities = vim.lsp.protocol.make_client_capabilities()
 
-  -- Enhance capabilities with blink.cmp if available
   local blink_ok, blink = pcall(require, "blink.cmp")
   if blink_ok and blink.get_lsp_capabilities then
     capabilities = blink.get_lsp_capabilities(capabilities)
   end
 
-  -- Enable snippet support
   capabilities.textDocument.completion.completionItem.snippetSupport = true
   capabilities.textDocument.completion.completionItem.resolveSupport = {
     properties = { "documentation", "detail", "additionalTextEdits" }
@@ -53,14 +55,14 @@ function M.setup()
             checkThirdParty = false
           },
           telemetry = { enable = false },
-          format = { enable = false }, -- Use stylua instead
+          format = { enable = false },
         },
       },
     },
     nixd = {
       condition = has_category("nix"),
-      settings = { 
-        nixd = { 
+      settings = {
+        nixd = {
           nixpkgs = { 
             expr = _G.nixCats("nixdExtras.nixpkgs") or "import <nixpkgs> { }"
           },
@@ -78,14 +80,14 @@ function M.setup()
               expr = string.format('(builtins.getFlake "%s/.config/dotfiles").homeConfigurations.default.options', vim.env.HOME)
             }
           }
-        } 
+        }
       },
     },
     tsserver = {
       condition = has_category("typescript"),
       on_attach = function(client, bufnr)
         client.server_capabilities.documentFormattingProvider = false
-        setup_keymaps(client, bufnr)
+        on_attach(client, bufnr)
       end,
     },
     pyright = {
@@ -96,8 +98,8 @@ function M.setup()
             typeCheckingMode = "basic",
             autoSearchPaths = true,
             useLibraryCodeForTypes = true,
-          } 
-        } 
+          }
+        }
       },
     },
     rust_analyzer = {
@@ -106,17 +108,17 @@ function M.setup()
         ["rust-analyzer"] = { 
           cargo = { allFeatures = true },
           checkOnSave = { command = "clippy" },
-        } 
+        }
       },
     },
     gopls = {
       condition = has_category("go"),
       settings = { 
         gopls = { 
-          analyses = { unusedparams = true }, 
+          analyses = { unusedparams = true },
           staticcheck = true,
           gofumpt = true,
-        } 
+        }
       },
     },
     clangd = {
@@ -132,14 +134,14 @@ function M.setup()
     if config.condition then
       lspconfig[server].setup({
         capabilities = config.capabilities or capabilities,
-        on_attach = config.on_attach or setup_keymaps,
+        on_attach = config.on_attach or on_attach,
         settings = config.settings,
         cmd = config.cmd,
       })
     end
   end
 
-  -- Diagnostics
+  -- Diagnostics Configuration
   vim.diagnostic.config({
     virtual_text = { prefix = "●", source = "if_many" },
     float = { source = "always", border = "rounded" },
@@ -150,12 +152,12 @@ function M.setup()
   })
 
   -- LSP diagnostic signs
-  local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+  local signs = { Error = "", Warn = "", Hint = "", Info = "" }
   for type, icon in pairs(signs) do
-    vim.fn.sign_define("DiagnosticSign" .. type, { text = icon, texthl = "DiagnosticSign" .. type })
+    local hl = "DiagnosticSign" .. type
+    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
   end
 
-  -- Handlers
   vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
   vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 end

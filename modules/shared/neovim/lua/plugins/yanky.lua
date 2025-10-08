@@ -5,7 +5,7 @@ function M.setup()
   if not ok then return end
 
   yanky.setup({
-    ring = { 
+    ring = {
       history_length = 100, 
       storage = "shada", 
       sync_with_numbered_registers = true, 
@@ -29,6 +29,10 @@ function M.setup()
   vim.keymap.set("n", "<c-n>", "<Plug>(YankyNextEntry)", { desc = "Next yank" })
   vim.keymap.set("n", "]p", "<Plug>(YankyPutIndentAfterLinewise)", { desc = "Put indent after" })
   vim.keymap.set("n", "[p", "<Plug>(YankyPutIndentBeforeLinewise)", { desc = "Put indent before" })
+
+  vim.keymap.set("n", "<leader>py", function()
+    require("telescope").extensions.yanky_history.yanky_history({})
+  end, { desc = "Yank History" })
 end
 
 return M

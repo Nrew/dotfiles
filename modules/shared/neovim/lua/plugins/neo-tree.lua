@@ -12,13 +12,6 @@ function M.setup()
 
     default_component_configs = {
       indent = { indent_size = 2, padding = 1 },
-      icon = { folder_closed = "", folder_open = "", folder_empty = "" },
-      git_status = {
-        symbols = {
-          added = "", modified = "", deleted = "✖", renamed = "󰁕",
-          untracked = "", ignored = "", unstaged = "󰄱", staged = "",
-        },
-      },
     },
 
     window = {
