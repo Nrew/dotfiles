@@ -161,9 +161,7 @@ require("lazy").setup({
   -- Lazy.nvim configuration
   dev = {
     -- Use plugins from runtimepath (Nix-installed)
-    path = function(plugin)
-      return nil  -- Let lazy.nvim find plugins in runtimepath
-    end,
+    -- Don't set a custom path - let lazy.nvim find plugins in runtimepath
     fallback = true,
   },
   install = {
