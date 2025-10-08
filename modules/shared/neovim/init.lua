@@ -149,8 +149,8 @@ require("lazy").setup({
 }, {
   -- Lazy.nvim configuration
   install = {
-    -- Install missing plugins automatically
-    missing = true,
+    -- Don't install plugins, they're managed by Nix
+    missing = false,
   },
   ui = {
     border = "rounded",
