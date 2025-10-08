@@ -156,6 +156,10 @@ require("lazy").setup({
     -- Don't check for updates, Nix manages versions
     enabled = false,
   },
+  rocks = {
+    -- Disable luarocks support, not needed with Nix-managed plugins
+    enabled = false,
+  },
   ui = {
     border = "rounded",
   },
