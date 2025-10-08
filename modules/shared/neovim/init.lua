@@ -3,11 +3,14 @@ require("core.keymaps")
 require("core.autocmds")
 
 -- Load theme first (it sets up the colorscheme)
-local theme_ok, theme_err = pcall(require, "plugins.theme")
-if theme_ok and theme.setup then
-  theme.setup()
+local theme_ok, theme = pcall(require, "plugins.theme")
+if theme_ok and type(theme.setup) == "function" then
+  local setup_ok, setup_err = pcall(theme.setup)
+  if not setup_ok then
+    vim.notify("Failed to setup theme: " .. tostring(setup_err), vim.log.levels.WARN)
+  end
 else
-  vim.notify("Failed to load theme: " .. tostring(theme_err), vim.log.levels.WARN)
+  vim.notify("Theme module not found or invalid", vim.log.levels.WARN)
 end
 
 -- Plugin loading with better error handling
