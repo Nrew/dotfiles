@@ -1,9 +1,5 @@
 local M = {}
 
-local function has_category(cat)
-  return type(_G.nixCats) == "function" and _G.nixCats(cat) or false
-end
-
 local function on_attach(client, bufnr)
   local map = vim.keymap.set
   local opts = { buffer = bufnr, silent = true }
@@ -45,11 +41,10 @@ function M.setup()
 
   local servers = {
     lua_ls = {
-      condition = has_category("lua"),
       settings = {
         Lua = {
           runtime = { version = "LuaJIT" },
-          diagnostics = { globals = { "vim", "nixCats" } },
+          diagnostics = { globals = { "vim" } },
           workspace = {
             library = vim.api.nvim_get_runtime_file("", true),
             checkThirdParty = false
@@ -60,11 +55,10 @@ function M.setup()
       },
     },
     nixd = {
-      condition = has_category("nix"),
       settings = {
         nixd = {
           nixpkgs = { 
-            expr = _G.nixCats("nixdExtras.nixpkgs") or "import <nixpkgs> { }"
+            expr = "import <nixpkgs> { }"
           },
           formatting = {
             command = { "nixfmt" }
@@ -84,14 +78,12 @@ function M.setup()
       },
     },
     tsserver = {
-      condition = has_category("typescript"),
       on_attach = function(client, bufnr)
         client.server_capabilities.documentFormattingProvider = false
         on_attach(client, bufnr)
       end,
     },
     pyright = {
-      condition = has_category("python"),
       settings = { 
         python = { 
           analysis = { 
@@ -103,7 +95,6 @@ function M.setup()
       },
     },
     rust_analyzer = {
-      condition = has_category("rust"),
       settings = { 
         ["rust-analyzer"] = { 
           cargo = { allFeatures = true },
@@ -112,7 +103,6 @@ function M.setup()
       },
     },
     gopls = {
-      condition = has_category("go"),
       settings = { 
         gopls = { 
           analyses = { unusedparams = true },
@@ -122,7 +112,6 @@ function M.setup()
       },
     },
     clangd = {
-      condition = has_category("c"),
       cmd = { "clangd", "--background-index", "--clang-tidy" },
       capabilities = vim.tbl_deep_extend("force", capabilities, {
         offsetEncoding = { "utf-16" }
@@ -131,14 +120,12 @@ function M.setup()
   }
 
   for server, config in pairs(servers) do
-    if config.condition then
-      lspconfig[server].setup({
-        capabilities = config.capabilities or capabilities,
-        on_attach = config.on_attach or on_attach,
-        settings = config.settings,
-        cmd = config.cmd,
-      })
-    end
+    lspconfig[server].setup({
+      capabilities = config.capabilities or capabilities,
+      on_attach = config.on_attach or on_attach,
+      settings = config.settings,
+      cmd = config.cmd,
+    })
   end
 
   -- Diagnostics Configuration
