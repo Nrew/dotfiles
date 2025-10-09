@@ -21,7 +21,7 @@ let
     neo-tree-nvim nvim-window-picker which-key-nvim
     
     # LSP & completion
-    nvim-lspconfig blink-cmp trouble-nvim
+    blink-cmp trouble-nvim
     luasnip friendly-snippets
 
     # Treesitter with all grammars
@@ -335,8 +335,8 @@ in {
       packageNames = [ "nvim" ];
       luaPath = ./.;
 
-      categoryDefinitions.replace = ({ pkgs, ... }: {
-        lspsAndRuntimeDep = {
+      categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {
+        lspsAndRuntimeDeps = {
           general = coreTools;
         } // languageServers;
 
@@ -361,7 +361,7 @@ in {
             hosts.node.enable = true;
           };
 
-          catagories = {
+          categories = {
             general = true;
             lua = true;
             nix = true;
