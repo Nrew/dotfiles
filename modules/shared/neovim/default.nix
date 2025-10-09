@@ -335,7 +335,7 @@ in {
       packageNames = [ "nvim" ];
       luaPath = ./.;
 
-      categoryDefinitions.replace = ({ pkgs, ... }: {
+      categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {
         lspsAndRuntimeDep = {
           general = coreTools;
         } // languageServers;
@@ -361,7 +361,7 @@ in {
             hosts.node.enable = true;
           };
 
-          catagories = {
+          categories = {
             general = true;
             lua = true;
             nix = true;
