@@ -146,7 +146,10 @@ require("lazy").setup({
 }, {
   -- Lazy.nvim configuration
   pkg = {
-    enabled = false,  -- Disable package management, Nix handles this
+    enabled = true,  -- Re-enable but configure for Nix
+    sources = {
+      "lazy",  -- Only use lazy source (runtimepath)
+    },
   },
   install = {
     -- Don't install plugins, they're managed by Nix
