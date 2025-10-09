@@ -336,7 +336,7 @@ in {
       luaPath = ./.;
 
       categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {
-        lspsAndRuntimeDep = {
+        lspsAndRuntimeDeps = {
           general = coreTools;
         } // languageServers;
 
