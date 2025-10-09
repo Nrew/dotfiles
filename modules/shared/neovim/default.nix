@@ -122,12 +122,9 @@ let
   # Helper function to create lazy.nvim plugin entries with dir
   mkEntryFromDrv = drv:
     if lib.isDerivation drv then
-      { name = "${lib.getName drv}"; path = drv; }
+      { name = "${lib.getName drv}"; path = "${drv}"; }
     else
       drv;
-
-  # Convert plugins to lazy.nvim format with paths
-  lazyPath = p: "{ dir = '${mkEntryFromDrv p.path}' }";
 
 in {
   config = {

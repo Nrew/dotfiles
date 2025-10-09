@@ -7,9 +7,14 @@ require("core.autocmds")
 local nix_plugins = vim.g.nix_lazy_plugins or {}
 
 -- Create a lookup table for plugin paths
+-- Convert Nix package names (with-dashes) to match GitHub-style names (with.dots)
 local plugin_paths = {}
 for _, plugin in ipairs(nix_plugins) do
+  -- Store with original name
   plugin_paths[plugin.name] = plugin.dir
+  -- Also store with dots instead of dashes for matching
+  local name_with_dots = plugin.name:gsub("%-", ".")
+  plugin_paths[name_with_dots] = plugin.dir
 end
 
 -- Helper to add dir to plugin spec
