@@ -3,12 +3,29 @@ require("core.options")
 require("core.keymaps")
 require("core.autocmds")
 
--- Setup lazy.nvim
-require("lazy").setup({
+-- nixCats: Get plugin specs from Nix (with dir paths to Nix store)
+local nix_plugins = vim.g.lazy_nix_plugins or {}
+
+-- Create lookup table from Nix plugins
+local nix_lookup = {}
+for _, spec in ipairs(nix_plugins) do
+  nix_lookup[spec.name] = spec
+end
+
+-- Helper to find and merge Nix spec
+local function with_nix(name, config)
+  local nix_spec = nix_lookup[name] or nix_lookup[name:gsub("%.", "-")]
+  if nix_spec then
+    return vim.tbl_extend("force", { dir = nix_spec.dir, name = nix_spec.name }, config or {})
+  end
+  return config or { name }
+end
+
+-- Define all plugin configurations
+local plugins = {
   -- Theme & UI
-  {
-    "nvim-telescope/telescope.nvim",
-    dependencies = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope-fzf-native.nvim" },
+  with_nix("telescope-nvim", {
+    dependencies = { "plenary.nvim", "telescope-fzf-native.nvim" },
     config = function() require("plugins.telescope").setup() end,
     cmd = "Telescope",
     keys = {
@@ -16,126 +33,170 @@ require("lazy").setup({
       { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
       { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
     },
-  },
+  }),
   
-  {
-    "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+  with_nix("lualine-nvim", {
+    dependencies = { "nvim-web-devicons" },
     config = function() require("plugins.lualine").setup() end,
     event = "VeryLazy",
-  },
+  }),
   
-  {
-    "akinsho/bufferline.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+  with_nix("bufferline-nvim", {
+    dependencies = { "nvim-web-devicons" },
     config = function() require("plugins.bufferline").setup() end,
     event = "VeryLazy",
-  },
+  }),
   
   -- File management & navigation
-  {
-    "nvim-neo-tree/neo-tree.nvim",
+  with_nix("neo-tree-nvim", {
     dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons",
-      "MunifTanjim/nui.nvim",
-      "s1n7ax/nvim-window-picker",
+      "plenary-nvim",
+      "nvim-web-devicons",
+      "nui-nvim",
+      "nvim-window-picker",
     },
     config = function() require("plugins.neo-tree").setup() end,
     cmd = "Neotree",
     keys = {
       { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "Toggle Neotree" },
     },
-  },
+  }),
   
-  {
-    "folke/which-key.nvim",
+  with_nix("which-key-nvim", {
     config = function() require("plugins.which-key").setup() end,
     event = "VeryLazy",
-  },
+  }),
   
   -- LSP & completion
-  {
-    "neovim/nvim-lspconfig",
-    dependencies = { "saghen/blink.cmp" },
+  with_nix("nvim-lspconfig", {
+    dependencies = { "blink-cmp" },
     config = function() require("plugins.lsp").setup() end,
     event = { "BufReadPre", "BufNewFile" },
-  },
+  }),
   
-  {
-    "saghen/blink.cmp",
-    dependencies = { "L3MON4D3/LuaSnip", "rafamadriz/friendly-snippets" },
+  with_nix("blink-cmp", {
+    dependencies = { "luasnip", "friendly-snippets" },
     config = function() require("plugins.completion").setup() end,
     event = "InsertEnter",
-  },
+  }),
   
-  {
-    "folke/trouble.nvim",
+  with_nix("trouble-nvim", {
     config = function() require("plugins.trouble").setup() end,
     cmd = "Trouble",
-  },
+  }),
   
-  { "L3MON4D3/LuaSnip", config = function() require("plugins.luasnip").setup() end },
-  { "rafamadriz/friendly-snippets" },
+  with_nix("luasnip", {
+    config = function() require("plugins.luasnip").setup() end,
+  }),
+  
+  with_nix("friendly-snippets", {}),
   
   -- Treesitter
-  {
-    "nvim-treesitter/nvim-treesitter",
+  with_nix("nvim-treesitter", {
     dependencies = {
-      "nvim-treesitter/nvim-treesitter-context",
-      "windwp/nvim-ts-autotag",
-      "nvim-treesitter/nvim-treesitter-textobjects",
+      "nvim-treesitter-context",
+      "nvim-ts-autotag",
+      "nvim-treesitter-textobjects",
     },
     config = function() require("plugins.treesitter").setup() end,
     event = { "BufReadPost", "BufNewFile" },
-  },
+  }),
   
   -- Editing enhancements
-  { "numToStr/Comment.nvim", config = function() require("plugins.comment").setup() end, event = "VeryLazy" },
-  { "kylechui/nvim-surround", config = function() require("plugins.surround").setup() end, event = "VeryLazy" },
-  { "folke/flash.nvim", config = function() require("plugins.flash").setup() end, event = "VeryLazy" },
-  { "echasnovski/mini.pairs", config = function() require("plugins.mini-pairs").setup() end, event = "InsertEnter" },
-  { "gbprod/yanky.nvim", config = function() require("plugins.yanky").setup() end, event = "VeryLazy" },
+  with_nix("comment-nvim", {
+    config = function() require("plugins.comment").setup() end,
+    event = "VeryLazy",
+  }),
+  
+  with_nix("nvim-surround", {
+    config = function() require("plugins.surround").setup() end,
+    event = "VeryLazy",
+  }),
+  
+  with_nix("flash-nvim", {
+    config = function() require("plugins.flash").setup() end,
+    event = "VeryLazy",
+  }),
+  
+  with_nix("mini-pairs", {
+    config = function() require("plugins.mini-pairs").setup() end,
+    event = "InsertEnter",
+  }),
+  
+  with_nix("yanky-nvim", {
+    config = function() require("plugins.yanky").setup() end,
+    event = "VeryLazy",
+  }),
   
   -- Visual improvements
-  { "lukas-reineke/indent-blankline.nvim", config = function() require("plugins.indent-blankline").setup() end, event = "BufReadPost" },
-  {
-    "folke/noice.nvim",
-    dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
+  with_nix("indent-blankline-nvim", {
+    config = function() require("plugins.indent-blankline").setup() end,
+    event = "BufReadPost",
+  }),
+  
+  with_nix("noice-nvim", {
+    dependencies = { "nui-nvim", "nvim-notify" },
     config = function() require("plugins.noice").setup() end,
     event = "VeryLazy",
-  },
-  { "stevearc/dressing.nvim", event = "VeryLazy" },
+  }),
+  
+  with_nix("dressing-nvim", {
+    event = "VeryLazy",
+  }),
   
   -- Git integration
-  { "lewis6991/gitsigns.nvim", config = function() require("plugins.gitsigns").setup() end, event = "BufReadPre" },
-  { "kdheepak/lazygit.nvim", config = function() require("plugins.lazygit").setup() end, cmd = "LazyGit" },
+  with_nix("gitsigns-nvim", {
+    config = function() require("plugins.gitsigns").setup() end,
+    event = "BufReadPre",
+  }),
+  
+  with_nix("lazygit-nvim", {
+    config = function() require("plugins.lazygit").setup() end,
+    cmd = "LazyGit",
+  }),
   
   -- Development tools
-  { "folke/todo-comments.nvim", config = function() require("plugins.todo-comments").setup() end, event = "BufReadPost" },
+  with_nix("todo-comments-nvim", {
+    config = function() require("plugins.todo-comments").setup() end,
+    event = "BufReadPost",
+  }),
   
   -- Session & project management
-  { "folke/persistence.nvim", config = function() require("plugins.persistence").setup() end, event = "VimEnter" },
-  { "ahmedkhalf/project.nvim", config = function() require("plugins.project").setup() end, event = "VeryLazy" },
+  with_nix("persistence-nvim", {
+    config = function() require("plugins.persistence").setup() end,
+    event = "VimEnter",
+  }),
+  
+  with_nix("project-nvim", {
+    config = function() require("plugins.project").setup() end,
+    event = "VeryLazy",
+  }),
   
   -- File browser
-  {
-    "mikavilpas/yazi.nvim",
+  with_nix("yazi-nvim", {
     config = function() require("plugins.yazi").setup() end,
     keys = {
       { "<leader>-", "<cmd>Yazi<cr>", desc = "Open Yazi" },
     },
-  },
+  }),
   
-  -- Utils
-  { "nvim-lua/plenary.nvim" },
-  { "MunifTanjim/nui.nvim" },
-  { "echasnovski/mini.icons", config = function() require("plugins.mini-icons").setup() end, event = "VeryLazy" },
-  { "luukvbaal/stabilize.nvim", config = function() require("plugins.stabilize").setup() end, event = "VeryLazy" },
-}, {
-  -- Lazy.nvim configuration for Nix-managed plugins
+  -- Utils (just need dir, no extra config)
+  with_nix("plenary-nvim", {}),
+  with_nix("nui-nvim", {}),
+  with_nix("mini-icons", {
+    config = function() require("plugins.mini-icons").setup() end,
+    event = "VeryLazy",
+  }),
+  with_nix("stabilize-nvim", {
+    config = function() require("plugins.stabilize").setup() end,
+    event = "VeryLazy",
+  }),
+}
+
+-- Setup lazy.nvim with nixCats pattern
+require("lazy").setup(plugins, {
   performance = {
-    reset_packpath = false,  -- Keep Nix plugins in runtimepath
+    reset_packpath = false,  -- Don't reset - Nix plugins are in packpath
   },
 })
 
@@ -147,7 +208,5 @@ if theme_ok and type(theme.setup) == "function" then
     vim.notify("Failed to setup theme: " .. tostring(setup_err), vim.log.levels.WARN)
   end
 else
-  vim.notify("Theme module not found or invalid", vim.log.levels.WARN)
+  vim.notify("Theme plugin not found or invalid", vim.log.levels.INFO)
 end
-
-vim.notify("Lazy.nvim Neovim initialized", vim.log.levels.INFO)

@@ -71,6 +71,70 @@ let
     return M
   '';
 
+  # Define all plugins with proper structure for lazy.nvim
+  lazyPlugins = with pkgs.vimPlugins; [
+    # Theme & UI
+    telescope-nvim telescope-fzf-native-nvim
+    lualine-nvim nvim-web-devicons bufferline-nvim
+    
+    # File management & navigation
+    neo-tree-nvim nvim-window-picker which-key-nvim
+    
+    # LSP & completion
+    nvim-lspconfig blink-cmp trouble-nvim
+    luasnip
+    friendly-snippets
+
+    # Treesitter with comprehensive parsers
+    (nvim-treesitter.withPlugins (p: with p; [
+      lua vim vimdoc query bash comment regex
+      html css javascript typescript tsx
+      python rust go nix c cpp make
+      json json5 yaml toml markdown markdown_inline
+      gitattributes gitignore
+    ]))
+    nvim-treesitter-context nvim-ts-autotag nvim-treesitter-textobjects
+    
+    # Editing enhancements
+    comment-nvim nvim-surround flash-nvim mini-pairs
+    yanky-nvim
+    
+    # Visual improvements
+    indent-blankline-nvim noice-nvim nvim-notify dressing-nvim
+    
+    # Git integration
+    gitsigns-nvim lazygit-nvim
+    
+    # Development tools
+    todo-comments-nvim
+    
+    # Session & project management
+    persistence-nvim project-nvim
+    
+    # File browser
+    yazi-nvim
+    
+    # Utils
+    plenary-nvim nui-nvim mini-icons
+    stabilize-nvim
+  ];
+
+  # Convert plugin derivation to lazy.nvim spec
+  mkLazyPlugin = plugin: {
+    name = lib.getName plugin;
+    path = "${plugin}";
+  };
+
+  # Generate all lazy plugin specs
+  lazyPluginSpecs = map mkLazyPlugin lazyPlugins;
+
+  # Generate Lua table for lazy plugins
+  mkLazyLua = specs: ''
+    return {
+      ${lib.concatStringsSep ",\n  " (map (spec: "{ dir = '${spec.path}', name = '${spec.name}' }") specs)}
+    }
+  '';
+
 in {
   config = {
     # Install Neovim with lazy.nvim support
@@ -86,53 +150,16 @@ in {
       plugins = with pkgs.vimPlugins; [
         # Install lazy.nvim
         lazy-nvim
-        
-        # Install all plugins via Nix (lazy.nvim will manage loading)
-        # Theme & UI
-        telescope-nvim telescope-fzf-native-nvim
-        lualine-nvim nvim-web-devicons bufferline-nvim
-        
-        # File management & navigation
-        neo-tree-nvim nvim-window-picker which-key-nvim
-        
-        # LSP & completion
-        nvim-lspconfig blink-cmp trouble-nvim
-        luasnip
-        friendly-snippets
+      ] ++ lazyPlugins;
 
-        # Treesitter with comprehensive parsers
-        (nvim-treesitter.withPlugins (p: with p; [
-          lua vim vimdoc query bash comment regex
-          html css javascript typescript tsx
-          python rust go nix c cpp make
-          json json5 yaml toml markdown markdown_inline
-          gitattributes gitignore
-        ]))
-        nvim-treesitter-context nvim-ts-autotag nvim-treesitter-textobjects
+      # Inject lazy plugin paths before init.lua loads
+      extraLuaConfig = ''
+        -- nixCats: define lazy.nvim plugin specs from Nix
+        local lazyPlugins = ${mkLazyLua lazyPluginSpecs}
         
-        # Editing enhancements
-        comment-nvim nvim-surround flash-nvim mini-pairs
-        yanky-nvim
-        
-        # Visual improvements
-        indent-blankline-nvim noice-nvim nvim-notify dressing-nvim
-        
-        # Git integration
-        gitsigns-nvim lazygit-nvim
-        
-        # Development tools
-        todo-comments-nvim
-        
-        # Session & project management
-        persistence-nvim project-nvim
-        
-        # File browser
-        yazi-nvim
-        
-        # Utils
-        plenary-nvim nui-nvim mini-icons
-        stabilize-nvim
-      ];
+        -- Make available globally for init.lua
+        vim.g.lazy_nix_plugins = lazyPlugins
+      '';
     };
     # Write the theme palette to the correct Neovim config location
     xdg.configFile."nvim/lua/theme/palette.lua".text = themePalette;
