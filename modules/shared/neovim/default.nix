@@ -124,7 +124,7 @@ let
 
   # Generate Lua table for lazy plugins
   mkLazyLua = specs: ''
-    return {
+    {
       ${lib.concatStringsSep ",\n  " (map (spec: "{ dir = '${spec.path}', name = '${spec.name}' }") specs)}
     }
   '';

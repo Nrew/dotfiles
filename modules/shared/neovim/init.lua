@@ -6,10 +6,17 @@ require("core.autocmds")
 -- nixCats: Get plugin specs from Nix (with dir paths to Nix store)
 local nix_plugins = vim.g.lazy_nix_plugins or {}
 
+-- Debug: Check if we got plugins from Nix
+if #nix_plugins == 0 then
+  vim.notify("No Nix plugins loaded! Check extraLuaConfig", vim.log.levels.ERROR)
+end
+
 -- Create lookup table from Nix plugins
 local nix_lookup = {}
 for _, spec in ipairs(nix_plugins) do
-  nix_lookup[spec.name] = spec
+  if spec and spec.name then
+    nix_lookup[spec.name] = spec
+  end
 end
 
 -- Helper to find and merge Nix spec
@@ -18,7 +25,13 @@ local function with_nix(name, config)
   if nix_spec then
     return vim.tbl_extend("force", { dir = nix_spec.dir, name = nix_spec.name }, config or {})
   end
-  return config or { name }
+  -- Fallback: if plugin not found in Nix, use the name as-is (lazy will try to install)
+  vim.notify("Plugin " .. name .. " not found in Nix specs, using fallback", vim.log.levels.WARN)
+  if config then
+    config[1] = name
+    return config
+  end
+  return name
 end
 
 -- Define all plugin configurations
