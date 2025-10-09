@@ -151,6 +151,12 @@ in {
         -- nixCats: Define lazy.nvim plugin specs from Nix (embedded)
         local nix_plugins = ${mkLazyLua lazyPluginSpecs}
         
+        -- Debug: Print what we're setting
+        print("Nix extraLuaConfig: Setting vim.g.lazy_nix_plugins with " .. #nix_plugins .. " plugins")
+        if #nix_plugins > 0 then
+          print("First plugin: " .. vim.inspect(nix_plugins[1]))
+        end
+        
         -- Make available globally for use in configuration
         vim.g.lazy_nix_plugins = nix_plugins
       '';
