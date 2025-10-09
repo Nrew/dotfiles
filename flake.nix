@@ -24,8 +24,8 @@
     # Catppuccin
     catppuccin.url = "github:catppuccin/nix";
 
-    # Textfox
-    textfox.url = "github:adriankarlen/textfox";
+    # Nix Cats
+    nixCats.url = "github:BirdeeHub/NixCats-nvim";
     
     rose-pine-hyprcursor = {
       url = "github:ndom91/rose-pine-hyprcursor";
