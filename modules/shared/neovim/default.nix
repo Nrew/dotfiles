@@ -146,13 +146,13 @@ in {
         lazy-nvim
       ] ++ lazyPlugins;
 
-      # Inject lazy plugin paths before init.lua loads
+      # Generate complete init.lua with Nix plugin specs embedded
       extraLuaConfig = ''
-        -- nixCats: define lazy.nvim plugin specs from Nix
-        local lazyPlugins = ${mkLazyLua lazyPluginSpecs}
+        -- nixCats: Define lazy.nvim plugin specs from Nix (embedded)
+        local nix_plugins = ${mkLazyLua lazyPluginSpecs}
         
-        -- Make available globally for init.lua
-        vim.g.lazy_nix_plugins = lazyPlugins
+        -- Make available globally for use in configuration
+        vim.g.lazy_nix_plugins = nix_plugins
       '';
     };
     # Write the theme palette to the correct Neovim config location

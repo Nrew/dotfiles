@@ -8,7 +8,13 @@ local nix_plugins = vim.g.lazy_nix_plugins or {}
 
 -- Debug: Check if we got plugins from Nix
 if #nix_plugins == 0 then
-  vim.notify("No Nix plugins loaded! Check extraLuaConfig", vim.log.levels.ERROR)
+  vim.notify("ERROR: No Nix plugins loaded! Check extraLuaConfig", vim.log.levels.ERROR)
+else
+  vim.notify("SUCCESS: Loaded " .. #nix_plugins .. " plugins from Nix", vim.log.levels.INFO)
+  -- Debug: Show first plugin spec
+  if nix_plugins[1] then
+    vim.notify("First plugin: " .. vim.inspect(nix_plugins[1]), vim.log.levels.INFO)
+  end
 end
 
 -- Create lookup table from Nix plugins
@@ -16,6 +22,8 @@ local nix_lookup = {}
 for _, spec in ipairs(nix_plugins) do
   if spec and spec.name then
     nix_lookup[spec.name] = spec
+    -- Debug: show what we're adding
+    vim.notify("Added to lookup: " .. spec.name .. " -> " .. vim.inspect(spec), vim.log.levels.DEBUG)
   end
 end
 
