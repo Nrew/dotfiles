@@ -77,7 +77,7 @@ function M.setup()
         }
       },
     },
-    tsserver = {
+    ts_ls = {
       on_attach = function(client, bufnr)
         client.server_capabilities.documentFormattingProvider = false
         on_attach(client, bufnr)
@@ -128,22 +128,22 @@ function M.setup()
     })
   end
 
-  -- Diagnostics Configuration
+  -- Diagnostics Configuration with modern sign API
   vim.diagnostic.config({
     virtual_text = { prefix = "●", source = "if_many" },
     float = { source = "always", border = "rounded" },
-    signs = true,
+    signs = {
+      text = {
+        [vim.diagnostic.severity.ERROR] = "",
+        [vim.diagnostic.severity.WARN] = "",
+        [vim.diagnostic.severity.HINT] = "",
+        [vim.diagnostic.severity.INFO] = "",
+      },
+    },
     underline = true,
     update_in_insert = false,
     severity_sort = true,
   })
-
-  -- LSP diagnostic signs
-  local signs = { Error = "", Warn = "", Hint = "", Info = "" }
-  for type, icon in pairs(signs) do
-    local hl = "DiagnosticSign" .. type
-    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-  end
 
   vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
   vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
