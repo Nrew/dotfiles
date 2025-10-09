@@ -21,7 +21,7 @@ let
     neo-tree-nvim nvim-window-picker which-key-nvim
     
     # LSP & completion
-    nvim-lspconfig blink-cmp trouble-nvim
+    blink-cmp trouble-nvim
     luasnip friendly-snippets
 
     # Treesitter with all grammars
