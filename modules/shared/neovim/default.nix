@@ -85,14 +85,8 @@ let
     luasnip
     friendly-snippets
 
-    # Treesitter with comprehensive parsers
-    (nvim-treesitter.withPlugins (p: with p; [
-      lua vim vimdoc query bash comment regex
-      html css javascript typescript tsx
-      python rust go nix c cpp make
-      json json5 yaml toml markdown markdown_inline
-      gitattributes gitignore
-    ]))
+    # Treesitter with all grammars
+    nvim-treesitter.withAllGrammars
     nvim-treesitter-context nvim-ts-autotag nvim-treesitter-textobjects
     
     # Editing enhancements
