@@ -216,6 +216,9 @@ local plugins = {
 
 -- Setup lazy.nvim with nixCats pattern
 require("lazy").setup(plugins, {
+  install = {
+    missing = false,  -- Don't install missing plugins - Nix manages installation
+  },
   performance = {
     reset_packpath = false,  -- Don't reset - Nix plugins are in packpath
   },
