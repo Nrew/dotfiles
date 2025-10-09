@@ -6,35 +6,26 @@ require("core.autocmds")
 -- nixCats: Get plugin specs from Nix (with dir paths to Nix store)
 local nix_plugins = vim.g.lazy_nix_plugins or {}
 
--- Debug: Check if we got plugins from Nix
-if #nix_plugins == 0 then
-  vim.notify("ERROR: No Nix plugins loaded! Check extraLuaConfig", vim.log.levels.ERROR)
-else
-  vim.notify("SUCCESS: Loaded " .. #nix_plugins .. " plugins from Nix", vim.log.levels.INFO)
-  -- Debug: Show first plugin spec
-  if nix_plugins[1] then
-    vim.notify("First plugin: " .. vim.inspect(nix_plugins[1]), vim.log.levels.INFO)
-  end
-end
-
--- Create lookup table from Nix plugins
+-- Create lookup table from Nix plugins (supports both dash and dot naming)
 local nix_lookup = {}
 for _, spec in ipairs(nix_plugins) do
-  if spec and spec.name then
+  if spec and spec.name and spec.dir then
     nix_lookup[spec.name] = spec
-    -- Debug: show what we're adding
-    vim.notify("Added to lookup: " .. spec.name .. " -> " .. vim.inspect(spec), vim.log.levels.DEBUG)
+    -- Also store with dots instead of dashes for matching
+    local name_with_dots = spec.name:gsub("%-", ".")
+    if name_with_dots ~= spec.name then
+      nix_lookup[name_with_dots] = spec
+    end
   end
 end
 
--- Helper to find and merge Nix spec
+-- Helper to find and merge Nix spec with config
 local function with_nix(name, config)
-  local nix_spec = nix_lookup[name] or nix_lookup[name:gsub("%.", "-")]
-  if nix_spec then
+  local nix_spec = nix_lookup[name]
+  if nix_spec and nix_spec.dir then
     return vim.tbl_extend("force", { dir = nix_spec.dir, name = nix_spec.name }, config or {})
   end
-  -- Fallback: if plugin not found in Nix, use the name as-is (lazy will try to install)
-  vim.notify("Plugin " .. name .. " not found in Nix specs, using fallback", vim.log.levels.WARN)
+  -- Fallback if plugin not in Nix: use as-is (shouldn't happen with proper Nix config)
   if config then
     config[1] = name
     return config

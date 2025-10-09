@@ -113,10 +113,10 @@ let
     stabilize-nvim
   ];
 
-  # Convert plugin derivation to lazy.nvim spec
+  # Convert plugin derivation to lazy.nvim spec with dir
   mkLazyPlugin = plugin: {
     name = lib.getName plugin;
-    path = "${plugin}";
+    dir = "${plugin}";
   };
 
   # Generate all lazy plugin specs
@@ -125,7 +125,7 @@ let
   # Generate Lua table for lazy plugins
   mkLazyLua = specs: ''
     {
-      ${lib.concatStringsSep ",\n  " (map (spec: "{ dir = '${spec.path}', name = '${spec.name}' }") specs)}
+      ${lib.concatStringsSep ",\n  " (map (spec: "{ dir = '${spec.dir}', name = '${spec.name}' }") specs)}
     }
   '';
 
@@ -146,19 +146,12 @@ in {
         lazy-nvim
       ] ++ lazyPlugins;
 
-      # Generate complete init.lua with Nix plugin specs embedded
-      extraLuaConfig = ''
-        -- nixCats: Define lazy.nvim plugin specs from Nix (embedded)
-        local nix_plugins = ${mkLazyLua lazyPluginSpecs}
-        
-        -- Debug: Print what we're setting
-        print("Nix extraLuaConfig: Setting vim.g.lazy_nix_plugins with " .. #nix_plugins .. " plugins")
-        if #nix_plugins > 0 then
-          print("First plugin: " .. vim.inspect(nix_plugins[1]))
-        end
-        
-        -- Make available globally for use in configuration
-        vim.g.lazy_nix_plugins = nix_plugins
+      # Inject plugin specs BEFORE init.lua runs
+      extraLuaConfig = let
+        pluginSpecsLua = mkLazyLua lazyPluginSpecs;
+      in ''
+        -- nixCats: Set plugin specs before init.lua loads
+        vim.g.lazy_nix_plugins = ${pluginSpecsLua}
       '';
     };
     # Write the theme palette to the correct Neovim config location
