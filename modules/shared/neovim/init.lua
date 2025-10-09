@@ -175,6 +175,7 @@ require("lazy").setup({
     border = "rounded",
   },
   performance = {
+    reset_packpath = false,  -- Don't reset packpath - Nix plugins are in runtimepath
     rtp = {
       disabled_plugins = {
         "gzip",
