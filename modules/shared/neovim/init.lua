@@ -59,8 +59,6 @@ local function show_results()
   vim.notify(message, vim.log.levels.INFO, { title = "Plugin Loader" })
 end
 
-load_plugin("theme")
-
 vim.api.nvim_create_autocmd("User", {
   pattern = "DeferredUIEnter",
   callback = function()

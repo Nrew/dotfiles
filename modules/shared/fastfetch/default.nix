@@ -1,4 +1,4 @@
-{ config, lib, pkgs, self, palette, ... }:
+{ config, lib, pkgs, self, ... }:
 {
   #──────────────────────────────────────────────────────────────────
   # Fastfetch Logo Image Management
@@ -27,10 +27,6 @@
       display = {
         separator = "  ";
         key.width = 16;
-        color = {
-          keys  = palette.primary;
-          title = palette.secondary;
-        };
       };
 
       modules = [
@@ -39,12 +35,10 @@
         # ───────────────────────────────────────────────────────────────────────────────
         {
           type = "title";
-          keyColor = palette.primary;
         }
         {
           type = "separator";
           string = "▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼";
-          color = palette.primary;
         }
         # ───────────────────────────────────────────────────────────────────────────────
         # システム情報 (System Information)
@@ -52,31 +46,26 @@
         {
           type = "os";
           key = "󰒋 オペレーティングシステム";
-          keyColor = palette.error;
           format = "{2} {9}";
         }
         {
           type = "kernel";
           key = "❯ カーネル";
-          keyColor = palette.info;   
           format = "{1} {2}";
         }
         {
           type = "host";
           key = " ホスト";
-          keyColor = palette.secondary;
           format = "{1}";
         }
         {
           type = "uptime";
           key = " アップタイム";
-          keyColor = palette.secondary;
           format = "{?1}{1} 日{?} {?2}{2} 時間{?} {?3}{3} 分{?}";
         }
         {
           type = "separator";
           string = " ≫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━≪";
-          color = palette.muted;
         }
 
         # ───────────────────────────────────────────────────────────────────────────────
@@ -86,24 +75,20 @@
         {
           type = "packages";
           key = " パッケージ";
-          keyColor = palette.warning;
           format = "{} (nix)";
         }
         {
           type = "shell";
           key = " シェル";
-          keyColor = palette.primary;
         }
         {
           type = "memory";
           key = "メモリ";
-          keyColor = palette.error;
           format = "{1} / {2} ({3})";
         }
         {
           type = "separator";
           string = " ≫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━≪";
-          color = palette.muted;
         }
 
         # ═══════════════════════════════════════════════════════════════
@@ -113,28 +98,23 @@
         {
           type = "display";
           key = "ディスプレイ";
-          keyColor = palette.secondary;
           format = "{1}x{2}@{5}Hz";
         }
         {
           type = "de";
           key = "デスクトップ環境";
-          keyColor = palette.secondary;
         }
         {
           type = "wm";
           key = "ウィンドウマネージャ";
-          keyColor = palette.warning;
         }
         {
           type = "terminal";
           key = " ターミナル";
-          keyColor = palette.info;
         }
         {
           type = "separator";
           string = "▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼";
-          color = palette.primary;
         }
         # ═══════════════════════════════════════════════════════════════
         # システム状態 (System Status)

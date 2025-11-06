@@ -1,7 +1,10 @@
-{ config, lib, pkgs, palette, ... }:
+{ config, lib, pkgs, ... }:
+
 {
+  catppuccin.tmux.enable = true;
   programs.tmux = {
-    enable = true;
+    enable = true; 
+    
     terminal = "tmux-256color";
     mouse = true;
     baseIndex = 1;
@@ -12,9 +15,6 @@
     prefix = "C-space";
 
     extraConfig = ''
-      # Source dynamic theme file (symlinked to current theme)
-      source-file ${config.xdg.configHome}/current-theme/tmux.conf
-      
       # Status bar configuration
       set -g status on
       set -g status-justify left
@@ -67,6 +67,4 @@
       tmuxPlugins.vim-tmux-navigator
     ];
   };
-
-
 }

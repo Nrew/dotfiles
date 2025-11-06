@@ -40,7 +40,7 @@
   # Outputs Configuration
   #──────────────────────────────────────────────────────────────────
 
-  outputs = { self, darwin, home-manager, nix-homebrew, nixpkgs, ... } @ inputs: 
+  outputs = { self, darwin, home-manager, nix-homebrew, nixpkgs, catppuccin, ... } @ inputs: 
     let
       inherit (self) inputs;
 
@@ -126,15 +126,19 @@
                   useGlobalPkgs = true;
                   useUserPackages = true;
                   extraSpecialArgs = specialArgs;
-                  users.${user} = import ./home;
+                  users.${user} = {
+                    imports = [
+                      ./home
+                      catppuccin.homeModules.catppuccin
+                    ];
+                  };
 
                   backupFileExtension = "backup";
                 };
-              } 
-
-            nix-homebrew.darwinModules.nix-homebrew
-          ];
-        };
+              }
+              nix-homebrew.darwinModules.nix-homebrew
+            ];
+          };
     
       #──────────────────────────────────────────────────────────────────
       #  Configuration
