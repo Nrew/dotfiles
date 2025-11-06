@@ -180,8 +180,11 @@
       };
 
       nixosConfigurations = {
-        # Example NixOS configuration - customize hostname as needed
+        # Add NixOS configurations here when needed. Example:
         # crow = mkNixOSConfiguration (builtins.head linuxSystems) "crow";
+        # 
+        # Note: Uncomment and customize the above line to add a NixOS host.
+        # Create a corresponding configuration in hosts/<hostname>/default.nix
       };
 
       #──────────────────────────────────────────────────────────────────
