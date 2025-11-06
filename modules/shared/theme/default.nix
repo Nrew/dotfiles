@@ -7,19 +7,22 @@
 # This module provides a single static theme for your entire system.
 # All applications (kitty, tmux, neovim, btop, etc.) use these colors.
 #
+# Current theme: Rose Pine (dark)
+# https://rosepinetheme.com/palette
+#
 # To change the theme:
 # 1. Edit the palette values below (or replace with another theme)
 # 2. Run: home-manager switch (or darwin-rebuild switch on macOS)
 #
-# Available color themes to copy from:
-# - Beige (current): Warm, minimal light theme
-# - Rose Pine: Popular dark purple theme
-# - Catppuccin: Soothing pastel themes (latte, frappe, macchiato, mocha)
-# - Minimal: Simple monochrome themes
+# Other available themes to try:
+# - Rose Pine Moon: Slightly lighter variant of Rose Pine
+# - Rose Pine Dawn: Light variant of Rose Pine
+# - Catppuccin Mocha: Dark, soothing pastel theme
+# - Catppuccin Latte: Light variant
 #
 # To add a different theme, visit:
-# - https://github.com/catppuccin/catppuccin - Catppuccin colors
 # - https://rosepinetheme.com/palette - Rose Pine colors
+# - https://github.com/catppuccin/catppuccin - Catppuccin colors
 #
 # ═══════════════════════════════════════════════════════════════════════
 
@@ -29,30 +32,33 @@ let
   # ═══════════════════════════════════════════════════════════════════
   # Theme Palette - Edit these values to change your theme!
   # ═══════════════════════════════════════════════════════════════════
+  # Using Rose Pine - A soho vibes colorscheme for Neovim
+  # https://rosepinetheme.com/palette
+  # ═══════════════════════════════════════════════════════════════════
   palette = {
-    name = "beige";
+    name = "rose-pine";
     
-    # Base colors (4)
-    base = "#efead8";
-    mantle = "#e5e0d0";
-    surface = "#cbc2b3";
-    overlay = "#a69e93";
+    # Base colors (4) - Background layers from darkest to lightest
+    base = "#191724";      # Base background
+    mantle = "#1f1d2e";    # Slightly lighter background
+    surface = "#26233a";   # Surface for elevated elements
+    overlay = "#393552";   # Overlays, borders
     
-    # Text colors (4)
-    text = "#2d2b28";
-    subtext0 = "#45413b";
-    subtext1 = "#5a554d";
-    muted = "#655f59";
+    # Text colors (4) - Foreground layers from primary to muted
+    text = "#e0def4";      # Primary text
+    subtext0 = "#908caa";  # Secondary text
+    subtext1 = "#6e6a86";  # Tertiary text
+    muted = "#555169";     # Muted/disabled text
     
-    # Accent colors (8)
-    primary = "#857a71";
-    secondary = "#8f857a";
-    red = "#a67070";
-    orange = "#b8905e";
-    yellow = "#cbb470";
-    green = "#8fa670";
-    cyan = "#70a6a6";
-    blue = "#7a92a6";
+    # Accent colors (8) - Rose Pine accent colors
+    primary = "#c4a7e7";   # Iris (purple) - primary accent
+    secondary = "#ebbcba"; # Rose (pink) - secondary accent
+    red = "#eb6f92";       # Love (red) - errors
+    orange = "#f6c177";    # Gold (orange) - warnings
+    yellow = "#f6c177";    # Gold (yellow/orange)
+    green = "#31748f";     # Pine (teal) - success
+    cyan = "#9ccfd8";      # Foam (cyan) - info
+    blue = "#31748f";      # Pine (blue/teal)
     
     # Semantic aliases (reference colors above for consistency)
     background = palette.base;
@@ -66,11 +72,11 @@ let
     link = palette.primary;
     subtext = palette.subtext0;
     
-    # Legacy compatibility (for backward compatibility)
-    love = palette.red;
-    gold = palette.yellow;
-    foam = palette.cyan;
-    pine = palette.green;
+    # Legacy compatibility (Rose Pine naming)
+    love = palette.red;      # Rose Pine "love"
+    gold = palette.yellow;   # Rose Pine "gold"
+    foam = palette.cyan;     # Rose Pine "foam"
+    pine = palette.green;    # Rose Pine "pine"
     
     # Wallpaper path
     wallpaper = "~/.config/dotfiles/images/wallpapers/BeigeInk.png";
