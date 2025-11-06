@@ -1,10 +1,34 @@
 { pkgs, config, lib, ... }:
 
+# ═══════════════════════════════════════════════════════════════════════
+# Simple Static Theme System
+# ═══════════════════════════════════════════════════════════════════════
+#
+# This module provides a single static theme for your entire system.
+# All applications (kitty, tmux, neovim, btop, etc.) use these colors.
+#
+# To change the theme:
+# 1. Edit the palette values below (or replace with another theme)
+# 2. Run: home-manager switch (or darwin-rebuild switch on macOS)
+#
+# Available color themes to copy from:
+# - Beige (current): Warm, minimal light theme
+# - Rose Pine: Popular dark purple theme
+# - Catppuccin: Soothing pastel themes (latte, frappe, macchiato, mocha)
+# - Minimal: Simple monochrome themes
+#
+# To add a different theme, visit:
+# - https://github.com/catppuccin/catppuccin - Catppuccin colors
+# - https://rosepinetheme.com/palette - Rose Pine colors
+#
+# ═══════════════════════════════════════════════════════════════════════
+
 let
   cfg = config.theme;
   
-  # Single static theme - beige (change this to switch themes)
-  # To use a different theme, change the values below or import from registry.nix
+  # ═══════════════════════════════════════════════════════════════════
+  # Theme Palette - Edit these values to change your theme!
+  # ═══════════════════════════════════════════════════════════════════
   palette = {
     name = "beige";
     
