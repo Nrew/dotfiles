@@ -33,8 +33,43 @@ in
     # ────────────────────────────────────────────────────────────────
 
     settings = {
-      # Include the dynamic theme file (symlinked to current theme)
-      include = "${config.xdg.configHome}/current-theme/kitty.conf";
+      # Theme colors (static - edit in theme/default.nix)
+      background = colors.base;
+      foreground = colors.text;
+      selection_background = colors.overlay;
+      selection_foreground = colors.text;
+      cursor = colors.text;
+      cursor_text_color = colors.base;
+      url_color = colors.primary;
+      
+      # ANSI colors
+      color0 = colors.overlay;
+      color8 = colors.muted;
+      color1 = colors.red;
+      color9 = colors.red;
+      color2 = colors.green;
+      color10 = colors.green;
+      color3 = colors.orange;
+      color11 = colors.orange;
+      color4 = colors.cyan;
+      color12 = colors.cyan;
+      color5 = colors.primary;
+      color13 = colors.primary;
+      color6 = colors.secondary;
+      color14 = colors.secondary;
+      color7 = colors.text;
+      color15 = colors.text;
+      
+      # Tab colors
+      active_tab_foreground = colors.text;
+      active_tab_background = colors.primary;
+      inactive_tab_foreground = colors.subtext0;
+      inactive_tab_background = colors.surface;
+      tab_bar_background = colors.base;
+      
+      # Border colors
+      active_border_color = colors.primary;
+      inactive_border_color = colors.overlay;
       
       # Non-color settings
       cursor_shape = "beam";
@@ -101,6 +136,5 @@ in
     };
   };
 
-  # Theme reloading is handled by the theme-switch script in theme/default.nix
-  # which uses symlinks for instant theme switching without additional scripts
+  # Theme is now static - change palette values in theme/default.nix and rebuild
 }

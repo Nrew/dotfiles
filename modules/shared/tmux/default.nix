@@ -23,8 +23,19 @@ in
     prefix = "C-space";
 
     extraConfig = ''
-      # Source dynamic theme file (symlinked to current theme)
-      source-file ${config.xdg.configHome}/current-theme/tmux.conf
+      # Theme colors (static - edit in theme/default.nix)
+      set -g status-style "bg=${colors.surface},fg=${colors.text}"
+      set -g status-left "#[fg=${colors.base},bg=${colors.primary},bold] #S #[fg=${colors.primary},bg=${colors.surface},nobold]"
+      set -g status-right "#[fg=${colors.overlay},bg=${colors.surface}]#[fg=${colors.text},bg=${colors.overlay}] %Y-%m-%d #[fg=${colors.primary},bg=${colors.overlay}]#[fg=${colors.base},bg=${colors.primary},bold] %H:%M "
+      
+      set -g window-status-format "#[fg=${colors.surface},bg=${colors.overlay}]#[fg=${colors.text},bg=${colors.overlay}] #I #W #[fg=${colors.overlay},bg=${colors.surface}]"
+      set -g window-status-current-format "#[fg=${colors.surface},bg=${colors.green}]#[fg=${colors.base},bg=${colors.green},bold] #I #W #[fg=${colors.green},bg=${colors.surface},nobold]"
+      
+      set -g pane-border-style "fg=${colors.overlay}"
+      set -g pane-active-border-style "fg=${colors.primary}"
+      
+      set -g message-style "fg=${colors.base},bg=${colors.primary}"
+      set -g mode-style "bg=${colors.primary},fg=${colors.base}"
       
       # Status bar configuration
       set -g status on

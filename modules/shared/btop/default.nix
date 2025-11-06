@@ -46,5 +46,5 @@ in
     theme[div_line]="${colors.border}"
   '';
 
-  # Theme reloading is handled by the theme-switch script in theme/default.nix
+  # Theme is now static - change palette values in theme/default.nix and rebuild
 }

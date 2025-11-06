@@ -77,41 +77,28 @@ let
   };
 
   themePalette = ''
-    -- Dynamic theme palette loader - reads from symlinked theme file
+    -- Static theme palette (edit in theme/default.nix)
     local M = {}
     
-    -- Load palette from the current theme symlink
     function M.get()
-      local config_home = os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")
-      local palette_file = config_home .. "/current-theme/nvim-palette.lua"
-      
-      -- Clear any cached version
-      package.loaded[palette_file] = nil
-      
-      local ok, palette = pcall(dofile, palette_file)
-      if not ok or not palette then
-        -- Fallback palette
-        return {
-          base = "${colors.base}",
-          mantle = "${colors.mantle}",
-          surface = "${colors.surface}",
-          overlay = "${colors.overlay}",
-          text = "${colors.text}",
-          subtext0 = "${colors.subtext0}",
-          subtext1 = "${colors.subtext1}",
-          muted = "${colors.muted}",
-          primary = "${colors.primary}",
-          secondary = "${colors.secondary}",
-          red = "${colors.red}",
-          orange = "${colors.orange}",
-          yellow = "${colors.yellow}",
-          green = "${colors.green}",
-          cyan = "${colors.cyan}",
-          blue = "${colors.blue}",
-        }
-      end
-      
-      return palette
+      return {
+        base = "${colors.base}",
+        mantle = "${colors.mantle}",
+        surface = "${colors.surface}",
+        overlay = "${colors.overlay}",
+        text = "${colors.text}",
+        subtext0 = "${colors.subtext0}",
+        subtext1 = "${colors.subtext1}",
+        muted = "${colors.muted}",
+        primary = "${colors.primary}",
+        secondary = "${colors.secondary}",
+        red = "${colors.red}",
+        orange = "${colors.orange}",
+        yellow = "${colors.yellow}",
+        green = "${colors.green}",
+        cyan = "${colors.cyan}",
+        blue = "${colors.blue}",
+      }
     end
     
     return M
