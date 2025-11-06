@@ -1,12 +1,14 @@
-{ config, lib, pkgs, self, palette ? null, ... }:
+{ config, lib, pkgs, self, ... }:
 
 let
-  # Fallback palette if theme system is not enabled
-  defaultPalette = {
-    primary = "#857a71"; secondary = "#8f857a"; red = "#a67070"; error = "#a67070"; info = "#70a6a6";
+  # Catppuccin Mocha colors for fastfetch
+  colors = {
+    primary = "#cba6f7";    # Catppuccin Mocha mauve
+    secondary = "#f5c2e7";  # Catppuccin Mocha pink
+    red = "#f38ba8";        # Catppuccin Mocha red
+    error = "#f38ba8";      # Catppuccin Mocha red
+    info = "#89dceb";       # Catppuccin Mocha sky
   };
-  
-  colors = if palette != null then palette else defaultPalette;
 in
 {
   #──────────────────────────────────────────────────────────────────

@@ -1,23 +1,36 @@
-{ config, lib, pkgs, palette, ... }:
+{ config, lib, pkgs, ... }:
+
+let
+  # Catppuccin Mocha colors for fzf (matching the theme)
+  # These are hardcoded but will match the catppuccin theme
+  colors = {
+    background = "#1e1e2e";  # Catppuccin Mocha base
+    overlay = "#45475a";     # Catppuccin Mocha surface2
+    text = "#cdd6f4";        # Catppuccin Mocha text
+    primary = "#cba6f7";     # Catppuccin Mocha mauve
+    secondary = "#f5c2e7";   # Catppuccin Mocha pink
+    error = "#f38ba8";       # Catppuccin Mocha red
+  };
+in
 {
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
 
-    # Theme colors from centralized palette
+    # Theme colors using Catppuccin Mocha palette
     colors = {
-      "bg+"     = palette.overlay;
-      "bg"      = palette.background;
-      "spinner" = palette.primary;
-      "hl"      = palette.error;
-      "fg"      = palette.text;
-      "header"  = palette.error;
-      "info"    = palette.secondary;
-      "pointer" = palette.primary;
-      "marker"  = palette.primary;
-      "fg+"     = palette.text;
-      "prompt"  = palette.secondary;
-      "hl+"     = palette.error; 
+      "bg+"     = colors.overlay;
+      "bg"      = colors.background;
+      "spinner" = colors.primary;
+      "hl"      = colors.error;
+      "fg"      = colors.text;
+      "header"  = colors.error;
+      "info"    = colors.secondary;
+      "pointer" = colors.primary;
+      "marker"  = colors.primary;
+      "fg+"     = colors.text;
+      "prompt"  = colors.secondary;
+      "hl+"     = colors.error; 
     };
     
     # Default options for better UX

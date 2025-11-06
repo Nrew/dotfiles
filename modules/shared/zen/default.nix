@@ -1,28 +1,46 @@
-{ config, lib, pkgs, palette, ... }:
+{ config, lib, pkgs, ... }:
 
+let
+  # Catppuccin Mocha colors for zen browser
+  colors = {
+    background = "#1e1e2e";  # Catppuccin Mocha base
+    surface = "#313244";     # Catppuccin Mocha surface0
+    overlay = "#45475a";     # Catppuccin Mocha surface2
+    text = "#cdd6f4";        # Catppuccin Mocha text
+    subtext = "#bac2de";     # Catppuccin Mocha subtext1
+    muted = "#9399b2";       # Catppuccin Mocha overlay2
+    primary = "#cba6f7";     # Catppuccin Mocha mauve
+    secondary = "#f5c2e7";   # Catppuccin Mocha pink
+    success = "#a6e3a1";     # Catppuccin Mocha green
+    warning = "#f9e2af";     # Catppuccin Mocha yellow
+    error = "#f38ba8";       # Catppuccin Mocha red
+    info = "#89dceb";        # Catppuccin Mocha sky
+    border = "#45475a";      # Catppuccin Mocha surface2
+  };
+in
 {
-  # Zen Browser configuration with centralized theme
+  # Zen Browser configuration with Catppuccin theme
   # Theme files work cross-platform
   
   # Create userChrome.css for theme customization
   home.file.".zen/chrome/userChrome.css".text = ''
-    /* Zen Browser Theme - Generated from centralized palette */
+    /* Zen Browser Theme - Catppuccin Mocha */
     
     :root {
-      /* Colors from theme palette */
-      --zen-bg: ${palette.background};
-      --zen-surface: ${palette.surface};
-      --zen-overlay: ${palette.overlay};
-      --zen-text: ${palette.text};
-      --zen-subtext: ${palette.subtext};
-      --zen-muted: ${palette.muted};
-      --zen-primary: ${palette.primary};
-      --zen-secondary: ${palette.secondary};
-      --zen-success: ${palette.success};
-      --zen-warning: ${palette.warning};
-      --zen-error: ${palette.error};
-      --zen-info: ${palette.info};
-      --zen-border: ${palette.border};
+      /* Colors from Catppuccin Mocha palette */
+      --zen-bg: ${colors.background};
+      --zen-surface: ${colors.surface};
+      --zen-overlay: ${colors.overlay};
+      --zen-text: ${colors.text};
+      --zen-subtext: ${colors.subtext};
+      --zen-muted: ${colors.muted};
+      --zen-primary: ${colors.primary};
+      --zen-secondary: ${colors.secondary};
+      --zen-success: ${colors.success};
+      --zen-warning: ${colors.warning};
+      --zen-error: ${colors.error};
+      --zen-info: ${colors.info};
+      --zen-border: ${colors.border};
       
       /* Apply theme colors */
       --zen-colors-primary: var(--zen-primary) !important;
