@@ -242,11 +242,39 @@ in
       # Minimal, efficient theme switching via symlinks
       (pkgs.writeShellScriptBin "theme-switch" ''
         #!/usr/bin/env bash
-        set -e
+        set -euo pipefail
         
         THEME_DIR="${config.xdg.configHome}/themes"
         CURRENT_DIR="${config.xdg.configHome}/current-theme"
         VARIANT="$1"
+        
+        # Color validation function
+        validate_hex_color() {
+          local color="$1"
+          local field="$2"
+          if [[ ! "$color" =~ ^#[0-9a-fA-F]{6}$ ]]; then
+            echo "⚠️  Warning: Invalid hex color for $field: '$color'" >&2
+            return 1
+          fi
+          return 0
+        }
+        
+        # Extract and validate color from kitty.conf
+        extract_color() {
+          local pattern="$1"
+          local field="$2"
+          local color
+          color=$(grep "^$pattern " "$KITTY_CONF" | awk '{print $2}')
+          if [ -z "$color" ]; then
+            echo "❌ Error: Could not extract $field from kitty.conf" >&2
+            exit 1
+          fi
+          if ! validate_hex_color "$color" "$field"; then
+            echo "❌ Error: Invalid color format for $field" >&2
+            exit 1
+          fi
+          echo "$color"
+        }
         
         # Ensure current-theme directory exists
         mkdir -p "$CURRENT_DIR"
@@ -266,8 +294,20 @@ in
         if [ ! -d "$THEME_DIR/$VARIANT" ]; then
           echo "❌ Unknown theme: $VARIANT"
           echo "Theme directory not found: $THEME_DIR/$VARIANT"
+          echo ""
+          echo "Available themes:"
+          ${lib.concatMapStrings (t: "echo \"  ${t}\"\n") registry.available}
           exit 1
         fi
+        
+        # Validate required theme files exist
+        for file in kitty.conf tmux.conf nvim-palette.lua; do
+          if [ ! -f "$THEME_DIR/$VARIANT/$file" ]; then
+            echo "❌ Error: Missing required theme file: $file" >&2
+            echo "Theme directory may be corrupted: $THEME_DIR/$VARIANT" >&2
+            exit 1
+          fi
+        done
         
         echo "🎨 Switching to: $VARIANT"
         
@@ -276,33 +316,57 @@ in
         ln -sf "$THEME_DIR/$VARIANT/tmux.conf" "$CURRENT_DIR/tmux.conf"
         ln -sf "$THEME_DIR/$VARIANT/nvim-palette.lua" "$CURRENT_DIR/nvim-palette.lua"
         
+        # Verify symlinks were created successfully
+        for file in kitty.conf tmux.conf nvim-palette.lua; do
+          if [ ! -L "$CURRENT_DIR/$file" ]; then
+            echo "❌ Error: Failed to create symlink for $file" >&2
+            exit 1
+          fi
+        done
+        
         # Update state file
         mkdir -p "${config.xdg.configHome}/theme"
         echo "$VARIANT" > "${config.xdg.configHome}/theme/current"
         
-        # Generate palette.json from current theme
-        # Extract colors from kitty.conf to create palette.json
+        # Generate palette.json from current theme with validation
         KITTY_CONF="$THEME_DIR/$VARIANT/kitty.conf"
         if [ -f "$KITTY_CONF" ]; then
+          # Extract and validate all colors
+          BASE=$(extract_color "background" "base")
+          TEXT=$(extract_color "foreground" "text")
+          PRIMARY=$(extract_color "color5" "primary")
+          SECONDARY=$(extract_color "color6" "secondary")
+          RED=$(extract_color "color1" "red")
+          ORANGE=$(extract_color "color3" "orange")
+          GREEN=$(extract_color "color2" "green")
+          CYAN=$(extract_color "color4" "cyan")
+          OVERLAY=$(extract_color "color0" "overlay")
+          MUTED=$(extract_color "color8" "muted")
+          SUBTEXT0=$(extract_color "inactive_tab_foreground" "subtext0")
+          
+          # Generate JSON with validated colors
           cat > "${config.xdg.configHome}/theme/palette.json" <<EOF
 {
   "variant": "$VARIANT",
   "isCustom": false,
   "colors": {
-    "base": "$(grep '^background ' "$KITTY_CONF" | awk '{print $2}')",
-    "text": "$(grep '^foreground ' "$KITTY_CONF" | awk '{print $2}')",
-    "primary": "$(grep '^color5 ' "$KITTY_CONF" | awk '{print $2}')",
-    "secondary": "$(grep '^color6 ' "$KITTY_CONF" | awk '{print $2}')",
-    "red": "$(grep '^color1 ' "$KITTY_CONF" | awk '{print $2}')",
-    "orange": "$(grep '^color3 ' "$KITTY_CONF" | awk '{print $2}')",
-    "green": "$(grep '^color2 ' "$KITTY_CONF" | awk '{print $2}')",
-    "cyan": "$(grep '^color4 ' "$KITTY_CONF" | awk '{print $2}')",
-    "overlay": "$(grep '^color0 ' "$KITTY_CONF" | awk '{print $2}')",
-    "muted": "$(grep '^color8 ' "$KITTY_CONF" | awk '{print $2}')",
-    "subtext0": "$(grep '^inactive_tab_foreground ' "$KITTY_CONF" | awk '{print $2}')"
+    "base": "$BASE",
+    "text": "$TEXT",
+    "primary": "$PRIMARY",
+    "secondary": "$SECONDARY",
+    "red": "$RED",
+    "orange": "$ORANGE",
+    "green": "$GREEN",
+    "cyan": "$CYAN",
+    "overlay": "$OVERLAY",
+    "muted": "$MUTED",
+    "subtext0": "$SUBTEXT0"
   }
 }
 EOF
+        else
+          echo "❌ Error: Kitty config not found: $KITTY_CONF" >&2
+          exit 1
         fi
         
         # Reload applications (minimal overhead)
@@ -315,10 +379,8 @@ EOF
           tmux source-file "${config.xdg.configHome}/tmux/tmux.conf" 2>/dev/null || true
         fi
         
-        # Reload btop theme
-        if command -v btop-reload-theme &> /dev/null; then
-          btop-reload-theme 2>/dev/null || true
-        fi
+        # Reload btop by signaling it directly (btop-reload-theme command removed)
+        pkill -SIGUSR1 btop 2>/dev/null || true
         
         # macOS window manager reload
         pkill -SIGUSR1 barik 2>/dev/null || true
