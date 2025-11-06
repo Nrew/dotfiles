@@ -21,35 +21,38 @@ in
     git-branchless # streamlined workflow for stacked changes
   ];
 
+  # ────────────────────────────────────────────────────────────────
+  # Diff & Merge Tools Configuration
+  # ────────────────────────────────────────────────────────────────
+  programs.delta = {
+    enableGitIntegration = true;
+    options = {
+      diff-so-fancy = true;
+      features = "decorations";
+      navigate = true;
+      light = false;
+      side-by-side = true;
+      line-numbers = true;
+    };
+  };
+
   programs.git = {
     enable = true;
-    userName = name;
-    userEmail = email;
 
     # ────────────────────────────────────────────────────────────────
     # Git LFS Configuration
     # ────────────────────────────────────────────────────────────────
     lfs.enable = true;
-    
-    # ────────────────────────────────────────────────────────────────
-    # Diff & Merge Tools Configuration
-    # ────────────────────────────────────────────────────────────────
-    delta = {
-      enable = true;
-      options = {
-        diff-so-fancy = true;
-        features = "decorations";
-        navigate = true;
-        light = false;
-        side-by-side = true;
-        line-numbers = true;
-      };
-    };
 
     # ────────────────────────────────────────────────────────────────
     # Core Git Configuration
     # ────────────────────────────────────────────────────────────────
-    extraConfig = {
+    settings = {
+      user = {
+        name = name;
+        email = email;
+      };
+
       init.defaultBranch = "main";
       pull.rebase = true;
       push.autoSetupRemote = true;
@@ -86,48 +89,49 @@ in
 
       # Remote URL shortcuts
       url."git@github.com:".insteadOf = "gh:";
-    };
+    
 
-    # ────────────────────────────────────────────────────────────────
-    # Git Aliases
-    # ────────────────────────────────────────────────────────────────
-    aliases = {
-      # Basic operations
-      br = "branch";
-      ci = "commit";
-      co = "checkout";
-      st = "status -sb";
-      
-      # Diff operations
-      df = "diff";
-      dc = "diff --cached";
+      # ────────────────────────────────────────────────────────────────
+      # Git Aliases
+      # ────────────────────────────────────────────────────────────────
+      alias = {
+        # Basic operations
+        br = "branch";
+        ci = "commit";
+        co = "checkout";
+        st = "status -sb";
+        
+        # Diff operations
+        df = "diff";
+        dc = "diff --cached";
 
-      # Log viewing
-      lg = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit";
-      lga = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all";
-      ls = "log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cblue [%cn]' --decorate";
-      
-      # Branch management
-      bb = "branch -v";
-      bd = "branch -d";
-      bdd = "branch -D";
-      
-      # Commit operations
-      amend = "commit --amend -C HEAD";
-      undo = "reset HEAD~1 --mixed";
-      unstage = "reset HEAD --";
-      
-      # Stash operations
-      sa = "stash apply";
-      sl = "stash list";
-      sp = "stash pop";
-      ss = "stash save";
-      
-      # Utility
-      aliases = "!git config --get-regexp '^alias\\.' | sed 's/alias\\.\\([^ ]*\\) \\(.*\\)/\\1\\\t => \\2/' | sort";
-      find = "!git ls-files | grep -i";
-      ign = "ls-files -o -i --exclude-standard";
-      who = "shortlog -s --";
+        # Log viewing
+        lg = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit";
+        lga = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all";
+        ls = "log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cblue [%cn]' --decorate";
+        
+        # Branch management
+        bb = "branch -v";
+        bd = "branch -d";
+        bdd = "branch -D";
+        
+        # Commit operations
+        amend = "commit --amend -C HEAD";
+        undo = "reset HEAD~1 --mixed";
+        unstage = "reset HEAD --";
+        
+        # Stash operations
+        sa = "stash apply";
+        sl = "stash list";
+        sp = "stash pop";
+        ss = "stash save";
+        
+        # Utility
+        aliases = "!git config --get-regexp '^alias\\.' | sed 's/alias\\.\\([^ ]*\\) \\(.*\\)/\\1\\\t => \\2/' | sort";
+        find = "!git ls-files | grep -i";
+        ign = "ls-files -o -i --exclude-standard";
+        who = "shortlog -s --";
+      };
     };
 
     # ────────────────────────────────────────────────────────────────

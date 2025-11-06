@@ -21,12 +21,7 @@ local function on_attach(client, bufnr)
 end
 
 function M.setup()
-  local lspconfig_ok, lspconfig = pcall(require, "lspconfig")
-  if not lspconfig_ok then
-    vim.notify("lspconfig not found", vim.log.levels.ERROR)
-    return
-  end
-
+  -- Setup capabilities
   local capabilities = vim.lsp.protocol.make_client_capabilities()
 
   local blink_ok, blink = pcall(require, "blink.cmp")
@@ -39,111 +34,182 @@ function M.setup()
     properties = { "documentation", "detail", "additionalTextEdits" }
   }
 
-  local servers = {
-    lua_ls = {
-      settings = {
-        Lua = {
-          runtime = { version = "LuaJIT" },
-          diagnostics = { globals = { "vim" } },
-          workspace = {
-            library = vim.api.nvim_get_runtime_file("", true),
-            checkThirdParty = false
-          },
-          telemetry = { enable = false },
-          format = { enable = false },
+  -- Configure LSP servers using vim.lsp.config
+  vim.lsp.config["*"] = {
+    capabilities = capabilities,
+    on_attach = on_attach,
+  }
+
+  -- Lua Language Server
+  vim.lsp.config.lua_ls = {
+    cmd = { "lua-language-server" },
+    root_markers = { ".luarc.json", ".luarc.jsonc", ".luacheckrc", ".stylua.toml", "stylua.toml", "selene.toml", "selene.yml", ".git" },
+    settings = {
+      Lua = {
+        runtime = { version = "LuaJIT" },
+        diagnostics = { globals = { "vim" } },
+        workspace = {
+          library = vim.api.nvim_get_runtime_file("", true),
+          checkThirdParty = false
         },
+        telemetry = { enable = false },
+        format = { enable = false },
       },
-    },
-    nixd = {
-      settings = {
-        nixd = {
-          nixpkgs = { 
-            expr = "import <nixpkgs> { }"
-          },
-          formatting = {
-            command = { "nixfmt" }
-          },
-          options = {
-            nixos = {
-              expr = string.format('(builtins.getFlake "%s/.config/dotfiles").nixosConfigurations.default.options', vim.env.HOME)
-            },
-            ["nix-darwin"] = {
-              expr = string.format('(builtins.getFlake "%s/.config/dotfiles").darwinConfigurations.owl.options', vim.env.HOME)
-            },
-            home_manager = {
-              expr = string.format('(builtins.getFlake "%s/.config/dotfiles").homeConfigurations.default.options', vim.env.HOME)
-            }
-          }
-        }
-      },
-    },
-    tsserver = {
-      on_attach = function(client, bufnr)
-        client.server_capabilities.documentFormattingProvider = false
-        on_attach(client, bufnr)
-      end,
-    },
-    pyright = {
-      settings = { 
-        python = { 
-          analysis = { 
-            typeCheckingMode = "basic",
-            autoSearchPaths = true,
-            useLibraryCodeForTypes = true,
-          }
-        }
-      },
-    },
-    rust_analyzer = {
-      settings = { 
-        ["rust-analyzer"] = { 
-          cargo = { allFeatures = true },
-          checkOnSave = { command = "clippy" },
-        }
-      },
-    },
-    gopls = {
-      settings = { 
-        gopls = { 
-          analyses = { unusedparams = true },
-          staticcheck = true,
-          gofumpt = true,
-        }
-      },
-    },
-    clangd = {
-      cmd = { "clangd", "--background-index", "--clang-tidy" },
-      capabilities = vim.tbl_deep_extend("force", capabilities, {
-        offsetEncoding = { "utf-16" }
-      }),
     },
   }
 
-  for server, config in pairs(servers) do
-    lspconfig[server].setup({
-      capabilities = config.capabilities or capabilities,
-      on_attach = config.on_attach or on_attach,
-      settings = config.settings,
-      cmd = config.cmd,
-    })
-  end
+  -- Nix Language Server
+  vim.lsp.config.nixd = {
+    cmd = { "nixd" },
+    root_markers = { "flake.nix", "default.nix", "shell.nix", ".git" },
+    settings = {
+      nixd = {
+        nixpkgs = { 
+          expr = "import <nixpkgs> { }"
+        },
+        formatting = {
+          command = { "nixfmt" }
+        },
+        options = {
+          nixos = {
+            expr = string.format('(builtins.getFlake "%s/.config/dotfiles").nixosConfigurations.default.options', vim.env.HOME)
+          },
+          ["nix-darwin"] = {
+            expr = string.format('(builtins.getFlake "%s/.config/dotfiles").darwinConfigurations.owl.options', vim.env.HOME)
+          },
+          home_manager = {
+            expr = string.format('(builtins.getFlake "%s/.config/dotfiles").homeConfigurations.default.options', vim.env.HOME)
+          }
+        }
+      }
+    },
+  }
 
-  -- Diagnostics Configuration
+  -- TypeScript/JavaScript Language Server
+  vim.lsp.config.ts_ls = {
+    cmd = { "typescript-language-server", "--stdio" },
+    root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
+    on_attach = function(client, bufnr)
+      client.server_capabilities.documentFormattingProvider = false
+      on_attach(client, bufnr)
+    end,
+  }
+
+  -- Python Language Server
+  vim.lsp.config.pyright = {
+    cmd = { "pyright-langserver", "--stdio" },
+    root_markers = { "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile", ".git" },
+    settings = {
+      python = {
+        analysis = {
+          typeCheckingMode = "basic",
+          autoSearchPaths = true,
+          useLibraryCodeForTypes = true,
+        }
+      }
+    },
+  }
+
+  -- Rust Language Server
+  vim.lsp.config.rust_analyzer = {
+    cmd = { "rust-analyzer" },
+    root_markers = { "Cargo.toml", "rust-project.json", ".git" },
+    settings = {
+      ["rust-analyzer"] = {
+        cargo = { allFeatures = true },
+        checkOnSave = { command = "clippy" },
+      }
+    },
+  }
+
+  -- Go Language Server
+  vim.lsp.config.gopls = {
+    cmd = { "gopls" },
+    root_markers = { "go.work", "go.mod", ".git" },
+    settings = {
+      gopls = {
+        analyses = { unusedparams = true },
+        staticcheck = true,
+        gofumpt = true,
+      }
+    },
+  }
+
+  -- C/C++ Language Server
+  vim.lsp.config.clangd = {
+    cmd = { "clangd", "--background-index", "--clang-tidy" },
+    root_markers = { ".clangd", ".clang-tidy", ".clang-format", "compile_commands.json", "compile_flags.txt", ".git" },
+    capabilities = vim.tbl_deep_extend("force", capabilities, {
+      offsetEncoding = { "utf-16" }
+    }),
+  }
+
+  -- Enable LSP servers based on filetype
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "lua" },
+    callback = function(args)
+      vim.lsp.enable("lua_ls", args.buf)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "nix" },
+    callback = function(args)
+      vim.lsp.enable("nixd", args.buf)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
+    callback = function(args)
+      vim.lsp.enable("ts_ls", args.buf)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "python" },
+    callback = function(args)
+      vim.lsp.enable("pyright", args.buf)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "rust" },
+    callback = function(args)
+      vim.lsp.enable("rust_analyzer", args.buf)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "go", "gomod", "gowork", "gotmpl" },
+    callback = function(args)
+      vim.lsp.enable("gopls", args.buf)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
+    callback = function(args)
+      vim.lsp.enable("clangd", args.buf)
+    end,
+  })
+
+  -- Diagnostics Configuration with modern sign API
   vim.diagnostic.config({
     virtual_text = { prefix = "●", source = "if_many" },
     float = { source = "always", border = "rounded" },
-    signs = true,
+    signs = {
+      text = {
+        [vim.diagnostic.severity.ERROR] = "",
+        [vim.diagnostic.severity.WARN] = "",
+        [vim.diagnostic.severity.HINT] = "",
+        [vim.diagnostic.severity.INFO] = "",
+      },
+    },
     underline = true,
     update_in_insert = false,
     severity_sort = true,
   })
-
-  -- LSP diagnostic signs
-  local signs = { Error = "", Warn = "", Hint = "", Info = "" }
-  for type, icon in pairs(signs) do
-    local hl = "DiagnosticSign" .. type
-    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-  end
 
   vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
   vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })

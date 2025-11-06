@@ -6,15 +6,6 @@ function M.setup()
 
   local actions = require("telescope.actions")
 
-  -- Check if FZF sorter is available
-  local sorter_ok, sorters = pcall(require, "telescope.sorters")
-  local fzf_sorter = nil
-  if sorter_ok and sorters.get_fzf_sorter then
-    fzf_sorter = sorters.get_fzf_sorter()
-  else
-    vim.notify("Telescope: FZF native sorter not available, using default.", vim.log.levels.WARN)
-  end
-
   telescope.setup({
     defaults = {
       prompt_prefix = " ",
@@ -28,7 +19,6 @@ function M.setup()
         height = 0.8,
       },
       file_ignore_patterns = { "%.git/", "node_modules/", "__pycache__/" },
-      sorter = fzf_sorter,
       mappings = {
         i = {
           ["<esc>"] = actions.close,
