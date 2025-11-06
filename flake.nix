@@ -135,6 +135,33 @@
             nix-homebrew.darwinModules.nix-homebrew
           ];
         };
+
+      #──────────────────────────────────────────────────────────────────
+      # NixOS Configuration
+      #──────────────────────────────────────────────────────────────────
+
+      mkNixOSConfiguration = system: hostname:
+        let
+          specialArgs = mkSpecialArgs system;
+        in
+          nixpkgs.lib.nixosSystem {
+            inherit system;
+            specialArgs = specialArgs;
+            modules = [
+              (./. + "/hosts/${hostname}")
+
+              home-manager.nixosModules.home-manager {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = specialArgs;
+                  users.${user} = import ./home;
+
+                  backupFileExtension = "backup";
+                };
+              }
+            ];
+          };
     
       #──────────────────────────────────────────────────────────────────
       #  Configuration
@@ -154,6 +181,11 @@
 
       darwinConfigurations = {
         owl = mkDarwinConfiguration (builtins.head darwinSystems) "owl";
+      };
+
+      nixosConfigurations = {
+        # Example NixOS configuration - customize hostname as needed
+        # crow = mkNixOSConfiguration (builtins.head linuxSystems) "crow";
       };
 
       #──────────────────────────────────────────────────────────────────
