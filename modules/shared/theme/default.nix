@@ -54,23 +54,23 @@ let
     cyan = "#70a6a6";
     blue = "#7a92a6";
     
-    # Semantic aliases
-    background = "#efead8";
-    success = "#8fa670";
-    warning = "#b8905e";
-    error = "#a67070";
-    info = "#70a6a6";
-    border = "#a69e93";
-    selection = "#a69e93";
-    cursor = "#2d2b28";
-    link = "#857a71";
-    subtext = "#45413b";
+    # Semantic aliases (reference colors above for consistency)
+    background = palette.base;
+    success = palette.green;
+    warning = palette.orange;
+    error = palette.red;
+    info = palette.cyan;
+    border = palette.overlay;
+    selection = palette.overlay;
+    cursor = palette.text;
+    link = palette.primary;
+    subtext = palette.subtext0;
     
-    # Legacy compatibility
-    love = "#a67070";
-    gold = "#cbb470";
-    foam = "#70a6a6";
-    pine = "#8fa670";
+    # Legacy compatibility (for backward compatibility)
+    love = palette.red;
+    gold = palette.yellow;
+    foam = palette.cyan;
+    pine = palette.green;
     
     # Wallpaper path
     wallpaper = "~/.config/dotfiles/images/wallpapers/BeigeInk.png";
