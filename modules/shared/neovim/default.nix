@@ -111,6 +111,9 @@ in {
   ];
 
   config = {
+    
+    # Enable Catppuccin theme for neovim
+    catppuccin.nvim.enable = true;
 
     xdg.configFile."nvim/lua/theme/palette.lua".text = themePalette;
     

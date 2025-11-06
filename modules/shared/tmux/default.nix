@@ -1,18 +1,12 @@
-{ config, lib, pkgs, palette ? null, ... }:
+{ config, lib, pkgs, ... }:
 
-let
-  # Fallback palette if theme system is not enabled
-  defaultPalette = {
-    base = "#efead8"; text = "#2d2b28"; primary = "#857a71"; secondary = "#8f857a";
-    red = "#a67070"; green = "#8fa670"; surface = "#cbc2b3"; overlay = "#a69e93";
-    muted = "#655f59"; subtext0 = "#45413b"; subtext1 = "#5a554d";
-  };
-  
-  colors = if palette != null then palette else defaultPalette;
-in
 {
   programs.tmux = {
     enable = true;
+    
+    # Enable Catppuccin theme
+    catppuccin.enable = true;
+    
     terminal = "tmux-256color";
     mouse = true;
     baseIndex = 1;
@@ -23,20 +17,6 @@ in
     prefix = "C-space";
 
     extraConfig = ''
-      # Theme colors (static - edit in theme/default.nix)
-      set -g status-style "bg=${colors.surface},fg=${colors.text}"
-      set -g status-left "#[fg=${colors.base},bg=${colors.primary},bold] #S #[fg=${colors.primary},bg=${colors.surface},nobold]"
-      set -g status-right "#[fg=${colors.overlay},bg=${colors.surface}]#[fg=${colors.text},bg=${colors.overlay}] %Y-%m-%d #[fg=${colors.primary},bg=${colors.overlay}]#[fg=${colors.base},bg=${colors.primary},bold] %H:%M "
-      
-      set -g window-status-format "#[fg=${colors.surface},bg=${colors.overlay}]#[fg=${colors.text},bg=${colors.overlay}] #I #W #[fg=${colors.overlay},bg=${colors.surface}]"
-      set -g window-status-current-format "#[fg=${colors.surface},bg=${colors.green}]#[fg=${colors.base},bg=${colors.green},bold] #I #W #[fg=${colors.green},bg=${colors.surface},nobold]"
-      
-      set -g pane-border-style "fg=${colors.overlay}"
-      set -g pane-active-border-style "fg=${colors.primary}"
-      
-      set -g message-style "fg=${colors.base},bg=${colors.primary}"
-      set -g mode-style "bg=${colors.primary},fg=${colors.base}"
-      
       # Status bar configuration
       set -g status on
       set -g status-justify left

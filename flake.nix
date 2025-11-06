@@ -130,7 +130,10 @@
 
                   backupFileExtension = "backup";
                 };
-              } 
+              }
+              
+              # Catppuccin theming module
+              inputs.catppuccin.homeManagerModules.catppuccin
 
             nix-homebrew.darwinModules.nix-homebrew
           ];
