@@ -1,4 +1,5 @@
 { config, lib, pkgs, ... }:
+
 {
-    home.file.".config/aerospace/aerospace.toml".source = ./config/aerospace.toml;
+  xdg.configFile."aerospace/aerospace.toml".source = ./config/aerospace.toml;
 }

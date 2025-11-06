@@ -156,12 +156,6 @@
         owl = mkDarwinConfiguration (builtins.head darwinSystems) "owl";
       };
 
-      #──────────────────────────────────────────────────────────────────
-      # Overlays Configuration
-      #──────────────────────────────────────────────────────────────────
-
-      overlays = import ./overlays { inherit inputs; };
-
       formatter = forAllSystems (system:
         nixpkgs.legacyPackages.${system}.nixpkgs-fmt
       );
