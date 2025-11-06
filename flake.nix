@@ -130,7 +130,10 @@
 
                   backupFileExtension = "backup";
                 };
-              } 
+              }
+              
+              # Catppuccin theming module
+              inputs.catppuccin.homeManagerModules.catppuccin
 
             nix-homebrew.darwinModules.nix-homebrew
           ];
@@ -155,12 +158,6 @@
       darwinConfigurations = {
         owl = mkDarwinConfiguration (builtins.head darwinSystems) "owl";
       };
-
-      #──────────────────────────────────────────────────────────────────
-      # Overlays Configuration
-      #──────────────────────────────────────────────────────────────────
-
-      overlays = import ./overlays { inherit inputs; };
 
       formatter = forAllSystems (system:
         nixpkgs.legacyPackages.${system}.nixpkgs-fmt
