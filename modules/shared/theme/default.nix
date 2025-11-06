@@ -7,33 +7,16 @@ let
   utils = import ./utils.nix { inherit lib; };
   registry = import ./registry.nix { inherit lib; };
   
-  # Default to beige theme if no runtime theme is set
+  # Default to beige theme - this is the build-time default
+  # Runtime theme switching is handled via symlinks, not Nix evaluation
   defaultVariant = "beige";
   
-  # Runtime theme file that can be changed without rebuilds
-  runtimeThemeFile = "${config.xdg.configHome}/theme/current.json";
-  
-  # Function to read runtime theme or use default
-  getRuntimeTheme = 
-    let
-      themeFile = runtimeThemeFile;
-      hasRuntimeTheme = builtins.pathExists themeFile;
-    in
-    if hasRuntimeTheme
-    then builtins.fromJSON (builtins.readFile themeFile)
-    else { variant = defaultVariant; custom = null; };
-  
-  # Get the current palette (either from registry or custom)
-  currentPalette = 
-    let
-      runtimeTheme = getRuntimeTheme;
-    in
-    if runtimeTheme.custom != null
-    then registry.mkTheme runtimeTheme.custom
-    else registry.${runtimeTheme.variant or defaultVariant};
+  # Build-time palette from the default theme
+  # This is used to generate static config files
+  buildTimePalette = registry.${defaultVariant};
 
   # Use utility function for JSON-safe palette
-  paletteForJSON = utils.toJsonSafe currentPalette;
+  paletteForJSON = utils.toJsonSafe buildTimePalette;
 in
 {
   options.theme = {
@@ -65,11 +48,11 @@ in
   };
   
   config = lib.mkIf cfg.enable {
-    _module.args.palette = currentPalette;
+    _module.args.palette = buildTimePalette;
     
     home.sessionVariables = {
-      THEME_VARIANT = getRuntimeTheme.variant or defaultVariant;
-      THEME_IS_CUSTOM = if (getRuntimeTheme.custom or null) != null then "true" else "false";
+      THEME_VARIANT = defaultVariant;
+      THEME_IS_CUSTOM = "false";
     };
     
     xdg.configFile = {
@@ -174,81 +157,83 @@ in
       # This avoids conflicts with mkOutOfStoreSymlink and home-manager's backup mechanism
       
       # Legacy palette.json for compatibility
+      # This contains the build-time default theme
+      # Runtime theme info is stored in theme/current file
       "theme/palette.json".text = builtins.toJSON {
-        variant = getRuntimeTheme.variant or defaultVariant;
-        isCustom = (getRuntimeTheme.custom or null) != null;
+        variant = defaultVariant;
+        isCustom = false;
         colors = paletteForJSON;
         font = cfg.font;
         spacing = { borderRadius = cfg.borderRadius; gap = cfg.gap; };
       };
       
-      # Shell environment variables for theme
+      # Shell environment variables for theme (build-time default)
       "theme/palette.sh".text = ''
-        export THEME_VARIANT="${getRuntimeTheme.variant or defaultVariant}"
+        export THEME_VARIANT="${defaultVariant}"
         # Base colors (4)
-        export THEME_BASE="${currentPalette.base}"
-        export THEME_MANTLE="${currentPalette.mantle}"
-        export THEME_SURFACE="${currentPalette.surface}"
-        export THEME_OVERLAY="${currentPalette.overlay}"
+        export THEME_BASE="${buildTimePalette.base}"
+        export THEME_MANTLE="${buildTimePalette.mantle}"
+        export THEME_SURFACE="${buildTimePalette.surface}"
+        export THEME_OVERLAY="${buildTimePalette.overlay}"
         # Text colors (4)
-        export THEME_TEXT="${currentPalette.text}"
-        export THEME_SUBTEXT0="${currentPalette.subtext0}"
-        export THEME_SUBTEXT1="${currentPalette.subtext1}"
-        export THEME_MUTED="${currentPalette.muted}"
+        export THEME_TEXT="${buildTimePalette.text}"
+        export THEME_SUBTEXT0="${buildTimePalette.subtext0}"
+        export THEME_SUBTEXT1="${buildTimePalette.subtext1}"
+        export THEME_MUTED="${buildTimePalette.muted}"
         # Accent colors (8)
-        export THEME_PRIMARY="${currentPalette.primary}"
-        export THEME_SECONDARY="${currentPalette.secondary}"
-        export THEME_RED="${currentPalette.red}"
-        export THEME_ORANGE="${currentPalette.orange}"
-        export THEME_YELLOW="${currentPalette.yellow}"
-        export THEME_GREEN="${currentPalette.green}"
-        export THEME_CYAN="${currentPalette.cyan}"
-        export THEME_BLUE="${currentPalette.blue}"
+        export THEME_PRIMARY="${buildTimePalette.primary}"
+        export THEME_SECONDARY="${buildTimePalette.secondary}"
+        export THEME_RED="${buildTimePalette.red}"
+        export THEME_ORANGE="${buildTimePalette.orange}"
+        export THEME_YELLOW="${buildTimePalette.yellow}"
+        export THEME_GREEN="${buildTimePalette.green}"
+        export THEME_CYAN="${buildTimePalette.cyan}"
+        export THEME_BLUE="${buildTimePalette.blue}"
         
         # Backward compatibility aliases
-        export THEME_SUBTEXT="${currentPalette.subtext}"
-        export THEME_BACKGROUND="${currentPalette.background}"
-        export THEME_SUCCESS="${currentPalette.success}"
-        export THEME_WARNING="${currentPalette.warning}"
-        export THEME_ERROR="${currentPalette.error}"
-        export THEME_INFO="${currentPalette.info}"
-        export THEME_LOVE="${currentPalette.love}"
-        export THEME_GOLD="${currentPalette.gold}"
-        export THEME_FOAM="${currentPalette.foam}"
-        export THEME_PINE="${currentPalette.pine}"
+        export THEME_SUBTEXT="${buildTimePalette.subtext}"
+        export THEME_BACKGROUND="${buildTimePalette.background}"
+        export THEME_SUCCESS="${buildTimePalette.success}"
+        export THEME_WARNING="${buildTimePalette.warning}"
+        export THEME_ERROR="${buildTimePalette.error}"
+        export THEME_INFO="${buildTimePalette.info}"
+        export THEME_LOVE="${buildTimePalette.love}"
+        export THEME_GOLD="${buildTimePalette.gold}"
+        export THEME_FOAM="${buildTimePalette.foam}"
+        export THEME_PINE="${buildTimePalette.pine}"
       '';
       
       "theme/palette.css".text = ''
         :root {
           /* Base colors (4) */
-          --base: ${currentPalette.base};
-          --mantle: ${currentPalette.mantle};
-          --surface: ${currentPalette.surface};
-          --overlay: ${currentPalette.overlay};
+          --base: ${buildTimePalette.base};
+          --mantle: ${buildTimePalette.mantle};
+          --surface: ${buildTimePalette.surface};
+          --overlay: ${buildTimePalette.overlay};
           
           /* Text colors (4) */
-          --text: ${currentPalette.text};
-          --subtext0: ${currentPalette.subtext0};
-          --subtext1: ${currentPalette.subtext1};
-          --muted: ${currentPalette.muted};
+          --text: ${buildTimePalette.text};
+          --subtext0: ${buildTimePalette.subtext0};
+          --subtext1: ${buildTimePalette.subtext1};
+          --muted: ${buildTimePalette.muted};
           
           /* Accent colors (8) */
-          --primary: ${currentPalette.primary};
-          --secondary: ${currentPalette.secondary};
-          --red: ${currentPalette.red};
-          --orange: ${currentPalette.orange};
-          --yellow: ${currentPalette.yellow};
-          --green: ${currentPalette.green};
-          --cyan: ${currentPalette.cyan};
-          --blue: ${currentPalette.blue};
+          --primary: ${buildTimePalette.primary};
+          --secondary: ${buildTimePalette.secondary};
+          --red: ${buildTimePalette.red};
+          --orange: ${buildTimePalette.orange};
+          --yellow: ${buildTimePalette.yellow};
+          --green: ${buildTimePalette.green};
+          --cyan: ${buildTimePalette.cyan};
+          --blue: ${buildTimePalette.blue};
           
           /* Backward compatibility aliases */
-          --bg: ${currentPalette.background};
-          --subtext: ${currentPalette.subtext};
-          --success: ${currentPalette.success};
-          --warning: ${currentPalette.warning};
-          --error: ${currentPalette.error};
-          --info: ${currentPalette.info};
+          --bg: ${buildTimePalette.background};
+          --subtext: ${buildTimePalette.subtext};
+          --success: ${buildTimePalette.success};
+          --warning: ${buildTimePalette.warning};
+          --error: ${buildTimePalette.error};
+          --info: ${buildTimePalette.info};
         }
       '';
     };

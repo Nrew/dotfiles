@@ -1,4 +1,13 @@
-{ config, lib, pkgs, self, palette, ... }:
+{ config, lib, pkgs, self, palette ? null, ... }:
+
+let
+  # Fallback palette if theme system is not enabled
+  defaultPalette = {
+    primary = "#857a71"; secondary = "#8f857a"; red = "#a67070"; error = "#a67070"; info = "#70a6a6";
+  };
+  
+  colors = if palette != null then palette else defaultPalette;
+in
 {
   #──────────────────────────────────────────────────────────────────
   # Fastfetch Logo Image Management
@@ -28,8 +37,8 @@
         separator = "  ";
         key.width = 16;
         color = {
-          keys  = palette.primary;
-          title = palette.secondary;
+          keys  = colors.primary;
+          title = colors.secondary;
         };
       };
 
@@ -39,12 +48,12 @@
         # ───────────────────────────────────────────────────────────────────────────────
         {
           type = "title";
-          keyColor = palette.primary;
+          keyColor = colors.primary;
         }
         {
           type = "separator";
           string = "▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼";
-          color = palette.primary;
+          color = colors.primary;
         }
         # ───────────────────────────────────────────────────────────────────────────────
         # システム情報 (System Information)
@@ -52,31 +61,31 @@
         {
           type = "os";
           key = "󰒋 オペレーティングシステム";
-          keyColor = palette.error;
+          keyColor = colors.error;
           format = "{2} {9}";
         }
         {
           type = "kernel";
           key = "❯ カーネル";
-          keyColor = palette.info;   
+          keyColor = colors.info;   
           format = "{1} {2}";
         }
         {
           type = "host";
           key = " ホスト";
-          keyColor = palette.secondary;
+          keyColor = colors.secondary;
           format = "{1}";
         }
         {
           type = "uptime";
           key = " アップタイム";
-          keyColor = palette.secondary;
+          keyColor = colors.secondary;
           format = "{?1}{1} 日{?} {?2}{2} 時間{?} {?3}{3} 分{?}";
         }
         {
           type = "separator";
           string = " ≫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━≪";
-          color = palette.muted;
+          color = colors.muted;
         }
 
         # ───────────────────────────────────────────────────────────────────────────────
@@ -86,24 +95,24 @@
         {
           type = "packages";
           key = " パッケージ";
-          keyColor = palette.warning;
+          keyColor = colors.warning;
           format = "{} (nix)";
         }
         {
           type = "shell";
           key = " シェル";
-          keyColor = palette.primary;
+          keyColor = colors.primary;
         }
         {
           type = "memory";
           key = "メモリ";
-          keyColor = palette.error;
+          keyColor = colors.error;
           format = "{1} / {2} ({3})";
         }
         {
           type = "separator";
           string = " ≫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━≪";
-          color = palette.muted;
+          color = colors.muted;
         }
 
         # ═══════════════════════════════════════════════════════════════
@@ -113,28 +122,28 @@
         {
           type = "display";
           key = "ディスプレイ";
-          keyColor = palette.secondary;
+          keyColor = colors.secondary;
           format = "{1}x{2}@{5}Hz";
         }
         {
           type = "de";
           key = "デスクトップ環境";
-          keyColor = palette.secondary;
+          keyColor = colors.secondary;
         }
         {
           type = "wm";
           key = "ウィンドウマネージャ";
-          keyColor = palette.warning;
+          keyColor = colors.warning;
         }
         {
           type = "terminal";
           key = " ターミナル";
-          keyColor = palette.info;
+          keyColor = colors.info;
         }
         {
           type = "separator";
           string = "▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼";
-          color = palette.primary;
+          color = colors.primary;
         }
         # ═══════════════════════════════════════════════════════════════
         # システム状態 (System Status)

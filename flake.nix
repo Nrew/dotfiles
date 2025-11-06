@@ -81,6 +81,10 @@
       mkLinuxApps = system: {
         "apply" = mkApp "apply" system;
         "build-switch" = mkApp "build-switch" system;
+        "copy-keys" = mkApp "copy-keys" system;
+        "create-keys" = mkApp "create-keys" system;
+        "check-keys" = mkApp "check-keys" system;
+        "install" = mkApp "install" system;
       };
       mkDarwinApps = system: {
         "apply" = mkApp "apply" system;
@@ -131,36 +135,9 @@
             nix-homebrew.darwinModules.nix-homebrew
           ];
         };
-
-      #──────────────────────────────────────────────────────────────────
-      # NixOS Configuration
-      #──────────────────────────────────────────────────────────────────
-
-      mkNixOSConfiguration = system: hostname:
-        let
-          specialArgs = mkSpecialArgs system;
-        in
-          nixpkgs.lib.nixosSystem {
-            inherit system;
-            specialArgs = specialArgs;
-            modules = [
-              (./. + "/hosts/${hostname}")
-
-              home-manager.nixosModules.home-manager {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  extraSpecialArgs = specialArgs;
-                  users.${user} = import ./home;
-
-                  backupFileExtension = "backup";
-                };
-              }
-            ];
-          };
     
       #──────────────────────────────────────────────────────────────────
-      # Legacy Packages Configuration
+      #  Configuration
       #──────────────────────────────────────────────────────────────────
       
       legacyPackages = forAllSystems pkgsFor;
@@ -177,14 +154,6 @@
 
       darwinConfigurations = {
         owl = mkDarwinConfiguration (builtins.head darwinSystems) "owl";
-      };
-
-      nixosConfigurations = {
-        # Add NixOS configurations here when needed. Example:
-        # crow = mkNixOSConfiguration (builtins.head linuxSystems) "crow";
-        # 
-        # Note: Uncomment and customize the above line to add a NixOS host.
-        # Create a corresponding configuration in hosts/<hostname>/default.nix
       };
 
       #──────────────────────────────────────────────────────────────────

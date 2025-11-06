@@ -1,4 +1,15 @@
-{ config, lib, pkgs, palette, ... }:
+{ config, lib, pkgs, palette ? null, ... }:
+
+let
+  # Fallback palette if theme system is not enabled
+  defaultPalette = {
+    base = "#efead8"; text = "#2d2b28"; primary = "#857a71"; secondary = "#8f857a";
+    red = "#a67070"; green = "#8fa670"; surface = "#cbc2b3"; overlay = "#a69e93";
+    muted = "#655f59"; subtext0 = "#45413b"; subtext1 = "#5a554d";
+  };
+  
+  colors = if palette != null then palette else defaultPalette;
+in
 {
   programs.tmux = {
     enable = true;

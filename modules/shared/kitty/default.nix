@@ -1,6 +1,20 @@
-{ lib, pkgs, config, palette, ... }:
+{ lib, pkgs, config, palette ? null, ... }:
 
 let
+  # Fallback palette if theme system is not enabled
+  # This ensures the module works independently
+  defaultPalette = {
+    base = "#efead8"; text = "#2d2b28"; primary = "#857a71"; secondary = "#8f857a";
+    red = "#a67070"; orange = "#b8905e"; yellow = "#cbb470"; green = "#8fa670";
+    cyan = "#70a6a6"; blue = "#7a92a6"; mantle = "#e5e0d0"; surface = "#cbc2b3";
+    overlay = "#a69e93"; subtext0 = "#45413b"; subtext1 = "#5a554d"; muted = "#655f59";
+    background = "#efead8"; subtext = "#45413b"; success = "#8fa670";
+    warning = "#b8905e"; error = "#a67070"; info = "#70a6a6";
+    selection = "#a69e93"; border = "#a69e93"; cursor = "#2d2b28"; link = "#857a71";
+  };
+  
+  colors = if palette != null then palette else defaultPalette;
+
   # Script to generate kitty theme from runtime palette
   kittyThemeReloader = pkgs.writeShellScript "kitty-theme-reload" ''
     #!/usr/bin/env bash

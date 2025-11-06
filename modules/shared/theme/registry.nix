@@ -205,7 +205,8 @@ let
     };
   };
   
-  available = builtins.attrNames themes;
+  # Sort available themes alphabetically for deterministic ordering
+  available = builtins.sort (a: b: a < b) (builtins.attrNames themes);
 
   exists = name: builtins.elem name available;
 

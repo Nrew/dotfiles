@@ -1,6 +1,16 @@
-{ pkgs, inputs, palette, ... }:
+{ pkgs, inputs, palette ? null, ... }:
 
 let
+  # Fallback palette if theme system is not enabled
+  defaultPalette = {
+    base = "#efead8"; mantle = "#e5e0d0"; surface = "#cbc2b3"; overlay = "#a69e93";
+    text = "#2d2b28"; subtext0 = "#45413b"; subtext1 = "#5a554d"; muted = "#655f59";
+    primary = "#857a71"; secondary = "#8f857a"; red = "#a67070"; orange = "#b8905e";
+    yellow = "#cbb470"; green = "#8fa670"; cyan = "#70a6a6"; blue = "#7a92a6";
+  };
+  
+  colors = if palette != null then palette else defaultPalette;
+
   utils = inputs.nixCats.utils;
 
   # Core tools needed for all languages
@@ -82,22 +92,22 @@ let
       if not ok or not palette then
         -- Fallback palette
         return {
-          base = "${palette.base}",
-          mantle = "${palette.mantle}",
-          surface = "${palette.surface}",
-          overlay = "${palette.overlay}",
-          text = "${palette.text}",
-          subtext0 = "${palette.subtext0}",
-          subtext1 = "${palette.subtext1}",
-          muted = "${palette.muted}",
-          primary = "${palette.primary}",
-          secondary = "${palette.secondary}",
-          red = "${palette.red}",
-          orange = "${palette.orange}",
-          yellow = "${palette.yellow}",
-          green = "${palette.green}",
-          cyan = "${palette.cyan}",
-          blue = "${palette.blue}",
+          base = "${colors.base}",
+          mantle = "${colors.mantle}",
+          surface = "${colors.surface}",
+          overlay = "${colors.overlay}",
+          text = "${colors.text}",
+          subtext0 = "${colors.subtext0}",
+          subtext1 = "${colors.subtext1}",
+          muted = "${colors.muted}",
+          primary = "${colors.primary}",
+          secondary = "${colors.secondary}",
+          red = "${colors.red}",
+          orange = "${colors.orange}",
+          yellow = "${colors.yellow}",
+          green = "${colors.green}",
+          cyan = "${colors.cyan}",
+          blue = "${colors.blue}",
         }
       end
       
