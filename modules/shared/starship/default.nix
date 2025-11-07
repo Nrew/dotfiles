@@ -1,11 +1,11 @@
 { config, pkgs, ... }:
 
 {
+  # Enable Catppuccin theme
+  catppuccin.starship.enable = true;
+
   programs.starship = {
     enable = true;
-    
-    # Enable Catppuccin theme
-    catppuccin.enable = true;
     
     settings = {
       add_newline = false;

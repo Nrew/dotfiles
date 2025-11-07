@@ -1,11 +1,11 @@
 { lib, pkgs, config, ... }:
 
 {
+  # Enable Catppuccin theme
+  catppuccin.kitty.enable = true;
+
   programs.kitty = {
     enable = true;
-    
-    # Enable Catppuccin theme
-    catppuccin.enable = true;
 
     # ────────────────────────────────────────────────────────────────
     # Font Configuration

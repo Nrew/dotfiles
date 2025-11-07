@@ -1,12 +1,11 @@
 { config, lib, pkgs, ... }:
 
 {
+  # Enable Catppuccin theme
+  catppuccin.tmux.enable = true;
+
   programs.tmux = {
     enable = true;
-    
-    # Enable Catppuccin theme
-    catppuccin.enable = true;
-    
     terminal = "tmux-256color";
     mouse = true;
     baseIndex = 1;

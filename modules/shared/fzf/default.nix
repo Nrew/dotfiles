@@ -1,12 +1,12 @@
 { config, lib, pkgs, ... }:
 
 {
+  # Enable Catppuccin theme
+  catppuccin.fzf.enable = true;
+
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
-
-    # Enable Catppuccin theme
-    catppuccin.enable = true;
     
     # Default options for better UX
     defaultOptions = [
