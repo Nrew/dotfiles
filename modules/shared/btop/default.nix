@@ -8,7 +8,6 @@
     catppuccin.enable = true;
     
     settings = {
-      color_theme = "catppuccin_mocha";
       theme_background = false;
       update_ms = 1000;
       proc_sorting = "cpu lazy";

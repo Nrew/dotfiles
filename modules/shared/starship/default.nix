@@ -3,6 +3,10 @@
 {
   programs.starship = {
     enable = true;
+    
+    # Enable Catppuccin theme
+    catppuccin.enable = true;
+    
     settings = {
       add_newline = false;
       continuation_prompt = "[▸▹ ](dimmed white)";
