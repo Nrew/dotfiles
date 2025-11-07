@@ -1,11 +1,11 @@
 { config, pkgs, lib, ... }:
 
 {
+  # Enable Catppuccin theme for btop
+  catppuccin.btop.enable = true;
+  
   programs.btop = {
     enable = true;
-    
-    # Enable Catppuccin theme
-    catppuccin.enable = true;
     
     settings = {
       theme_background = false;

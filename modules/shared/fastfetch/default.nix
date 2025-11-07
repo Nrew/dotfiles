@@ -1,16 +1,9 @@
 { config, lib, pkgs, self, ... }:
 
-let
-  # Catppuccin Mocha colors for fastfetch
-  colors = {
-    primary = "#cba6f7";    # Catppuccin Mocha mauve
-    secondary = "#f5c2e7";  # Catppuccin Mocha pink
-    red = "#f38ba8";        # Catppuccin Mocha red
-    error = "#f38ba8";      # Catppuccin Mocha red
-    info = "#89dceb";       # Catppuccin Mocha sky
-  };
-in
 {
+  # Enable Catppuccin theme for fastfetch
+  catppuccin.fastfetch.enable = true;
+
   #──────────────────────────────────────────────────────────────────
   # Fastfetch Logo Image Management
   #──────────────────────────────────────────────────────────────────
@@ -38,10 +31,6 @@ in
       display = {
         separator = "  ";
         key.width = 16;
-        color = {
-          keys  = colors.primary;
-          title = colors.secondary;
-        };
       };
 
       modules = [
@@ -50,12 +39,10 @@ in
         # ───────────────────────────────────────────────────────────────────────────────
         {
           type = "title";
-          keyColor = colors.primary;
         }
         {
           type = "separator";
           string = "▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼";
-          color = colors.primary;
         }
         # ───────────────────────────────────────────────────────────────────────────────
         # システム情報 (System Information)
@@ -63,31 +50,26 @@ in
         {
           type = "os";
           key = "󰒋 オペレーティングシステム";
-          keyColor = colors.error;
           format = "{2} {9}";
         }
         {
           type = "kernel";
           key = "❯ カーネル";
-          keyColor = colors.info;   
           format = "{1} {2}";
         }
         {
           type = "host";
-          key = " ホスト";
-          keyColor = colors.secondary;
+          key = " ホスト";
           format = "{1}";
         }
         {
           type = "uptime";
-          key = " アップタイム";
-          keyColor = colors.secondary;
+          key = " アップタイム";
           format = "{?1}{1} 日{?} {?2}{2} 時間{?} {?3}{3} 分{?}";
         }
         {
           type = "separator";
           string = " ≫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━≪";
-          color = colors.muted;
         }
 
         # ───────────────────────────────────────────────────────────────────────────────
@@ -96,25 +78,21 @@ in
 
         {
           type = "packages";
-          key = " パッケージ";
-          keyColor = colors.warning;
+          key = " パッケージ";
           format = "{} (nix)";
         }
         {
           type = "shell";
-          key = " シェル";
-          keyColor = colors.primary;
+          key = " シェル";
         }
         {
           type = "memory";
           key = "メモリ";
-          keyColor = colors.error;
           format = "{1} / {2} ({3})";
         }
         {
           type = "separator";
           string = " ≫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━≪";
-          color = colors.muted;
         }
 
         # ═══════════════════════════════════════════════════════════════
@@ -124,28 +102,23 @@ in
         {
           type = "display";
           key = "ディスプレイ";
-          keyColor = colors.secondary;
           format = "{1}x{2}@{5}Hz";
         }
         {
           type = "de";
           key = "デスクトップ環境";
-          keyColor = colors.secondary;
         }
         {
           type = "wm";
           key = "ウィンドウマネージャ";
-          keyColor = colors.warning;
         }
         {
           type = "terminal";
-          key = " ターミナル";
-          keyColor = colors.info;
+          key = " ターミナル";
         }
         {
           type = "separator";
           string = "▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼";
-          color = colors.primary;
         }
         # ═══════════════════════════════════════════════════════════════
         # システム状態 (System Status)
