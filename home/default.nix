@@ -26,13 +26,6 @@ in
       borderRadius = 8;
       gap = 16;
     };
-    
-    # Catppuccin global theme configuration
-    catppuccin = {
-      enable = true;
-      flavor = "mocha";  # mocha (dark), macchiato, frappe, or latte (light)
-      accent = "mauve";  # mauve (purple), pink, blue, etc.
-    };
 
     # Enable home-manager
     programs.home-manager.enable = true;
