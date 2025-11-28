@@ -1,24 +1,9 @@
-{ config, lib, pkgs, palette, ... }:
+{ config, lib, pkgs, catppuccin, ... }:
 {
+  catppuccin.fzf.enable = true;
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
-
-    # Theme colors from centralized palette
-    colors = {
-      "bg+"     = palette.overlay;
-      "bg"      = palette.background;
-      "spinner" = palette.primary;
-      "hl"      = palette.error;
-      "fg"      = palette.text;
-      "header"  = palette.error;
-      "info"    = palette.secondary;
-      "pointer" = palette.primary;
-      "marker"  = palette.primary;
-      "fg+"     = palette.text;
-      "prompt"  = palette.secondary;
-      "hl+"     = palette.error; 
-    };
     
     # Default options for better UX
     defaultOptions = [

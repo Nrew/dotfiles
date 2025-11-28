@@ -131,9 +131,9 @@ let user = "nrew"; in
       brews = [                                 # Install CLI tools via Homebrew
         # `brew install`
         "mas"
-	      "lua"
+	"lua"
         "spicetify-cli"
-	      "switchaudio-osx"
+	"switchaudio-osx"
         "nowplaying-cli"
       ];
       casks = [                                 # Install GUI apps via Homebrew
