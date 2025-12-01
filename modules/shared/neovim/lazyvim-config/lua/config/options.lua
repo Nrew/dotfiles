@@ -1,9 +1,4 @@
-local opt, g = vim.opt, vim.g
-
--- Leaders
-g.mapleader = " "
-g.maplocalleader = " "
-g.have_nerd_fonts = true
+local opt = vim.opt
 
 -- Core behavior
 opt.mouse = "a"
@@ -21,13 +16,13 @@ opt.timeoutlen = 300
 opt.termguicolors = true
 opt.number = true
 opt.relativenumber = true
-opt.signcolumn = "yes:1"
+opt.signcolumn = "yes"
 opt.scrolloff = 8
 opt.sidescrolloff = 8
 opt.pumheight = 10
 opt.showmode = false
 opt.laststatus = 3
-opt.fillchars = { eob = " ", diff = "╱", vert = "│" }
+opt.fillchars = { eob = " ", diff = "╱" }
 
 -- Search
 opt.ignorecase = true
@@ -41,7 +36,7 @@ opt.tabstop = 2
 opt.shiftwidth = 2
 opt.autoindent = true
 opt.smartindent = true
-opt.wrap = true
+opt.wrap = false
 opt.linebreak = true
 opt.breakindent = true
 opt.list = true
@@ -51,16 +46,12 @@ opt.listchars = { tab = "󰌒 ", trail = "·", extends = "⟩", precedes = "⟨"
 opt.splitbelow = true
 opt.splitright = true
 opt.splitkeep = "screen"
-opt.winblend = 10  -- Pseudo-transparency for floating windows
+opt.winblend = 10
 
 -- Completion
-opt.completeopt = { "menuone", "noselect" }
-opt.pumblend = 10  -- Pseudo-transparency for popup menu
+opt.completeopt = "menu,menuone,noselect"
+opt.pumblend = 10
 
 -- Folding
 opt.foldlevel = 99
 opt.foldenable = true
-
--- Misc
-opt.isfname:append("@-@")
-opt.shortmess:append("sIc")

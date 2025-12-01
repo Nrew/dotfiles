@@ -1,84 +1,84 @@
-{ pkgs, ... }:
-
-let user = "nrew"; in
+{ pkgs, user, ... }:
 
 {
-    # ────────────────────────────────────────────────────────────────
-    # Import Modules
-    # ────────────────────────────────────────────────────────────────
+  # ────────────────────────────────────────────────────────────────
+  # Import Modules
+  # ────────────────────────────────────────────────────────────────
 
-    imports = [];
+  imports = [ ];
 
-    # ────────────────────────────────────────────────────────────────
-    # System Packages
-    # ────────────────────────────────────────────────────────────────
+  # ────────────────────────────────────────────────────────────────
+  # System Packages
+  # ────────────────────────────────────────────────────────────────
 
-    environment.systemPackages = with pkgs; [
-        docker
-        git
-        git-lfs
-        neovim
-        cmake
-        cargo
-        texinfo
+  environment.systemPackages = with pkgs; [
+    docker
+    git
+    git-lfs
+    neovim
+    cmake
+    cargo
+    texinfo
 
-        (python3.withPackages (ps: with ps; [
-            pip
-            virtualenv
-        ]))
+    (python3.withPackages (ps: with ps; [
+      pip
+      virtualenv
+    ]))
+  ];
+
+  # ────────────────────────────────────────────────────────────────
+  # Fonts Configuration
+  # ────────────────────────────────────────────────────────────────
+
+  fonts = {
+    packages = with pkgs; [
+      maple-mono-NF
+      nerdfonts
     ];
+  };
 
-    # ────────────────────────────────────────────────────────────────
-    # Fonts Configuration
-    # ────────────────────────────────────────────────────────────────
+  # ────────────────────────────────────────────────────────────────
+  # Environment Variables
+  # ────────────────────────────────────────────────────────────────
 
-    fonts = {
-        packages = with pkgs; [
-            maple-mono.truetype
-            maple-mono.NF-unhinted
-            nerd-fonts.symbols-only
-            nerd-fonts.jetbrains-mono
-            nerd-fonts.fira-code
-            nerd-fonts.iosevka
-        ];
+  environment.variables = {
+    LANG = "en_US.UTF-8";
+    LC_ALL = "en_US.UTF-8";
+  };
+
+  # ────────────────────────────────────────────────────────────────
+  # Nix Settings
+  # ────────────────────────────────────────────────────────────────
+
+  nixpkgs.config.allowUnfree = true;
+
+  nix = {
+    package = pkgs.nix;
+    settings = {
+      trusted-users = [ "@admin" "${user}" ];
+      substituters = [ "https://nix-community.cachix.org" "https://cache.nixos.org" ];
+      trusted-public-keys = [
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      ];
     };
 
-    # ────────────────────────────────────────────────────────────────
-    # Environment Variables
-    # ────────────────────────────────────────────────────────────────
-
-    environment.variables = {
-        LANG   = "en_US.UTF-8";
-        LC_ALL = "en_US.UTF-8";
+    gc = {
+      automatic = true;
+      interval = {
+        Weekday = 0;
+        Hour = 2;
+        Minute = 0;
+      };
+      options = "--delete-older-than 30d";
     };
 
-    # ────────────────────────────────────────────────────────────────
-    # Nix Settings
-    # ────────────────────────────────────────────────────────────────
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+  };
 
-    nixpkgs.config.allowUnfree = true;
-
-    nix = {
-      package = pkgs.nix;
-	    settings = {
-            trusted-users = [ "@admin" "${user}" ];
-            substituters = [ "https://nix-community.cachix.org" "https://cache.nixos.org" ];
-            trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
-        };
-
-        gc = {
-            automatic = true;
-            interval = { Weekday = 0; Hour = 2; Minute = 0; };
-            options = "--delete-older-than 30d";
-        };
-
-        extraOptions = ''
-            experimental-features = nix-command flakes
-        '';
-    };
-
-    # The stateVersion attribute is used to specify the version of NixOS
-    # to maintain backwards compatibility with older configurations.
-    # Changing this value can affect the behavior of the system.
-    system.stateVersion = 4;
+  # The stateVersion attribute is used to specify the version of NixOS/nix-darwin
+  # to maintain backwards compatibility with older configurations.
+  system.stateVersion = 4;
 }

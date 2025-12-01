@@ -12,6 +12,5 @@
     ./fastfetch
     ./fzf
     ./btop
-    ./zen
   ];
 }

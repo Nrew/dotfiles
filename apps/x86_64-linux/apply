@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 VERSION=1.0
 
 # Color codes
@@ -9,11 +11,11 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Determine the operating system
-export OS=$(uname)
+OS=$(uname)
 
-# Primary network interface
+# Primary network interface (Linux only)
 if [[ "$OS" != "Darwin" ]]; then
-  export PRIMARY_IFACE=$(ip -o -4 route show to default | awk '{print $5}')
+  PRIMARY_IFACE=$(ip -o -4 route show to default | awk '{print $5}')
   echo -e "${GREEN}Found primary network interface $PRIMARY_IFACE${NC}"
 fi
 
@@ -32,33 +34,77 @@ _prompt() {
   local variable="$2"
 
   _print "$message"
-  read -r $variable
+  read -r "$variable"
+}
+
+# Input validation functions
+validate_email() {
+  local email="$1"
+  if [[ ! "$email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+    return 1
+  fi
+  return 0
+}
+
+validate_hostname() {
+  local hostname="$1"
+  if [[ ! "$hostname" =~ ^[a-zA-Z0-9-]+$ ]]; then
+    return 1
+  fi
+  return 0
+}
+
+validate_username() {
+  local username="$1"
+  if [[ ! "$username" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+    return 1
+  fi
+  return 0
+}
+
+# Escape special characters for sed
+escape_sed() {
+  echo "$1" | sed 's/[&/\]/\\&/g'
 }
 
 # Fetch username from the system
-export USERNAME=$(whoami)
+USERNAME=$(whoami)
 
 # If the username is 'nixos' or 'root', ask the user for their username
 if [[ "$USERNAME" == "nixos" ]] || [[ "$USERNAME" == "root" ]]; then
-  _prompt "${YELLOW}You're running as $USERNAME. Please enter your desired username: ${NC}" USERNAME
+  while true; do
+    _prompt "${YELLOW}You're running as $USERNAME. Please enter your desired username: ${NC}" USERNAME
+    if validate_username "$USERNAME"; then
+      break
+    else
+      _print "${RED}Invalid username format. Use lowercase letters, numbers, dashes, and underscores only.${NC}"
+    fi
+  done
 fi
 
 # Check if git is available
 if command -v git >/dev/null 2>&1; then
   # Fetch email and name from git config
-  export GIT_EMAIL=$(git config --get user.email)
-  export GIT_NAME=$(git config --get user.name)
+  GIT_EMAIL=$(git config --get user.email || true)
+  GIT_NAME=$(git config --get user.name || true)
 else
   _print "${RED}Git is not available on this system.${NC}"
 fi
 
 # If git email is not found or git is not available, ask the user
-if [[ -z "$GIT_EMAIL" ]]; then
-  _prompt "${YELLOW}Please enter your email: ${NC}" GIT_EMAIL
+if [[ -z "${GIT_EMAIL:-}" ]]; then
+  while true; do
+    _prompt "${YELLOW}Please enter your email: ${NC}" GIT_EMAIL
+    if validate_email "$GIT_EMAIL"; then
+      break
+    else
+      _print "${RED}Invalid email format. Please try again.${NC}"
+    fi
+  done
 fi
 
 # If git name is not found or git is not available, ask the user
-if [[ -z "$GIT_NAME" ]]; then
+if [[ -z "${GIT_NAME:-}" ]]; then
   _prompt "${YELLOW}Please enter your name: ${NC}" GIT_NAME
 fi
 
@@ -72,13 +118,13 @@ select_boot_disk() {
 
   # Warning message for data deletion
   _print "${RED}WARNING: All data on the chosen disk will be erased during the installation!${NC}"
-  _prompt "${YELLOW}Please enter the name of your boot disk (e.g., sda, nvme0n1). Do not include the full path ("/dev/"): ${NC}" _boot_disk
+  _prompt "${YELLOW}Please enter the name of your boot disk (e.g., sda, nvme0n1). Do not include the full path (\"/dev/\"): ${NC}" _boot_disk
 
   # Confirmation for disk selection to prevent accidental data loss
   _print "${YELLOW}You have selected $_boot_disk as the boot disk. This will delete everything on this disk. Are you sure? (Y/N): ${NC}"
   read -r confirmation
   if [[ "$confirmation" =~ ^[Yy]$ ]]; then
-    export BOOT_DISK=$_boot_disk
+    BOOT_DISK=$_boot_disk
   else
     _print "${RED}Disk selection cancelled by the user. Please run the script again to select the correct disk.${NC}"
     exit 1
@@ -87,8 +133,14 @@ select_boot_disk() {
 
 # Set hostname and find primary disk if this is NixOS
 if [[ "$OS" != "Darwin" ]]; then
-  _prompt "${YELLOW}Please enter a hostname for the system: ${NC}" HOST_NAME
-  export HOST_NAME
+  while true; do
+    _prompt "${YELLOW}Please enter a hostname for the system: ${NC}" HOST_NAME
+    if validate_hostname "$HOST_NAME"; then
+      break
+    else
+      _print "${RED}Invalid hostname format. Use letters, numbers, and hyphens only.${NC}"
+    fi
+  done
   select_boot_disk
 fi
 
@@ -98,7 +150,7 @@ confirm_details() {
   _print "Email: $GIT_EMAIL"
   _print "Name: $GIT_NAME${NC}"
 
-  if([[ "$OS" != "Darwin" ]]); then
+  if [[ "$OS" != "Darwin" ]]; then
     _print "${GREEN}Primary interface: $PRIMARY_IFACE"
     _print "Boot disk: $BOOT_DISK"
     _print "Hostname: $HOST_NAME${NC}"
@@ -107,47 +159,75 @@ confirm_details() {
   _prompt "${YELLOW}Is this correct? yes/no: ${NC}" choice
 
   case "$choice" in
-    [Nn] | [Nn][Oo] ) 
-      _print "${RED}Exiting script.${NC}" 
+    [Nn] | [Nn][Oo] )
+      _print "${RED}Exiting script.${NC}"
       exit 1
       ;;
-    [Yy] | [Yy][Ee][Ss] ) 
+    [Yy] | [Yy][Ee][Ss] )
       _print "${GREEN}Continuing...${NC}"
       ;;
-    * ) 
-      _print "${RED}Invalid option. Exiting script.${NC}" 
+    * )
+      _print "${RED}Invalid option. Exiting script.${NC}"
       exit 1
       ;;
   esac
 }
 
-# Call the confirmation function
 confirm_details
 
 # Function to replace tokens in each file
 replace_tokens() {
   local file="$1"
-  if [[ $(basename $1) != "apply" ]]; then
-    if [[ "$OS" == "Darwin" ]]; then
-      # macOS
-      LC_ALL=C LANG=C sed -i '' -e "s/%USER%/$USERNAME/g" "$file"
-      LC_ALL=C LANG=C sed -i '' -e "s/%EMAIL%/$GIT_EMAIL/g" "$file"
-      LC_ALL=C LANG=C sed -i '' -e "s/%NAME%/$GIT_NAME/g" "$file"
-    else
-      # Linux or other
-      sed -i -e "s/%USER%/$USERNAME/g" "$file"
-      sed -i -e "s/%EMAIL%/$GIT_EMAIL/g" "$file"
-      sed -i -e "s/%NAME%/$GIT_NAME/g" "$file"
-      sed -i -e "s/%INTERFACE%/$PRIMARY_IFACE/g" "$file"
-      sed -i -e "s/%DISK%/$BOOT_DISK/g" "$file"
-      sed -i -e "s/%HOST%/$HOST_NAME/g" "$file"
-    fi
+  local basename_file
+  basename_file=$(basename "$file")
+
+  # Skip the apply script itself
+  if [[ "$basename_file" == "apply" ]]; then
+    return
+  fi
+
+  # Escape variables for safe sed usage
+  local safe_username safe_email safe_name
+  safe_username=$(escape_sed "$USERNAME")
+  safe_email=$(escape_sed "$GIT_EMAIL")
+  safe_name=$(escape_sed "$GIT_NAME")
+
+  if [[ "$OS" == "Darwin" ]]; then
+    # macOS sed syntax
+    LC_ALL=C LANG=C sed -i '' \
+      -e "s|%USER%|$safe_username|g" \
+      -e "s|%EMAIL%|$safe_email|g" \
+      -e "s|%NAME%|$safe_name|g" \
+      "$file"
+  else
+    # Linux sed syntax
+    local safe_interface safe_disk safe_host
+    safe_interface=$(escape_sed "$PRIMARY_IFACE")
+    safe_disk=$(escape_sed "$BOOT_DISK")
+    safe_host=$(escape_sed "$HOST_NAME")
+
+    sed -i \
+      -e "s|%USER%|$safe_username|g" \
+      -e "s|%EMAIL%|$safe_email|g" \
+      -e "s|%NAME%|$safe_name|g" \
+      -e "s|%INTERFACE%|$safe_interface|g" \
+      -e "s|%DISK%|$safe_disk|g" \
+      -e "s|%HOST%|$safe_host|g" \
+      "$file"
   fi
 }
 
-# Traverse directories and call replace_tokens on each Nix file
+# Export function for use with find
 export -f replace_tokens
-find . -type f -exec bash -c 'replace_tokens "$0"' {} \;
+export -f escape_sed
+export OS USERNAME GIT_EMAIL GIT_NAME
+
+# Only process configuration files (not all files)
+_print "${YELLOW}Applying configuration...${NC}"
+find . -type f \( -name "*.nix" -o -name "*.toml" -o -name "*.lua" \) \
+  -not -path "./.git/*" \
+  -not -path "./result*" \
+  -exec bash -c 'replace_tokens "$0"' {} \;
 
 echo "$USERNAME" > /tmp/username.txt
-_print "${GREEN}User $USERNAME information applied.${NC}"
+_print "${GREEN}User $USERNAME information applied successfully.${NC}"

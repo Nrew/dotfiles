@@ -24,14 +24,6 @@
     # Catppuccin
     catppuccin.url = "github:catppuccin/nix";
 
-    # Nix Cats
-    nixCats.url = "github:BirdeeHub/NixCats-nvim";
-    
-    rose-pine-hyprcursor = {
-      url = "github:ndom91/rose-pine-hyprcursor";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Homebrew
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
   };
@@ -40,14 +32,12 @@
   # Outputs Configuration
   #──────────────────────────────────────────────────────────────────
 
-  outputs = { self, darwin, home-manager, nix-homebrew, nixpkgs, catppuccin, ... } @ inputs: 
+  outputs = { self, darwin, home-manager, nix-homebrew, nixpkgs, catppuccin, ... } @ inputs:
     let
-      inherit (self) inputs;
-
       user = "nrew";
-      linuxSystems = ["x86_64-linux"];
-      darwinSystems = ["aarch64-darwin"];
-      
+      linuxSystems = [ "x86_64-linux" ];
+      darwinSystems = [ "aarch64-darwin" ];
+
       forAllSystems = f: nixpkgs.lib.genAttrs (darwinSystems ++ linuxSystems) f;
 
       #──────────────────────────────────────────────────────────────────
@@ -81,10 +71,6 @@
       mkLinuxApps = system: {
         "apply" = mkApp "apply" system;
         "build-switch" = mkApp "build-switch" system;
-        "copy-keys" = mkApp "copy-keys" system;
-        "create-keys" = mkApp "create-keys" system;
-        "check-keys" = mkApp "check-keys" system;
-        "install" = mkApp "install" system;
       };
       mkDarwinApps = system: {
         "apply" = mkApp "apply" system;
@@ -159,12 +145,6 @@
       darwinConfigurations = {
         owl = mkDarwinConfiguration (builtins.head darwinSystems) "owl";
       };
-
-      #──────────────────────────────────────────────────────────────────
-      # Overlays Configuration
-      #──────────────────────────────────────────────────────────────────
-
-      overlays = import ./overlays { inherit inputs; };
 
       formatter = forAllSystems (system:
         nixpkgs.legacyPackages.${system}.nixpkgs-fmt

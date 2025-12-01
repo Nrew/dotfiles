@@ -18,7 +18,7 @@
     };
 
     # Initialize plugins
-    initContent = ''
+    initExtra = ''
       # Run fastfetch on shell start (only in kitty terminal)
       if [[ -n "$KITTY_WINDOW_ID" ]] && command -v fastfetch &> /dev/null; then
         fastfetch

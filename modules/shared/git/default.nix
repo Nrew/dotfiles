@@ -1,8 +1,8 @@
 { config, lib, pkgs, ... }:
 let
-    name = "Nrew";
-    user = "nrew";
-    email = "andrew.sayegh29@gmail.com";
+  name = "Nrew";
+  user = "nrew";
+  email = "andrew.sayegh29@gmail.com";
 in
 {
 
@@ -25,6 +25,7 @@ in
   # Diff & Merge Tools Configuration
   # ────────────────────────────────────────────────────────────────
   programs.delta = {
+    enable = true;
     enableGitIntegration = true;
     options = {
       diff-so-fancy = true;
