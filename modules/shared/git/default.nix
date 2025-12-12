@@ -25,10 +25,10 @@ in
   # Diff & Merge Tools Configuration
   # ────────────────────────────────────────────────────────────────
   programs.delta = {
+    enable = true;
     enableGitIntegration = true;
     options = {
       diff-so-fancy = true;
-      features = "decorations";
       navigate = true;
       light = false;
       side-by-side = true;

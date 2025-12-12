@@ -16,15 +16,33 @@ in
         ../modules/crow
     ];
 
+    # Change colorScheme to switch themes globally
+    # Options: "catppuccin", "rose-pine", "nord", "gruvbox", "tokyo-night"
     theme = {
-      enable = true;
-      font = {
-        mono = "JetBrainsMono Nerd Font";
-        sans = "Inter";
-        size = { small = 12; normal = 14; large = 16; };
-      };
-      borderRadius = 8;
-      gap = 16;
+        enable = true;
+        colorScheme = "catppuccin";
+        catppuccin.flavor = "mocha"; # mocha, macchiato, frappe, latte
+        rosePine.variant = "main"; # main, moon, dawn
+        font = {
+            mono = "JetBrainsMono Nerd Font";
+            sans = "Inter";
+            size = {
+                small = 12;
+                normal = 14;
+                large = 16;
+            };
+        };
+        borderRadius = 8;
+        gap = 16;
+        opacity = {
+        terminal = 0.97;
+        popup = 10;
+        };
+    };
+
+    catppuccin = {
+        enable = (config.theme.colorScheme == "catppuccin");
+        flavor = config.theme.catppuccin.flavor;
     };
 
     # Enable home-manager

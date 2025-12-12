@@ -1,4 +1,4 @@
-{ config, lib, pkgs, catppuccin, ... }:
+{ config, lib, pkgs, ... }:
 {
   catppuccin.fzf.enable = true;
   programs.fzf = {

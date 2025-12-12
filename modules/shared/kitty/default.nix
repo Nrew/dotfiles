@@ -27,7 +27,7 @@
       window_padding_width = toString config.theme.gap;
       window_border_width = "1pt";
 
-      background_opacity = "0.97";
+      background_opacity = toString config.theme.opacity.terminal;
 
       # Smooth animations for clean minimal aesthetics
       repaint_delay = "10";

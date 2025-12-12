@@ -27,7 +27,6 @@ in
     imagemagick     # Image processing
     gowall          # Image processing
     
-    
     # Terminal and shell
     tmux            # Terminal multiplexer
     kitty           # Terminal emulator
