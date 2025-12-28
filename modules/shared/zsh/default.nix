@@ -3,6 +3,9 @@
   programs.zsh = {
     enable = true;
 
+    # Use XDG config directory for zsh configuration files
+    dotDir = "${config.xdg.configHome}/zsh";
+
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
