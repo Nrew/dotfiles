@@ -69,7 +69,7 @@ in
         # configuration is compatible with. This helps avoid breakage
         # when a new Home Manager release introduces backwards
         # incompatible changes.
-        stateVersion = "24.11";
+        stateVersion = "26.05";
 
         # Theme configuration
         sessionVariables = {
