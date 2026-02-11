@@ -7,7 +7,6 @@
     ./tmux
     ./zsh
     ./starship
-    ./neovim
     ./git
     ./fastfetch
     ./fzf

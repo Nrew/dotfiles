@@ -24,9 +24,12 @@
     # Catppuccin
     catppuccin.url = "github:catppuccin/nix";
 
-    # Nix Cats
-    nixCats.url = "github:BirdeeHub/NixCats-nvim";
-    
+    # Nixvim
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Homebrew
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
   };
@@ -35,7 +38,7 @@
   # Outputs Configuration
   #──────────────────────────────────────────────────────────────────
 
-  outputs = { self, darwin, home-manager, nix-homebrew, nixpkgs, catppuccin, ... } @ inputs:
+  outputs = { self, darwin, home-manager, nix-homebrew, nixpkgs, catppuccin, nixvim, ... } @ inputs:
     let
       user = "nrew";
       linuxSystems = [ "x86_64-linux" ];
@@ -123,6 +126,7 @@
                     imports = [
                       ./home
                       catppuccin.homeModules.catppuccin
+                      nixvim.homeModules.nixvim
                     ];
                   };
 
