@@ -138,7 +138,6 @@ let user = "nrew"; in
       ];
       casks = [                                 # Install GUI apps via Homebrew
         # `brew install --cask`
-        "anki"
         "discord"
         "obsidian"
         "raycast"

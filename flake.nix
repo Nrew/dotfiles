@@ -25,10 +25,7 @@
     catppuccin.url = "github:catppuccin/nix";
 
     # Nixvim
-    nixvim = {
-      url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nixvim.url = "github:dc-tec/nixvim";
 
     # Homebrew
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
@@ -126,7 +123,6 @@
                     imports = [
                       ./home
                       catppuccin.homeModules.catppuccin
-                      nixvim.homeModules.nixvim
                     ];
                   };
 
