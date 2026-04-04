@@ -20,9 +20,14 @@
 
     # Initialize plugins
     initContent = ''
-      # Run fastfetch on shell start (only in kitty terminal)
-      if [[ -n "$KITTY_WINDOW_ID" ]] && command -v fastfetch &> /dev/null; then
+      # Run fastfetch on shell start (kitty terminal, before tmux attaches)
+      if [[ -n "$KITTY_WINDOW_ID" && -z "$TMUX" ]] && command -v fastfetch &>/dev/null; then
         fastfetch
+      fi
+
+      # Auto-attach to tmux when opening a new terminal (skip if already in tmux or inside neovim)
+      if command -v tmux &>/dev/null && [[ -z "$TMUX" && -z "$NVIM" ]]; then
+        tmux attach-session 2>/dev/null || tmux new-session -s main
       fi
 
       # Better history search

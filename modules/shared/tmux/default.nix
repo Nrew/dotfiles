@@ -50,6 +50,9 @@
       
       # Reload config
       bind r source-file ${config.xdg.configHome}/tmux/tmux.conf \; display "Config reloaded!"
+
+      # Continuum auto-restore on startup
+      set -g @continuum-restore 'on'
       
       # Smart pane switching with awareness of Vim splits
       is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
