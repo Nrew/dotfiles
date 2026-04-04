@@ -11,5 +11,6 @@
     ./fastfetch
     ./fzf
     ./btop
+    ./neovim
   ];
 }
