@@ -120,6 +120,9 @@ on-focus-changed = ['move-mouse window-lazy-center']
   # Fullscreen toggle (Hyprland-like)
   alt-m = 'fullscreen'
 
+  # Open a new Kitty terminal window in the current workspace
+  alt-enter = 'exec-and-forget open -na Kitty'
+
 # ─────────────────────────────────────────────────────────────────────
 # Resize Mode - Smooth Window Resizing
 # ─────────────────────────────────────────────────────────────────────
