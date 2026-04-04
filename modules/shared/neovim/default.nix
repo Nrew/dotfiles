@@ -40,14 +40,8 @@
     ];
   };
 
-  # Symlink only the lua/ subtree so programs.neovim can still own init.lua.
-  # The generated init.lua sources our entry point via extraLuaConfig below.
-  xdg.configFile."nvim/lua".source =
-    config.lib.file.mkOutOfStoreSymlink
-      "/Users/nrew/.config/dotfiles/modules/shared/neovim/config/lua";
+  xdg.configFile."nvim/lua".source = ./config/lua;
 
-  # Load our LazyVim entry-point.  programs.neovim wraps this in its own
-  # generated init.lua, so we just need to call the lazy bootstrap.
   programs.neovim.extraLuaConfig = ''
     require("config.lazy")
   '';
