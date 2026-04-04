@@ -12,7 +12,7 @@
 
       # Nix
       nixd
-      nixfmt-rfc-style
+      nixfmt
 
       # TypeScript / JS
       typescript-language-server
