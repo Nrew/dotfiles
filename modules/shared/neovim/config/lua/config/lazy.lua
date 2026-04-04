@@ -25,14 +25,24 @@ require("lazy").setup({
   spec = {
     -- LazyVim base distribution
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
-    -- Your overrides (colorscheme, lsp, etc.)
+
+    -- Language extras (LSP config, treesitter, formatter wiring per language)
+    { import = "lazyvim.plugins.extras.lang.typescript" },
+    { import = "lazyvim.plugins.extras.lang.python" },
+    { import = "lazyvim.plugins.extras.lang.rust" },
+    { import = "lazyvim.plugins.extras.lang.nix" },
+    { import = "lazyvim.plugins.extras.lang.json" },
+    { import = "lazyvim.plugins.extras.lang.yaml" },
+    { import = "lazyvim.plugins.extras.lang.markdown" },
+
+    -- Local overrides (colorscheme, lsp, dashboard, formatting, treesitter)
     { import = "plugins" },
   },
   defaults = {
     lazy = false,
     version = false,
   },
-  install = { colorscheme = { "catppuccin", "habamax" } },
+  install = { colorscheme = { "theme", "habamax" } },
   checker = {
     enabled = true,
     notify = false,
