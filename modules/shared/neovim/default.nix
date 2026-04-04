@@ -41,8 +41,9 @@
   };
 
   xdg.configFile."nvim/lua".source = ./config/lua;
+  xdg.configFile."nvim/colors".source = ./config/colors;
 
-  programs.neovim.extraLuaConfig = ''
+  programs.neovim.initLua = ''
     require("config.lazy")
   '';
 }
