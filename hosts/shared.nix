@@ -14,7 +14,6 @@
         docker
         git
         git-lfs
-        neovim
         cmake
         cargo
         texinfo
