@@ -24,9 +24,6 @@
     # Catppuccin
     catppuccin.url = "github:catppuccin/nix";
 
-    # Nixvim
-    nixvim.url = "github:dc-tec/nixvim";
-
     # Homebrew
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
   };
@@ -35,7 +32,7 @@
   # Outputs Configuration
   #──────────────────────────────────────────────────────────────────
 
-  outputs = { self, darwin, home-manager, nix-homebrew, nixpkgs, catppuccin, nixvim, ... } @ inputs:
+  outputs = { self, darwin, home-manager, nix-homebrew, nixpkgs, catppuccin, ... } @ inputs:
     let
       user = "nrew";
       linuxSystems = [ "x86_64-linux" ];
