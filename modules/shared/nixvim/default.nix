@@ -1,5 +1,0 @@
-{pkgs, nixvim, ...}:
-{
-    packages = [
-    ];
-}
