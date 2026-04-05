@@ -12,5 +12,6 @@
     ./fzf
     ./btop
     ./neovim
+    ./spicetify
   ];
 }

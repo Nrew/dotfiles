@@ -24,6 +24,12 @@
     # Catppuccin
     catppuccin.url = "github:catppuccin/nix";
 
+    # Spicetify (Spotify theming)
+    spicetify-nix = {
+      url = "github:Gerg-L/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Homebrew
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
   };
@@ -32,7 +38,7 @@
   # Outputs Configuration
   #──────────────────────────────────────────────────────────────────
 
-  outputs = { self, darwin, home-manager, nix-homebrew, nixpkgs, catppuccin, ... } @ inputs:
+  outputs = { self, darwin, home-manager, nix-homebrew, nixpkgs, catppuccin, spicetify-nix, ... } @ inputs:
     let
       user = "nrew";
       linuxSystems = [ "x86_64-linux" ];
@@ -120,6 +126,7 @@
                     imports = [
                       ./home
                       catppuccin.homeModules.catppuccin
+                      spicetify-nix.homeManagerModules.default
                     ];
                   };
 
