@@ -5,7 +5,7 @@ in
 {
   programs.spicetify = {
     enable = true;
-    theme = spicePkgs.themes.Bloom;
+    theme = spicePkgs.themes.bloom;
     colorScheme = "custom";
     customColorScheme = {
       text               = "dad4bb";
