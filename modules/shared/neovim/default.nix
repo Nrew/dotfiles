@@ -13,6 +13,7 @@
       # Nix
       nixd
       nixfmt
+      statix
 
       # TypeScript / JS
       typescript-language-server
