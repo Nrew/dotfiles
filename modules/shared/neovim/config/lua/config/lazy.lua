@@ -47,6 +47,10 @@ require("lazy").setup({
     enabled = true,
     notify = false,
   },
+  rocks = {
+    -- hererocks tries to compile Lua 5.1 from source; disabled on nix
+    hererocks = false,
+  },
   performance = {
     rtp = {
       -- CRITICAL for nix: keep nix-installed packages on the runtime path
