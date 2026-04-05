@@ -263,9 +263,20 @@ hi("NoiceConfirmBorder",            { fg = c.shade4 })
 hi("NoiceMini",                     { fg = c.shade5, bg = c.shade1 })
 
 -- ── Snacks Picker ─────────────────────────────────────────────────────────
-hi("SnacksPickerBorder",   { fg = c.shade3 })
-hi("SnacksPickerMatch",    { fg = c.accent0, bold = true })
-hi("SnacksPickerSelected", { bg = c.shade2 })
+hi("SnacksPickerNormal",        { fg = c.shade6, bg = c.shade0 })
+hi("SnacksPickerPreviewNormal", { fg = c.shade6, bg = c.shade0 })
+hi("SnacksPickerInputNormal",   { fg = c.shade6, bg = c.shade1 })
+hi("SnacksPickerBorder",        { fg = c.shade3, bg = c.shade0 })
+hi("SnacksPickerInputBorder",   { fg = c.shade4, bg = c.shade1 })
+hi("SnacksPickerPreviewBorder", { fg = c.shade3, bg = c.shade0 })
+hi("SnacksPickerMatch",         { fg = c.accent0, bold = true })
+hi("SnacksPickerSelected",      { bg = c.shade2 })
+
+-- ── Snacks Explorer ────────────────────────────────────────────────────────
+hi("SnacksExplorerNormal",      { fg = c.shade6, bg = c.shade0 })
+hi("SnacksExplorerBorder",      { fg = c.shade3, bg = c.shade0 })
+hi("SnacksExplorerFile",        { fg = c.shade6 })
+hi("SnacksExplorerDir",         { fg = c.accent5 })
 
 -- ── Snacks Dashboard (map to NierDash* so dark bg applies to all elements)
 hi("SnacksDashboardNormal",       { link = "NierDashNormal" })
