@@ -134,6 +134,30 @@ hi("LspReferenceRead",               { bg = c.shade2 })
 hi("LspReferenceWrite",              { bg = c.shade2 })
 hi("LspSignatureActiveParameter",    { fg = c.accent0, bold = true })
 
+-- ── LSP Semantic Tokens ────────────────────────────────────────────────────
+-- Prevent LSP semantic tokens from overriding treesitter highlight colors.
+-- Without these, nixd/lua_ls/etc emit @lsp.type.* groups that fall through
+-- to built-in defaults instead of the theme palette.
+hi("@lsp.type.comment",          { fg = c.shade4, italic = true })
+hi("@lsp.type.comment.nix",      { fg = c.shade4, italic = true })
+hi("@lsp.type.keyword",          { fg = c.accent5 })
+hi("@lsp.type.string",           { fg = c.accent3 })
+hi("@lsp.type.number",           { fg = c.accent3 })
+hi("@lsp.type.type",             { fg = c.accent7 })
+hi("@lsp.type.typeParameter",    { fg = c.accent7 })
+hi("@lsp.type.function",         { fg = c.accent2 })
+hi("@lsp.type.method",           { fg = c.accent2 })
+hi("@lsp.type.variable",         { fg = c.shade6 })
+hi("@lsp.type.parameter",        { fg = c.shade6 })
+hi("@lsp.type.property",         { fg = c.shade6 })
+hi("@lsp.type.namespace",        { fg = c.shade5 })
+hi("@lsp.type.enum",             { fg = c.accent7 })
+hi("@lsp.type.enumMember",       { fg = c.accent3 })
+hi("@lsp.type.interface",        { fg = c.accent7 })
+hi("@lsp.type.struct",           { fg = c.accent7 })
+hi("@lsp.type.macro",            { fg = c.accent6 })
+hi("@lsp.type.decorator",        { fg = c.accent6 })
+
 -- ── TreeSitter ────────────────────────────────────────────────────────────
 hi("@variable",                { fg = c.shade6 })
 hi("@variable.builtin",        { fg = c.shade5 })
