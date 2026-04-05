@@ -63,13 +63,7 @@ in
         autocrlf = "input";
       };
 
-      # UI configuration
-      color = {
-        ui = true;
-        diff = "auto";
-        status = "auto";
-        branch = "auto";
-      };
+      color.ui = true;
 
       # Helper settings
       help.autocorrect = 1;
