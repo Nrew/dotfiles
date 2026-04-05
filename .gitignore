@@ -15,3 +15,4 @@ result-*
 # Temporary files
 *.tmp
 .tmp/
+.superpowers/
