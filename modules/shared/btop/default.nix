@@ -1,4 +1,4 @@
-{ }:
+{ ... }:
 
 {
   catppuccin.btop.enable = true;
