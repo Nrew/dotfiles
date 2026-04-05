@@ -19,7 +19,7 @@ window.title.max-length = 50
 
 # A list of applications that will always be displayed by application name.
 # Other applications will show the window title if there is more than one window.
-window.title.always-display-app-name-for = ["Mail", "Chrome", "Arc"]
+window.title.always-display-app-name-for = ["Mail", "Zen", "Discord"]
 
 [widgets.default.nowplaying.popup]
 view-variant = "horizontal"
