@@ -74,11 +74,6 @@
       setopt INTERACTIVE_COMMENTS # Allow comments in interactive shell
       setopt RC_QUOTES            #
       unsetopt FLOW_CONTROL       # Disable start/stop characters in shell editor
-
-      # Load custom functions
-      #for func in ${config.home.homeDirectory}/zsh/functions/*; do
-      #  source $func
-      #done
     '';
 
     # Shell aliases
@@ -98,12 +93,9 @@
       gp = "git push";
       gpl = "git pull";
       gs = "git status";
-      gst = "git status";
 
       # Vim
       v = "nvim";
-      vi = "nvim";
-      vim = "nvim";
 
       # System
       grep = "rg";
