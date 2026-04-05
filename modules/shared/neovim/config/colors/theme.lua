@@ -13,8 +13,9 @@ vim.g.colors_name = "theme"
 local c = {
   -- Shades: light background → dark foreground (vim-automata-theme shade0–shade7)
   shade0 = "#dad4bb", -- bg: warm parchment
-  shade1 = "#cac4ad", -- bg_soft: cursor line, popups
-  shade2 = "#b9b49f", -- bg_mid: comments, line numbers
+  shade1 = "#cac4ad", -- bg_soft: popups, floats, statusline
+  shade2 = "#b9b49f", -- bg_mid: line numbers, visual boundaries
+  warm_hl = "#d3cba8", -- cursor line: warmer golden highlight (distinct from shade1)
   shade3 = "#a9a491", -- fg_dim: muted UI text
   shade4 = "#999482", -- fg_mid2
   shade5 = "#898474", -- fg_mid: statusline, titles
@@ -29,11 +30,6 @@ local c = {
   accent5 = "#5e6666", -- statement/keyword: muted slate
   accent6 = "#b26f5f", -- preproc/macro: mauve
   accent7 = "#50403c", -- type: deep warm brown
-  -- YoRHa terminal dark mode (dashboard / loading screen aesthetic)
-  term_bg  = "#0a0a0a",
-  term_bg2 = "#1a1a1a",
-  term_fg  = "#e8e6e3",
-  term_dim = "#a09890",
 }
 
 local function hi(group, opts)
@@ -50,10 +46,10 @@ hi("VisualNOS",        { bg = c.shade2 })
 hi("Search",           { fg = c.shade0, bg = c.accent2 })
 hi("IncSearch",        { fg = c.shade0, bg = c.accent2 })
 hi("CurSearch",        { fg = c.shade0, bg = c.accent0 })
-hi("CursorLine",       { bg = c.shade1 })
-hi("CursorColumn",     { bg = c.shade1 })
+hi("CursorLine",       { bg = c.warm_hl })
+hi("CursorColumn",     { bg = c.warm_hl })
 hi("CursorLineNr",     { fg = c.shade5, bold = true })
-hi("ColorColumn",      { bg = c.shade1 })
+hi("ColorColumn",      { bg = c.warm_hl })
 hi("LineNr",           { fg = c.shade3 })
 hi("SignColumn",       { fg = c.shade3, bg = c.shade0 })
 hi("Folded",           { fg = c.shade4, bg = c.shade1 })
@@ -85,7 +81,7 @@ hi("WarningMsg",       { fg = c.accent0 })
 hi("QuickFixLine",     { bg = c.shade1 })
 
 -- ── Syntax ────────────────────────────────────────────────────────────────
-hi("Comment",          { fg = c.shade2, italic = true })
+hi("Comment",          { fg = c.shade4, italic = true })
 hi("Constant",         { fg = c.accent3 })
 hi("String",           { fg = c.accent3 })
 hi("Character",        { fg = c.accent4 })
@@ -184,7 +180,7 @@ hi("@type.definition",         { fg = c.accent7 })
 hi("@attribute",               { fg = c.accent6 })
 hi("@namespace",               { fg = c.shade5 })
 hi("@module",                  { fg = c.shade5 })
-hi("@comment",                 { fg = c.shade2, italic = true })
+hi("@comment",                 { fg = c.shade4, italic = true })
 hi("@comment.todo",            { fg = c.shade0, bg = c.accent0, bold = true })
 hi("@punctuation",             { fg = c.shade5 })
 hi("@punctuation.bracket",     { fg = c.shade5 })
@@ -284,16 +280,15 @@ hi("SnacksDashboardDir",          { link = "NierDashFooter" })
 hi("SnacksDashboardSpecial",      { link = "NierDashKey" })
 hi("SnacksDashboardTerminal",     { link = "NierDashFooter" })
 
--- ── NieR Dashboard: YoRHa terminal dark mode ──────────────────────────────
--- Used exclusively by the dashboard window via winhighlight override.
-hi("NierDashNormal",    { fg = c.term_fg,  bg = c.term_bg })
-hi("NierDashAscii",     { fg = c.term_dim, bg = c.term_bg })
-hi("NierDashHeader",    { fg = c.term_fg,  bg = c.term_bg, bold = true })
-hi("NierDashSeparator", { fg = c.shade4,   bg = c.term_bg })
-hi("NierDashButton",    { fg = c.term_dim, bg = c.term_bg })
-hi("NierDashButtonSel", { fg = c.term_fg,  bg = c.term_bg2, bold = true })
-hi("NierDashFooter",    { fg = c.shade5,   bg = c.term_bg, italic = true })
-hi("NierDashKey",       { fg = c.accent0,  bg = c.term_bg, bold = true })
+-- ── NieR Dashboard: warm parchment mode ───────────────────────────────────
+hi("NierDashNormal",    { fg = c.shade6,  bg = c.shade0 })
+hi("NierDashAscii",     { fg = c.shade4,  bg = c.shade0 })
+hi("NierDashHeader",    { fg = c.shade7,  bg = c.shade0, bold = true })
+hi("NierDashSeparator", { fg = c.shade3,  bg = c.shade0 })
+hi("NierDashButton",    { fg = c.shade5,  bg = c.shade0 })
+hi("NierDashButtonSel", { fg = c.shade7,  bg = c.warm_hl, bold = true })
+hi("NierDashFooter",    { fg = c.shade4,  bg = c.shade0, italic = true })
+hi("NierDashKey",       { fg = c.accent0, bg = c.shade0, bold = true })
 
 -- ── Lualine theme ─────────────────────────────────────────────────────────
 -- Exposed as vim.g.nier_lualine_theme for use in lualine opts override.
