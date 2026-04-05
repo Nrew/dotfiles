@@ -81,7 +81,7 @@ hi("WarningMsg",       { fg = c.accent0 })
 hi("QuickFixLine",     { bg = c.shade1 })
 
 -- ── Syntax ────────────────────────────────────────────────────────────────
-hi("Comment",          { fg = c.shade4, italic = true })
+hi("Comment",          { fg = c.accent7, italic = true })
 hi("Constant",         { fg = c.accent3 })
 hi("String",           { fg = c.accent3 })
 hi("Character",        { fg = c.accent4 })
@@ -138,8 +138,8 @@ hi("LspSignatureActiveParameter",    { fg = c.accent0, bold = true })
 -- Prevent LSP semantic tokens from overriding treesitter highlight colors.
 -- Without these, nixd/lua_ls/etc emit @lsp.type.* groups that fall through
 -- to built-in defaults instead of the theme palette.
-hi("@lsp.type.comment",          { fg = c.shade4, italic = true })
-hi("@lsp.type.comment.nix",      { fg = c.shade4, italic = true })
+hi("@lsp.type.comment",          { fg = c.accent7, italic = true })
+hi("@lsp.type.comment.nix",      { fg = c.accent7, italic = true })
 hi("@lsp.type.keyword",          { fg = c.accent5 })
 hi("@lsp.type.string",           { fg = c.accent3 })
 hi("@lsp.type.number",           { fg = c.accent3 })
@@ -204,7 +204,7 @@ hi("@type.definition",         { fg = c.accent7 })
 hi("@attribute",               { fg = c.accent6 })
 hi("@namespace",               { fg = c.shade5 })
 hi("@module",                  { fg = c.shade5 })
-hi("@comment",                 { fg = c.shade4, italic = true })
+hi("@comment",                 { fg = c.accent7, italic = true })
 hi("@comment.todo",            { fg = c.shade0, bg = c.accent0, bold = true })
 hi("@punctuation",             { fg = c.shade5 })
 hi("@punctuation.bracket",     { fg = c.shade5 })
@@ -294,13 +294,18 @@ hi("SnacksPickerBorder",        { fg = c.shade3, bg = c.shade0 })
 hi("SnacksPickerInputBorder",   { fg = c.shade4, bg = c.shade1 })
 hi("SnacksPickerPreviewBorder", { fg = c.shade3, bg = c.shade0 })
 hi("SnacksPickerMatch",         { fg = c.accent0, bold = true })
-hi("SnacksPickerSelected",      { bg = c.shade2 })
+hi("SnacksPickerSelected",      { bg = c.warm_hl })
+
+-- ── Snacks (window-level groups used by explorer sidebar and floats) ────────
+hi("SnacksNormal",              { fg = c.shade6, bg = c.shade0 })
+hi("SnacksBorder",              { fg = c.shade3, bg = c.shade0 })
+hi("SnacksBackdrop",            { bg = c.shade0 })
 
 -- ── Snacks Explorer ────────────────────────────────────────────────────────
 hi("SnacksExplorerNormal",      { fg = c.shade6, bg = c.shade0 })
 hi("SnacksExplorerBorder",      { fg = c.shade3, bg = c.shade0 })
-hi("SnacksExplorerFile",        { fg = c.shade6 })
-hi("SnacksExplorerDir",         { fg = c.accent5 })
+hi("SnacksExplorerFile",        { fg = c.shade7 })
+hi("SnacksExplorerDir",         { fg = c.accent7, bold = true })
 
 -- ── Snacks Dashboard (map to NierDash* so dark bg applies to all elements)
 hi("SnacksDashboardNormal",       { link = "NierDashNormal" })
@@ -317,12 +322,12 @@ hi("SnacksDashboardTerminal",     { link = "NierDashFooter" })
 
 -- ── NieR Dashboard: warm parchment mode ───────────────────────────────────
 hi("NierDashNormal",    { fg = c.shade6,  bg = c.shade0 })
-hi("NierDashAscii",     { fg = c.shade4,  bg = c.shade0 })
-hi("NierDashHeader",    { fg = c.shade7,  bg = c.shade0, bold = true })
-hi("NierDashSeparator", { fg = c.shade3,  bg = c.shade0 })
-hi("NierDashButton",    { fg = c.shade5,  bg = c.shade0 })
-hi("NierDashButtonSel", { fg = c.shade7,  bg = c.warm_hl, bold = true })
-hi("NierDashFooter",    { fg = c.shade4,  bg = c.shade0, italic = true })
+hi("NierDashAscii",     { fg = c.shade6,  bg = c.shade0 })
+hi("NierDashHeader",    { fg = c.accent7, bg = c.shade0, bold = true })
+hi("NierDashSeparator", { fg = c.shade4,  bg = c.shade0 })
+hi("NierDashButton",    { fg = c.shade7,  bg = c.shade0 })
+hi("NierDashButtonSel", { fg = c.accent7, bg = c.warm_hl, bold = true })
+hi("NierDashFooter",    { fg = c.shade6,  bg = c.shade0, italic = true })
 hi("NierDashKey",       { fg = c.accent0, bg = c.shade0, bold = true })
 
 -- ── Lualine theme ─────────────────────────────────────────────────────────
