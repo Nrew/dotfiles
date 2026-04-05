@@ -37,6 +37,11 @@
       fd
       lazygit
       tree-sitter
+
+      # Render tools (snacks/render-markdown: PDF, LaTeX, Mermaid)
+      ghostscript
+      tectonic
+      mermaid-cli
     ];
   };
 
