@@ -58,17 +58,6 @@
       "cmd+f" = "move_window_forward";
       "cmd+b" = "move_window_backward";
 
-      # Tab management
-      "cmd+t" = "new_tab_with_cwd";
-      "cmd+alt+w" = "close_tab";
-      "shift+cmd+]" = "next_tab";
-      "shift+cmd+[" = "previous_tab";
-      "cmd+1" = "goto_tab 1";
-      "cmd+2" = "goto_tab 2";
-      "cmd+3" = "goto_tab 3";
-      "cmd+4" = "goto_tab 4";
-      "cmd+5" = "goto_tab 5";
-
       # Font size
       "cmd+plus" = "change_font_size all +2.0";
       "cmd+minus" = "change_font_size all -2.0";
