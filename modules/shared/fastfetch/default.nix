@@ -42,23 +42,23 @@
         }
         {
           type = "os";
-          key = "󰒋 オペレーティングシステム";
+          key = "󰒋 os";
           format = "{2} {9}";
         }
         {
           type = "host";
-          key = " ホスト";
+          key = " host";
           format = "{1}";
         }
         {
           type = "kernel";
-          key = "❯ カーネル";
+          key = "❯ kernel";
           format = "{1} {2}";
         }
         {
           type = "uptime";
-          key = " アップタイム";
-          format = "{?1}{1}日{?} {?2}{2}時間{?} {?3}{3}分{?}";
+          key = " uptime";
+          format = "{?1}{1}d{?} {?2}{2}h{?} {?3}{3}m{?}";
         }
         {
           type = "separator";
@@ -66,15 +66,15 @@
         }
         {
           type = "shell";
-          key = " シェル";
+          key = " shell";
         }
         {
           type = "terminal";
-          key = " ターミナル";
+          key = " terminal";
         }
         {
           type = "memory";
-          key = " メモリ";
+          key = " memory";
           format = "{1} / {2} ({3})";
         }
         {
