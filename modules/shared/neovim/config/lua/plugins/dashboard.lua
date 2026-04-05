@@ -13,14 +13,6 @@ return {
       math.randomseed(os.time())
       local quote = quotes[math.random(#quotes)]
 
-      -- Wire the dark YoRHa terminal bg via the snacks style system.
-      -- opts.dashboard.wo is NOT a valid field; winhighlight must live here.
-      opts.styles = opts.styles or {}
-      opts.styles.dashboard = opts.styles.dashboard or {}
-      opts.styles.dashboard.wo = vim.tbl_extend("force", opts.styles.dashboard.wo or {}, {
-        winhighlight = "Normal:NierDashNormal,NormalFloat:NierDashNormal,EndOfBuffer:NierDashNormal",
-      })
-
       opts.dashboard = opts.dashboard or {}
       opts.dashboard.enabled = true
 
